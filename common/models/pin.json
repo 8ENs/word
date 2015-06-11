@@ -1,0 +1,37 @@
+{
+  "name": "Pin",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "coords": {
+      "type": "geopoint",
+      "required": true
+    },
+    "message": {
+      "type": "string",
+      "required": true
+    },
+    "recipient": {
+      "type": "string",
+      "required": true
+    },
+    "media": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "required": true
+    },
+    "status": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}
