@@ -3,11 +3,13 @@ module.exports = function(app) {
     if (err) throw err;
  
     app.models.Pin.create([
-      {coords: {lat: 49.282112, lng: -123.108313}, message: 'Vancouver', recipient: 'Jody', type: 'public', status: 'discovered'}
+      {coords: {lat: 49.282112, lng: -123.108313}, message: 'Winnipeg', recipient: 'Jody', type: 'public', status: 'discovered'}
     ], function(err, Pin) {
       if (err) throw err;
  
       console.log('Models created: \n', Pin);
     });
+
+
   });
 };

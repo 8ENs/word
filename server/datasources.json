@@ -1,8 +1,9 @@
 {
   "db": {
-    "database": "wordDB",
-    "connector": "mongodb",
     "host": "localhost",
-    "port": 27017
+    "port": 27017,
+    "database": "wordDB",
+    "name": "db",
+    "connector": "mongodb"
   }
 }

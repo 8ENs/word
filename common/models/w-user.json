@@ -1,0 +1,19 @@
+{
+  "name": "wUser",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "user_id": {
+      "type": "hasMany",
+      "model": "Pin",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": []
+}
