@@ -1,0 +1,19 @@
+<head>
+  <title>LoopBack</title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>
+    $.getJSON( "/api/Pins", function( data ) {
+      var pins = [];
+      $.each( data, function( key, val) {
+        pins.push(val.message);
+      });
+      $( "#show" ).text(pins);
+    });
+
+  </script>
+
+</head>
+<body>
+    <h1>LoopBack Rocks!</h1>
+    <p id="show">Hello World... </p>
+</body>
