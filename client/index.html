@@ -1,19 +1,107 @@
 <head>
   <title>LoopBack</title>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="./application.js"></script>
   <script>
     $.getJSON( "/api/Pins", function( data ) {
       var pins = [];
       $.each( data, function( key, val) {
         pins.push(val.message);
       });
-      $( "#show" ).text(pins);
+      $( "#bootup" ).text(pins);
     });
-
   </script>
 
 </head>
 <body>
-    <h1>LoopBack Rocks!</h1>
-    <p id="show">Hello World... </p>
+  <h1>Contact List</h1>
+  <h6>(warning: limited error checking)</h6>
+
+  <div id="navbar">
+    <button id="b_create_new">Create new</button>
+    <button id="b_list_all">List all</button>
+    <button id="b_find">Find</button>
+    <button id="b_delete">Delete</button>
+    <button id="b_add_phone">Add phone</button>
+  </div>
+
+  <hr>
+
+  <!-- Only on startup -->
+  <div class="main">
+    <p id="bootup">Hello World... </p>
+  </div>
+
+  <!-- Create new -->
+  <div id="create_new" class="main" style="display: none">
+    <h3>Create new</h3>
+    <div>
+      <label>First Name:</label>
+      <input id="firstname" type="text" name="firstname" placeholder="first" required="true">
+    </div>
+    <div>
+      <label>Last Name:</label>
+      <input id="lastname" type="text" name="lastname" placeholder="last" required="true">
+    </div>
+    <div>
+      <label>Email:</label>
+      <input id="email" type="email" name="email" placeholder="email" required="true">
+    </div>
+    <div>
+      <button id="b_save">Save</button>
+      <span class="saved" style="display: none">Saved!</span>
+    </div>
+  </div>
+
+  <!-- List all -->
+  <div id="list_all" class="main" style="display: none">
+    <h3>List all</h3>
+  </div>
+
+  <!-- Find -->
+  <div id="find" class="main" style="display: none">
+    <h3>Find</h3>
+    <input id="search_box" type="text" name="query" placeholder="by first/last/email">
+  </div>
+
+  <!-- Delete -->
+  <div id="delete" class="main" style="display: none">
+    <h3>Delete</h3>
+      <div>
+        <label>ID #:</label>
+        <input id="delete_id" type="text" name="id" placeholder="by id # (integer)" required="true">
+        <button id="b_delete_id">Delete</button>
+        <span id="deleted" style="display: none">User deleted!</span>
+      </div>  
+    </form>
+  </div>
+
+  <!-- Add phone -->
+  <div id="add_phone" class="main" style="display: none">
+    <h3>Add phone</h3>
+    <div>
+      <label>Phone #:</label>
+      <input id="phone" type="text" name="phone" placeholder="#x9" required="true">
+    </div>
+    <div>
+      <label>Label:</label>
+      <input id="label" type="text" name="label" placeholder="label" required="true">
+    </div>
+    <div>
+      <label>Add to contact ID #:</label>
+      <input id="contact_id" type="text" name="id" placeholder="by id # (integer)" required="true">
+    </div>
+    <div>
+      <button id="b_save_phone">Add</button>
+      <span class="saved" style="display: none">Saved!</span>
+    </div>  
+  </div>
+
+  <hr>
+
+  <!-- Everything will show up here -->
+  <div id="show">
+
+  </div>
+
 </body>
