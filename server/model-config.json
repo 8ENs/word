@@ -33,7 +33,7 @@
     "public": false
   },
   "Pin": {
-    "dataSource": "wordDB",
+    "dataSource": "db",
     "public": true
   }
 }

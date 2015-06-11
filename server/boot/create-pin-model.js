@@ -1,5 +1,5 @@
 module.exports = function(app) {
-  app.dataSources.wordDB.automigrate('Pin', function(err) {
+  app.dataSources.db.automigrate('Pin', function(err) {
     if (err) throw err;
  
     app.models.Pin.create([

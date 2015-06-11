@@ -1,10 +1,6 @@
 {
   "db": {
-    "name": "db",
-    "connector": "memory"
-  },
-  "wordDB": {
-    "name": "wordDB",
+    "database": "wordDB",
     "connector": "mongodb",
     "host": "localhost",
     "port": 27017
