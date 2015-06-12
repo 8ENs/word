@@ -163,21 +163,23 @@ $(function() {
     })
   });
 
-  // //user registration
-  // $( "#register_submit" ).on( "click", function() {
-  //   var url = "/api/wUsers"
-  //   var firstName = $( "#firstname" ).val();
-  //   var lastName = $( "#lastname" ).val();
-  //   var regEmail = $( "#email" ).val();
-  //   var userName = $( "#username" ).val();
-  //   var password = $( "#password" ).val();
-  //   var regData = {email: regEmail, password: password, firstname: firstName, lastname: lastName, username: userName};
+  //user registration
+  $( "#register_submit" ).on( "click", function() {
+    var url = "/api/wUsers"
+    var firstName = $( "#regFirstname" ).val();
+    var lastName = $( "#regLastname" ).val();
+    var email = $( "#regEmail" ).val();
+    var userName = $( "#regUsername" ).val();
+    var password = $( "#regPassword" ).val();
+    var regData = {email: email, password: password, firstname: firstName, lastname: lastName, username: userName};
     
-  //   $.post( url, regData, function (data) {
-  //     console.log("user: " + userName + " created!");
-  //     $("#register").empty().text("Registration complete. Please login now :)");
-  //   });
-  // });
+    $.post( url, regData, function (data) {
+      console.log("user: " + userName + " created!");
+      $("#status").text('account created! Please login now.');
+      $(".view").hide();
+      $("#div_welcome").show();
+    });
+  });
 
 
 });
