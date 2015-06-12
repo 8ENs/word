@@ -1,0 +1,77 @@
+function initialize() {
+  var mapOptions = {
+    zoom: 14
+  };
+  map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+  // Try HTML5 geolocation
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      
+      var pos = new google.maps.LatLng(position.coords.latitude,
+                                       position.coords.longitude);
+
+      // Add a pins to the Map
+      var pins = [];
+      var ico = 'http://www.google.com/mapmaker/mapfiles/marker-k.png'
+
+      $.getJSON( "/api/Pins", function( data ) {
+        pins = data;
+
+        pins.forEach(function(pin) {
+
+          var location = new google.maps.LatLng(pin.coords.lat, pin.coords.lng);
+          var marker = new google.maps.Marker({
+            position: location,
+            map: map,
+            icon: ico,
+            animation: google.maps.Animation.DROP
+          });
+        });
+
+      });
+
+      // Add a current location to the Map
+      var marker = new google.maps.Marker({
+        map: map,
+        position: pos,
+        // draggable: true, // need to update lat/lng if draggable enabled
+        icon: 'https://www.google.com/support/enterprise/static/geo/cdate/art/dots/blue_dot.png'
+      });
+
+      map.setCenter(pos);
+    }, function() {
+      handleNoGeolocation(true);
+    });
+  } else {
+    // Browser doesn't support Geolocation
+    handleNoGeolocation(false);
+  }
+
+}
+
+function handleNoGeolocation(errorFlag) {
+  console.log(errorFlag);
+  if (errorFlag) {
+    var content = 'Error: The Geolocation service failed.';
+  } else {
+    var content = 'Error: Your browser doesn\'t support geolocation.';
+  }
+
+  var options = {
+    map: map,
+    position: new google.maps.LatLng(60, 105),
+    content: content
+  };
+
+  var infowindow = new google.maps.InfoWindow(options);
+  map.setCenter(options.position);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+// need to update if draggable
+// google.maps.event.addListener(marker, 'dragend', function(event) {
+//   $("#currentLat").val(event.latLng.A);
+//   $("#currentLon").val(event.latLng.F);
+// });

@@ -46,7 +46,7 @@ $(function() {
         );
       });
       
-
+      list(pins);
     });
   }
 
@@ -77,40 +77,30 @@ $(function() {
     $.getJSON( "/api/Pins", function( data ) {
       iterator(data);
     });
-
-    // only display results if still on the appropriate view
-    if ($("h3:visible")[0].innerText == "List all") {
-      list(pins);
-    }
   });
 
   // added delay on keyup to avoid multiple ajax calls stacking up and printing results multiple times
-  var delay = (function(){
-    var timer = 0;
-    return function(callback, ms){
-      clearTimeout (timer);
-      timer = setTimeout(callback, ms);
-    };
-  })();
+  // var delay = (function(){
+  //   var timer = 0;
+  //   return function(callback, ms){
+  //     clearTimeout (timer);
+  //     timer = setTimeout(callback, ms);
+  //   };
+  // })();
 
   // find dynamically from search box
-  $( "#search_box" ).on( "keyup", function() {
-    var self = this;
-    delay(function(){
-      var search_string = $( self ).val();
-      var query_hash = {query: search_string};
-      $( ".show_all").remove();
+  // $( "#search_box" ).on( "keyup", function() {
+  //   var self = this;
+  //   delay(function(){
+  //     var search_string = $( self ).val();
+  //     var query_hash = {query: search_string};
+  //     $( ".show_all").remove();
 
-      $.getJSON( "/api/Pins", query_hash, function( data ) {
-        iterator(data);
-
-        // only display results if still on the appropriate view
-        if ($("h3:visible")[0].innerText == "Find") {
-          list(pins);
-        }
-      });
-    }, 500 );
-  });
+  //     $.getJSON( "/api/Pins", query_hash, function( data ) {
+  //       iterator(data);
+  //     });
+  //   }, 500 );
+  // });
 
   // destroy the database entry (no error handling for id not found)
   $( "#b_delete_id" ).on( "click", function() {
