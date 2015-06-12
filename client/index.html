@@ -5,8 +5,9 @@
 
 </head>
 <body>
-  <h1>Contact List</h1>
-  <h6>(warning: limited error checking)</h6>
+  <h1>Word on The Street</h1>
+  <p id="status">Not Logged In</p>
+
 
   <div id="navbar">
     <button id="b_create_new">Create new</button>
@@ -14,6 +15,7 @@
     <button id="b_find">Find</button>
     <button id="b_delete">Delete</button>
     <button id="b_login">Login</button>
+    <button id="b_logout" style="display: none">Logout</button>
   </div>
 
   <hr>
@@ -106,6 +108,12 @@
     </div>
   </div>
 
+    <!-- Login -->
+  <div id="logout" class="main" style="display: none">
+    <p>Logout successful (maybe :P)</p>
+
+  </div>
+
   <!-- Find -->
   <div id="find" class="main" style="display: none">
     <h3>Find</h3>
@@ -127,8 +135,6 @@
   <hr>
 
   <!-- Everything will show up here -->
-  <div id="show">
-
-  </div>
+  <div id="show"> </div>
 
 </body>

@@ -1,19 +1,10 @@
 $(function() {
-  // See: http://docs.jquery.com/Tutorials:Introducing_$(document).ready()
-
-  // specify the data type as JSON
-  // $.get()
-  // $.post()
-  // $.getJSON()
-  // $.ajax()
-
-
   // initializing
-  var accessToken = '';
-  var currentUser = '';
+  var accessToken = null;
+  var currentUser = null;
   var pins = [];
 
-
+  //hide all main views and loads one on any nav button click
   $( "#navbar button" ).on( "click", function() {
     // hide all visible '.main' views
     $( ".main" ).hide();
@@ -33,13 +24,11 @@ $(function() {
   function iterator(data) {
     pins = [];
     $.getJSON( "/api/wUsers/", function( users ) {
-      
-      $.each( data, function( key, val ) {
 
+      $.each( data, function( key, val ) {
         user = users.filter(function(user) {
           return user.id == val.wUserId;
         })[0];
-
         var fullname = user.firstname + ' ' + user.lastname;
 
         pins.push( 
@@ -86,7 +75,6 @@ $(function() {
   }
 
   $( "#b_list_all" ).on( "click", function() {
-    // e.preventDefault();
     $.getJSON( "/api/Pins", function( data ) {
       iterator(data);
     });
@@ -147,6 +135,7 @@ $(function() {
     var url = "/api/Pins"
     var newPin = {wUserId: sender, recipient: recipient, message: message, coords: coords, type: type, status: status};
     $.post( url, newPin, function (data) {
+      debugger
       process(data);
     });
   });
@@ -156,16 +145,31 @@ $(function() {
     var url = "/api/wUsers/login"
     var loginEmail = $( "#loginEmail" ).val();
     var password = $( "#password" ).val();
-
     var loginData = {email: loginEmail, password: password, ttl: 1209600000};
+    
     $.post( url, loginData, function (data) {
       accessToken = data.id;
-      $("#show").append("access token: " + data.id + " userID: " + data.userId);
+      $('#b_login').hide();
+      $('#b_logout').show();
       $.get( "/api/wUsers/" + data.userId, function( userJson ) {
         currentUser = userJson;
+        $("#status").text("Logged in as " + currentUser.firstname + " " + currentUser.lastname);
       });
 
     });
+  });
+
+  $( "#b_logout" ).on( "click", function() {
+    var url = "/api/wUsers/logout?access_token=" + accessToken
+    $.post(url, null, function(){
+      console.log('logout successful')
+      accessToken = null;
+      currentUser = null;
+      $('#b_login').show();
+      $('#b_logout').hide();
+      $("#status").text("Not Logged In");
+    })
+
   });
 
 });
