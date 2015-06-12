@@ -160,8 +160,13 @@ $(function() {
     var loginData = {email: loginEmail, password: password, ttl: 1209600000};
     $.post( url, loginData, function (data) {
       accessToken = data.id;
-      
       $("#show").append("access token: " + data.id + " userID: " + data.userId);
+      $.get( "/api/wUsers/" + data.userId, function( userJson ) {
+        currentUser = userJson;
+        console.log(userJson);
+        debugger
+      });
+
     });
   });
 
