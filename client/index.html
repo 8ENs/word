@@ -2,15 +2,6 @@
   <title>LoopBack</title>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="./application.js"></script>
-  <script>
-    $.getJSON( "/api/Pins", function( data ) {
-      var pins = [];
-      $.each( data, function( key, val) {
-        pins.push(val.message);
-      });
-      $( "#bootup" ).text(pins);
-    });
-  </script>
 
 </head>
 <body>
@@ -29,12 +20,45 @@
 
   <!-- Only on startup -->
   <div class="main">
-    <p id="bootup">Hello World... </p>
+    <p id="bootup">Welcome! (please use the nav bar above)</p>
   </div>
 
-  <!-- Create new -->
+  <!-- Create pin -->
   <div id="create_new" class="main" style="display: none">
     <h3>Create new</h3>
+    <div>
+      <label>FROM (until session):</label>
+      <input id="sender" type="text" name="sender" value="557a0acb5882524e6a621195" required="true">
+    </div>
+    <div>
+      <label>TO (until auth):</label>
+      <input id="recipient" type="text" name="recipient" value="557a136c7ec4c0ab6a742f39" required="true">
+    </div>
+    <div>
+      <label>Message:</label>
+      <input id="message" type="text" name="message" placeholder="write msg here..." required="true">
+    </div>
+    <div>
+      <label>Lat:</label>
+      <input id="lat" type="text" name="lat" value="49.282112" required="true">
+    </div>
+    <div>
+      <label>Lng:</label>
+      <input id="lng" type="text" name="lng" value="-123.108313" required="true">
+    </div>
+    <div>
+      <label>Type:</label>
+      <input id="type" type="text" name="type" value="private" required="true">
+    </div>
+    <div>
+      <button id="b_save">Save</button>
+      <span class="saved" style="display: none">Saved!</span>
+    </div>
+  </div>
+
+  <!-- Register user -->
+  <div id="register" class="main" style="display: none">
+    <h3>Register</h3>
     <div>
       <label>First Name:</label>
       <input id="firstname" type="text" name="firstname" placeholder="first" required="true">
@@ -48,7 +72,15 @@
       <input id="email" type="email" name="email" placeholder="email" required="true">
     </div>
     <div>
-      <button id="b_save">Save</button>
+      <label>Username:</label>
+      <input id="username" type="text" name="username" placeholder="@user" required="true">
+    </div>
+    <div>
+      <label>Password:</label>
+      <input id="password" type="password" name="password" placeholder="password" required="true">
+    </div>
+    <div>
+      <button id="register">Save</button>
       <span class="saved" style="display: none">Saved!</span>
     </div>
   </div>
@@ -69,9 +101,9 @@
     <h3>Delete</h3>
       <div>
         <label>ID #:</label>
-        <input id="delete_id" type="text" name="id" placeholder="by id # (integer)" required="true">
+        <input id="delete_id" type="text" name="id" placeholder="by id #" required="true">
         <button id="b_delete_id">Delete</button>
-        <span id="deleted" style="display: none">User deleted!</span>
+        <span id="deleted" style="display: none">Pin deleted!</span>
       </div>  
     </form>
   </div>

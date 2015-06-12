@@ -8,8 +8,7 @@ $(function() {
   // $.ajax()
 
   // initializing
-  var contacts = [];
-  var phones = "";
+  var pins = [];
 
   $( "#navbar button" ).on( "click", function() {
     // hide all visible '.main' views
@@ -30,11 +29,10 @@ $(function() {
   function iterator(data) {
     pins = [];
     $.each( data, function( key, val ) {
-      debugger;
       pins.push( 
         "<b><li id='" + key + "'>" + val.id + "</li></b>"
         + "<ul>"
-          + "<li>FROM (wUserId): " + val.wUserId + "</li>"
+          + "<li>FROM (wUserId **need to convert**): " + val.wUserId + "</li>"
           + "<li>TO (recipient): " + val.recipient + "</li>"
           + "<li>Message: " + val.message + "</li>"
           + "<li>Coords: " + " (" + val.coords.lat + ", " + val.coords.lng + ")" + "</li>"
@@ -55,14 +53,13 @@ $(function() {
 
   // if .save (success), clear input boxes and flash a 'Success!' message (this covers two views)
   function process(data) {
-    data = JSON.parse(data);
-    if (data.result) {
-      $( "#firstname" ).val('');
-      $( "#lastname" ).val('');
-      $( "#email" ).val('');
-      $( "#phone" ).val('');
-      $( "#label" ).val('');
-      $( "#contact_id" ).val('');
+    // data = JSON.parse(data);
+    if (data) {
+      // $( "#firstname" ).val('');
+      // $( "#lastname" ).val('');
+      $( "#message" ).val('');
+      // $( "#phone" ).val('');
+      // $( "#label" ).val('');
       $( ".saved" ).fadeIn('slow').fadeOut('slow');
     } else {
       alert("STB");
@@ -98,13 +95,12 @@ $(function() {
       var query_hash = {query: search_string};
       $( ".show_all").remove();
 
-      // alternatively could have passed params direclty in url: $.getJSON( "/contacts/find?query=" + search_string, function( data ) {
-      $.getJSON( "/contacts/find", query_hash, function( data ) {
+      $.getJSON( "/api/Pins", query_hash, function( data ) {
         iterator(data);
 
         // only display results if still on the appropriate view
         if ($("h3:visible")[0].innerText == "Find") {
-          list(contacts);
+          list(pins);
         }
       });
     }, 500 );
@@ -113,34 +109,45 @@ $(function() {
   // destroy the database entry (no error handling for id not found)
   $( "#b_delete_id" ).on( "click", function() {
     var id = $( "#delete_id" ).val();
-    $.get( "/contact/delete/" + id );
-    $( "#delete_id" ).val('');
-    $("#deleted").fadeIn('slow').fadeOut('slow');
+    $.ajax({
+      url: '/api/Pins/' + id,
+      type: 'DELETE',
+      success: function(response) {
+        $( "#delete_id" ).val('');
+        $("#deleted").fadeIn('slow').fadeOut('slow');
+      }
+    });
   });
 
-  // creates new contact in DB
+  // creates new pin in DB
   $( "#b_save" ).on( "click", function() {
-    var firstname = $( "#firstname" ).val();
-    var lastname = $( "#lastname" ).val();
-    var email = $( "#email" ).val();
+    var sender = $( "#sender" ).val();
+    var recipient = $( "#recipient" ).val();
+    var message = $( "#message" ).val();
+    var lat = $( "#lat" ).val();
+    var lng = $( "#lng" ).val();
+    var type = $( "#type" ).val();
+    var status = 'discovered';
+    var coords = {lat: lat, lng: lng};
 
-    // alternatively could have sent url in with params directly: var url = "/contact/new/?firstname=" + firstname + "&lastname=" + lastname + "&email=" + email;
-    var url = "/contact/new"
-    var newUser = {firstname: firstname, lastname: lastname, email: email};
-    $.post( url, newUser, function (data) {
+    var url = "/api/Pins"
+    var newPin = {wUserId: sender, recipient: recipient, message: message, coords: coords, type: type, status: status};
+    $.post( url, newPin, function (data) {
       process(data);
     });
   });
 
-  // adds new phone in DB
-  $( "#b_save_phone" ).on( "click", function() {
-    var phone = $( "#phone" ).val();
-    var label = $( "#label" ).val();
-    var contact_id = $( "#contact_id" ).val();
-    var newPhone = {phone: phone, label: label, contact_id: contact_id};
-    $.post( '/contact/phone/new', newPhone, function (data) {
-      process(data);
-    });
-  });
+    // register new user
+  // $( "#register" ).on( "click", function() {
+  //   var firstname = $( "#firstname" ).val();
+  //   var lastname = $( "#lastname" ).val();
+  //   var email = $( "#email" ).val();
+
+  //   var url = "/contact/new"
+  //   var newUser = {firstname: firstname, lastname: lastname, email: email};
+  //   $.post( url, newUser, function (data) {
+  //     process(data);
+  //   });
+  // });
 
 });
