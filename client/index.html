@@ -1,6 +1,6 @@
 <head>
   <title>LoopBack</title>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="./application.js"></script>
   <script>
     $.getJSON( "/api/Pins", function( data ) {
@@ -23,6 +23,7 @@
     <button id="b_find">Find</button>
     <button id="b_delete">Delete</button>
     <button id="b_add_phone">Add phone</button>
+    <button id="b_login">Login</button>
   </div>
 
   <hr>
@@ -56,6 +57,22 @@
   <!-- List all -->
   <div id="list_all" class="main" style="display: none">
     <h3>List all</h3>
+  </div>
+
+  <!-- Login -->
+  <div id="login" class="main" style="display: none">
+    <h3>Login</h3>
+    Email:<br>
+    <input type="text" id="loginEmail" name="email">
+    <br>
+    Password:<br>
+    <input type="password" id="password" name="password">
+    <br><br>
+    <button id="loginNow">Login</button>
+
+    <p id="loginInfo">jgewud</p>
+
+
   </div>
 
   <!-- Find -->

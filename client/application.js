@@ -7,9 +7,11 @@ $(function() {
   // $.getJSON()
   // $.ajax()
 
+
   // initializing
   var contacts = [];
   var phones = "";
+  var accessToken = '';
 
   $( "#navbar button" ).on( "click", function() {
     // hide all visible '.main' views
@@ -129,6 +131,21 @@ $(function() {
     var newUser = {firstname: firstname, lastname: lastname, email: email};
     $.post( url, newUser, function (data) {
       process(data);
+    });
+  });
+
+
+
+    // logs in user
+  $( "#loginNow" ).on( "click", function() {
+    var url = "/api/wUsers/login"
+    var loginEmail = $( "#loginEmail" ).val();
+    var password = $( "#password" ).val();
+
+    var loginData = {email: loginEmail, password: password, ttl: 1209600000};
+    $.post( url, loginData, function (data) {
+      accessToken = data.id;
+      $("#loginInfo").text("access token: " + data.id + "    userID: " + data.userId);
     });
   });
 
