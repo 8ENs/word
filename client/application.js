@@ -9,9 +9,8 @@ $(function() {
 
 
   // initializing
-  var contacts = [];
-  var phones = "";
   var accessToken = '';
+  var currentUser = '';
   var pins = [];
 
 
@@ -33,18 +32,33 @@ $(function() {
   // generate list
   function iterator(data) {
     pins = [];
-    $.each( data, function( key, val ) {
-      pins.push( 
-        "<b><li id='" + key + "'>" + val.id + "</li></b>"
-        + "<ul>"
-          + "<li>FROM (wUserId **need to convert**): " + val.wUserId + "</li>"
-          + "<li>TO (recipient): " + val.recipient + "</li>"
-          + "<li>Message: " + val.message + "</li>"
-          + "<li>Coords: " + " (" + val.coords.lat + ", " + val.coords.lng + ")" + "</li>"
-          + "<li>Type: " + val.type + "</li>"
-          + "<li>Status: " + val.status + "</li>"
-        + "</ul>"
-      );
+    $.getJSON( "/api/wUsers/", function( users ) {
+      
+      $.each( data, function( key, val ) {
+
+        user = users.filter(function(user) {
+          return user.id == val.wUserId;
+        })[0];
+
+        var fullname = user.firstname + ' ' + user.lastname;
+
+        pins.push( 
+          "<b><li id='" + key + "'>" + val.id + "</li></b>"
+          + "<ul>"
+            + "<li>FROM: " + fullname + "</li>"
+            + "<li>TO (recipient): " + val.recipient + "</li>"
+            + "<li>Message: " + val.message + "</li>"
+            + "<li>Coords: " + " (" + val.coords.lat + ", " + val.coords.lng + ")" + "</li>"
+            + "<li>Type: " + val.type + "</li>"
+            + "<li>Status: " + val.status + "</li>"
+          + "</ul>"
+        );
+      });
+      
+      // only display results if still on the appropriate view
+      if ($("h3:visible")[0].innerText == "List all") {
+        list(pins);
+      }
     });
   }
 
@@ -75,11 +89,6 @@ $(function() {
     // e.preventDefault();
     $.getJSON( "/api/Pins", function( data ) {
       iterator(data);
-     
-      // only display results if still on the appropriate view
-      if ($("h3:visible")[0].innerText == "List all") {
-        list(pins);
-      }
     });
   });
 
@@ -151,6 +160,7 @@ $(function() {
     var loginData = {email: loginEmail, password: password, ttl: 1209600000};
     $.post( url, loginData, function (data) {
       accessToken = data.id;
+      
       $("#show").append("access token: " + data.id + " userID: " + data.userId);
     });
   });
