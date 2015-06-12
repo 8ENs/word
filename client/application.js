@@ -138,7 +138,7 @@ $(function() {
   $( "#loginNow" ).on( "click", function() {
     var url = "/api/wUsers/login"
     var loginEmail = $( "#loginEmail" ).val();
-    var password = $( "#password" ).val();
+    var password = $( "#loginPassword" ).val();
     var loginData = {email: loginEmail, password: password, ttl: 1209600000};
     
     $.post( url, loginData, function (data) {
@@ -148,6 +148,7 @@ $(function() {
       $.get( "/api/wUsers/" + data.userId, function( userJson ) {
         currentUser = userJson;
         $("#status").text("Logged in as " + currentUser.firstname + " " + currentUser.lastname);
+        $("#login").empty().text("Login complete. Enjoy your stay :)");
       });
 
     });
@@ -164,7 +165,23 @@ $(function() {
       $('#b_logout').hide();
       $("#status").text("Not Logged In");
     })
-
   });
+
+  //user registration
+  $( "#register_submit" ).on( "click", function() {
+    var url = "/api/wUsers"
+    var firstName = $( "#firstname" ).val();
+    var lastName = $( "#lastname" ).val();
+    var regEmail = $( "#email" ).val();
+    var userName = $( "#username" ).val();
+    var password = $( "#password" ).val();
+    var regData = {email: regEmail, password: password, firstname: firstName, lastname: lastName, username: userName};
+    
+    $.post( url, regData, function (data) {
+      console.log("user: " + userName + " created!");
+      $("#register").empty().text("Registration complete. Please login now :)");
+    });
+  });
+
 
 });
