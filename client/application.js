@@ -163,7 +163,6 @@ $(function() {
       $("#show").append("access token: " + data.id + " userID: " + data.userId);
       $.get( "/api/wUsers/" + data.userId, function( userJson ) {
         currentUser = userJson;
-        console.log(userJson);
       });
 
     });
