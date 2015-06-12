@@ -44,10 +44,7 @@ $(function() {
         );
       });
       
-      // only display results if still on the appropriate view
-      if ($("h3:visible")[0].innerText == "List all") {
-        list(pins);
-      }
+
     });
   }
 
@@ -78,6 +75,11 @@ $(function() {
     $.getJSON( "/api/Pins", function( data ) {
       iterator(data);
     });
+
+    // only display results if still on the appropriate view
+    if ($("h3:visible")[0].innerText == "List all") {
+      list(pins);
+    }
   });
 
   // added delay on keyup to avoid multiple ajax calls stacking up and printing results multiple times
@@ -123,21 +125,22 @@ $(function() {
 
   // creates new pin in DB
   $( "#b_save" ).on( "click", function() {
-    var sender = $( "#sender" ).val();
-    var recipient = $( "#recipient" ).val();
-    var message = $( "#message" ).val();
-    var lat = $( "#lat" ).val();
-    var lng = $( "#lng" ).val();
-    var type = $( "#type" ).val();
-    var status = 'discovered';
-    var coords = {lat: lat, lng: lng};
+    if (currentUser != null) {
+      var recipient = $( "#recipient" ).val();
+      var message = $( "#message" ).val();
+      var type = $( "#type" ).val();
+      var status = 'discovered';
+      var coords = {lat: $("#lat").val(), lng: $("#lng").val()};
 
-    var url = "/api/Pins"
-    var newPin = {wUserId: sender, recipient: recipient, message: message, coords: coords, type: type, status: status};
-    $.post( url, newPin, function (data) {
-      debugger
-      process(data);
-    });
+      var url = "/api/Pins"
+      var newPin = {wUserId: currentUser.id, recipient: recipient, message: message, coords: coords, type: type, status: status};
+
+      $.post( url, newPin, function (data) {
+        process(data);
+      });
+    } else {
+      $( "#message" ).val('ERR - NOT LOGGED IN')
+    }
   });
   
     // logs in user
