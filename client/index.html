@@ -1,17 +1,15 @@
 <head>
-  <title>LoopBack</title>
+  <title>Word</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
   <script src="./application.js"></script>
-
 </head>
 <body>
-  <h1>Contact List</h1>
-  <h6>(warning: limited error checking)</h6>
+  <h1>Word on the Street</h1>
 
   <div id="navbar">
     <button id="b_create_new">Create new</button>
     <button id="b_list_all">List all</button>
-    <button id="b_find">Find</button>
+    <button id="b_find" disabled>Find</button>
     <button id="b_delete">Delete</button>
     <button id="b_login">Login</button>
   </div>
@@ -26,10 +24,6 @@
   <!-- Create pin -->
   <div id="create_new" class="main" style="display: none">
     <h3>Create new</h3>
-    <div>
-      <label>FROM:</label>
-      <input id="sender" type="text" name="sender" value="557a0acb5882524e6a621195" required="true">
-    </div>
     <div>
       <label>TO:</label>
       <input id="recipient" type="text" name="recipient" placeholder="(need to validate username)" required="true">
