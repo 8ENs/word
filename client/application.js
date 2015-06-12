@@ -43,9 +43,7 @@ $(function() {
           + "</ul>"
         );
       });
-      
     list(pins);
-
     });
   }
 
@@ -72,6 +70,7 @@ $(function() {
     }
   }
 
+  // lists all pins
   $( "#b_list_all" ).on( "click", function() {
     $.getJSON( "/api/Pins", function( data ) {
       iterator(data);
@@ -140,7 +139,7 @@ $(function() {
     }
   });
   
-    // logs in user
+  // logs in user
   $( "#loginNow" ).on( "click", function() {
     var url = "/api/wUsers/login"
     var loginEmail = $( "#loginEmail" ).val();
@@ -159,6 +158,7 @@ $(function() {
     });
   });
 
+  // logs out user
   $( "#b_logout" ).on( "click", function() {
     var url = "/api/wUsers/logout?access_token=" + accessToken
     $.post(url, null, function(){
