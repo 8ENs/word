@@ -164,7 +164,6 @@ $(function() {
       $.get( "/api/wUsers/" + data.userId, function( userJson ) {
         currentUser = userJson;
         console.log(userJson);
-        debugger
       });
 
     });
