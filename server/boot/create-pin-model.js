@@ -12,7 +12,7 @@ module.exports = function(app) {
   //   ], function(err, wUser) {
   //     if (err) throw err;
  
-  //     console.log('Models created: \n', User);
+  //     console.log('Models created: \n', wUser);
   //   });
 
   //   // RUN SECOND
