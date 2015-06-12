@@ -8,31 +8,31 @@
 <body>
 
   <h1>Word on The Street</h1>
-  <p id="status">Not Logged In</p>
 
   <div id="map" style="height: 200px; width: 400px; margin: 0px; padding: 0px">map</div>
   <hr>
 
+  <!-- Navbar -->
   <div id="navbar">
-    <button id="b_create_new">Create new</button>
-    <button id="b_list_all">List all</button>
-    <button id="b_find" disabled>Find</button>
-    <button id="b_delete">Delete</button>
-    <button id="b_login">Login</button>
-    <button id="b_register">Create Account</button>
-    <button id="b_logout" style="display: none">Logout</button>
+    <button id="nav_drop">Drop</button>
+    <button id="nav_explore">Explore</button>
+    <button id="nav_find" disabled>Find</button>
+    <button id="nav_delete">Delete</button>
+    <button id="nav_login">Login</button>
+    <button id="nav_register">Create Account</button>
+    <button id="nav_logout" style="display: none">Logout</button>
   </div>
 
   <hr>
 
   <!-- Only on startup -->
-  <div class="main">
-    <p id="bootup">Welcome! (please use the nav bar above)</p>
+  <div id="div_welcome" class="view">
+    <p id="status">Welcome. Please login.</p>
   </div>
 
-  <!-- Create pin -->
-  <div id="create_new" class="main" style="display: none">
-    <h3>Create new</h3>
+  <!-- Drop pin -->
+  <div id="div_drop" class="view" style="display: none">
+    <h3>Drop</h3>
     <div>
       <label>TO:</label>
       <input id="recipient" type="text" name="recipient" placeholder="(need to validate username)" required="true">
@@ -54,13 +54,13 @@
       <input id="type" type="text" name="type" value="private" required="true">
     </div>
     <div>
-      <button id="b_save">Save</button>
-      <span class="saved" style="display: none">Saved!</span>
+      <button id="drop">Drop</button>
+      <span class="dropped" style="display: none">Dropped!</span>
     </div>
   </div>
 
   <!-- Register user -->
-  <div id="register" class="main" style="display: none">
+  <div id="div_register" class="view" style="display: none">
     <h3>Register</h3>
     <div>
       <label>First Name:</label>
@@ -88,13 +88,32 @@
     </div>
   </div>
 
-  <!-- List all -->
-  <div id="list_all" class="main" style="display: none">
-    <h3>List all</h3>
+  <!-- Explore -->
+  <div id="div_explore" class="view" style="display: none">
+    <h3>Explore</h3>
+    <div id="pin_list"></div>
+  </div>
+
+  <!-- Find -->
+  <div id="div_find" class="view" style="display: none">
+    <h3>Find</h3>
+    <input id="search_box" type="text" name="query" placeholder="by first/last/email">
+  </div>
+
+  <!-- Delete -->
+  <div id="div_delete" class="view" style="display: none">
+    <h3>Delete</h3>
+    <div>
+      <label>ID #:</label>
+      <input id="delete_id" type="text" name="id" placeholder="by id #" required="true">
+      <button id="delete">Delete</button>
+      <span id="msg_deleted" style="display: none">Pin deleted!</span>
+    </div>  
+    </form>
   </div>
 
   <!-- Login -->
-  <div id="login" class="main" style="display: none">
+  <div id="div_login" class="view" style="display: none">
     <h3>Login</h3>
     <div>
       <label>Email:</label>
@@ -105,37 +124,9 @@
       <input type="password" id="loginPassword" name="password">
     </div>
     <div>
-      <button id="loginNow">Login</button>
+      <button id="login">Login</button>
     </div>
   </div>
 
-  <!-- Logout -->
-  <div id="logout" class="main" style="display: none">
-    <p>Logout successful (maybe :P)</p>
-
-  </div>
-
-  <!-- Find -->
-  <div id="find" class="main" style="display: none">
-    <h3>Find</h3>
-    <input id="search_box" type="text" name="query" placeholder="by first/last/email">
-  </div>
-
-  <!-- Delete -->
-  <div id="delete" class="main" style="display: none">
-    <h3>Delete</h3>
-      <div>
-        <label>ID #:</label>
-        <input id="delete_id" type="text" name="id" placeholder="by id #" required="true">
-        <button id="b_delete_id">Delete</button>
-        <span id="deleted" style="display: none">Pin deleted!</span>
-      </div>  
-    </form>
-  </div>
-
   <hr>
-
-  <!-- Everything will show up here -->
-  <div id="show"> </div>
-
 </body>

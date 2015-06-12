@@ -4,17 +4,13 @@ $(function() {
   var currentUser = null;
   var pins = [];
 
-  //hide all main views and loads one on any nav button click
   $( "#navbar button" ).on( "click", function() {
-    // hide all visible '.main' views
-    $( ".main" ).hide();
-
-    // remove any output from other views
-    $( ".show_all" ).remove();
+    // hide all currently visible view
+    $( ".view" ).hide();
     
-    // set 'id' to button.id after removing 'b_' from the start and then show it
-    var id = this.id.substring(2, this.id.length);
-    $( "#" + id ).show();
+    // navbar redirect (eg. click on #nav_drop points to #div_drop)
+    var id = this.id.substring(4, this.id.length);
+    $( "#div_" + id ).show();
 
     // empty search box on 'find' view
     $( "#search_box" ).val('');
@@ -23,23 +19,22 @@ $(function() {
   // generate list
   function iterator(data) {
     pins = [];
-    $.getJSON( "/api/wUsers/", function( users ) {
+    $.getJSON( "/api/wUsers/", function(users) {
+      $.each( data, function( idx, pin ) {
 
-      $.each( data, function( key, val ) {
-        user = users.filter(function(user) {
-          return user.id == val.wUserId;
+        sender = users.filter(function(user) {
+          return user.id == pin.wUserId;
         })[0];
-        var fullname = user.firstname + ' ' + user.lastname;
 
         pins.push( 
-          "<b><li id='" + key + "'>" + val.id + "</li></b>"
+          "<b><li id='" + idx + "'>" + pin.id + "</li></b>"
           + "<ul>"
-            + "<li>FROM: " + fullname + "</li>"
-            + "<li>TO (recipient): " + val.recipient + "</li>"
-            + "<li>Message: " + val.message + "</li>"
-            + "<li>Coords: " + " (" + val.coords.lat + ", " + val.coords.lng + ")" + "</li>"
-            + "<li>Type: " + val.type + "</li>"
-            + "<li>Status: " + val.status + "</li>"
+            + "<li>FROM: " + sender.firstname + ' ' + sender.lastname + "</li>"
+            + "<li>TO (recipient): " + pin.recipient + "</li>"
+            + "<li>Message: " + pin.message + "</li>"
+            + "<li>Coords: " + " (" + pin.coords.lat + ", " + pin.coords.lng + ")" + "</li>"
+            + "<li>Type: " + pin.type + "</li>"
+            + "<li>Status: " + pin.status + "</li>"
           + "</ul>"
         );
       });
@@ -51,28 +46,27 @@ $(function() {
   // display list
   function list(pins) {
     $( "<ul/>", {
-      "class": "show_all",
+      "class": "view",
       html: pins.join( "" )
-    }).appendTo( "#show" );
+    }).appendTo( "#pin_list" );
   }
 
   // if .save (success), clear input boxes and flash a 'Success!' message (this covers two views)
   function process(data) {
-    // data = JSON.parse(data);
     if (data) {
       // $( "#firstname" ).val('');
       // $( "#lastname" ).val('');
       $( "#message" ).val('');
       // $( "#phone" ).val('');
       // $( "#label" ).val('');
-      $( ".saved" ).fadeIn('slow').fadeOut('slow');
+      $( ".dropped" ).fadeIn('slow').fadeOut('slow');
     } else {
       alert("STB");
     }
   }
 
   // lists all pins
-  $( "#b_list_all" ).on( "click", function() {
+  $( "#nav_explore" ).on( "click", function() {
     $.getJSON( "/api/Pins", function( data ) {
       iterator(data);
     });
@@ -93,7 +87,7 @@ $(function() {
   //   delay(function(){
   //     var search_string = $( self ).val();
   //     var query_hash = {query: search_string};
-  //     $( ".show_all").remove();
+  //     $( ".div_show").remove();
 
   //     $.getJSON( "/api/Pins", query_hash, function( data ) {
   //       iterator(data);
@@ -102,20 +96,20 @@ $(function() {
   // });
 
   // destroy the database entry (no error handling for id not found)
-  $( "#b_delete_id" ).on( "click", function() {
+  $( "#delete" ).on( "click", function() {
     var id = $( "#delete_id" ).val();
     $.ajax({
       url: '/api/Pins/' + id,
       type: 'DELETE',
       success: function(response) {
-        $( "#delete_id" ).val('');
-        $("#deleted").fadeIn('slow').fadeOut('slow');
+        $("#delete_id").val('');
+        $("#msg_deleted").fadeIn('slow').fadeOut('slow');
       }
     });
   });
 
   // creates new pin in DB
-  $( "#b_save" ).on( "click", function() {
+  $( "#drop" ).on( "click", function() {
     if (currentUser != null) {
       var recipient = $( "#recipient" ).val();
       var message = $( "#message" ).val();
@@ -134,54 +128,56 @@ $(function() {
     }
   });
   
-  // logs in user
-  $( "#loginNow" ).on( "click", function() {
+  // login
+  $( "#login" ).on( "click", function() {
     var url = "/api/wUsers/login"
     var loginEmail = $( "#loginEmail" ).val();
     var password = $( "#loginPassword" ).val();
     var loginData = {email: loginEmail, password: password, ttl: 1209600000};
-    
-    $.post( url, loginData, function (data) {
-      accessToken = data.id;
-      $('#b_login').hide();
-      $('#b_logout').show();
-      $.get( "/api/wUsers/" + data.userId, function( userJson ) {
-        currentUser = userJson;
-        $("#status").text("Logged in as " + currentUser.firstname + " " + currentUser.lastname);
-        $("#login").empty().text("Login complete. Enjoy your stay :)");
-      });
 
+    $.post( url, loginData, function(auth) {
+      accessToken = auth.id;
+      $('#nav_login').hide();
+      $('#nav_logout').show();
+      $.get( "/api/wUsers/" + auth.userId, function(userJson) {
+        currentUser = userJson;
+        $("#status").text("Hey " + currentUser.firstname + "!");
+        $(".view").hide();
+        $("#div_welcome").show();
+      });
     });
+
   });
 
-  // logs out user
-  $( "#b_logout" ).on( "click", function() {
+  // logout
+  $( "#nav_logout" ).on( "click", function() {
     var url = "/api/wUsers/logout?access_token=" + accessToken
     $.post(url, null, function(){
-      console.log('logout successful')
       accessToken = null;
       currentUser = null;
-      $('#b_login').show();
-      $('#b_logout').hide();
-      $("#status").text("Not Logged In");
+      $('#nav_logout').hide();
+      $('#nav_login').show();
+      $("#status").text("Welcome. Please login.");
+      $(".view").hide();
+      $("#div_welcome").show();
     })
   });
 
-  //user registration
-  $( "#register_submit" ).on( "click", function() {
-    var url = "/api/wUsers"
-    var firstName = $( "#firstname" ).val();
-    var lastName = $( "#lastname" ).val();
-    var regEmail = $( "#email" ).val();
-    var userName = $( "#username" ).val();
-    var password = $( "#password" ).val();
-    var regData = {email: regEmail, password: password, firstname: firstName, lastname: lastName, username: userName};
+  // //user registration
+  // $( "#register_submit" ).on( "click", function() {
+  //   var url = "/api/wUsers"
+  //   var firstName = $( "#firstname" ).val();
+  //   var lastName = $( "#lastname" ).val();
+  //   var regEmail = $( "#email" ).val();
+  //   var userName = $( "#username" ).val();
+  //   var password = $( "#password" ).val();
+  //   var regData = {email: regEmail, password: password, firstname: firstName, lastname: lastName, username: userName};
     
-    $.post( url, regData, function (data) {
-      console.log("user: " + userName + " created!");
-      $("#register").empty().text("Registration complete. Please login now :)");
-    });
-  });
+  //   $.post( url, regData, function (data) {
+  //     console.log("user: " + userName + " created!");
+  //     $("#register").empty().text("Registration complete. Please login now :)");
+  //   });
+  // });
 
 
 });
