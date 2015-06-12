@@ -11,10 +11,12 @@ function initialize() {
       var pos = new google.maps.LatLng(position.coords.latitude,
                                        position.coords.longitude);
 
-      // Add a pins to the Map
+      // Initialize
       var pins = [];
-      var ico = 'http://www.google.com/mapmaker/mapfiles/marker-k.png'
+      var pin_icon = 'http://www.google.com/mapmaker/mapfiles/marker-k.png'
+      var current_loc_icon = 'https://www.google.com/support/enterprise/static/geo/cdate/art/dots/blue_dot.png'
 
+      // Add a pins to the Map
       $.getJSON( "/api/Pins", function( data ) {
         pins = data;
 
@@ -24,8 +26,8 @@ function initialize() {
           var marker = new google.maps.Marker({
             position: location,
             map: map,
-            icon: ico,
-            animation: google.maps.Animation.DROP
+            icon: pin_icon
+            // animation: google.maps.Animation.DROP
           });
         });
 
@@ -36,10 +38,15 @@ function initialize() {
         map: map,
         position: pos,
         // draggable: true, // need to update lat/lng if draggable enabled
-        icon: 'https://www.google.com/support/enterprise/static/geo/cdate/art/dots/blue_dot.png'
+        icon: current_loc_icon,
+        zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
 
       map.setCenter(pos);
+
+      // var mapDiv = $('#map');
+      // google.maps.event.addDomListener(mapDiv, 'click', showAlert);
+
     }, function() {
       handleNoGeolocation(true);
     });
