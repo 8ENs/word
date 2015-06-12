@@ -151,7 +151,7 @@ $(function() {
     var loginData = {email: loginEmail, password: password, ttl: 1209600000};
     $.post( url, loginData, function (data) {
       accessToken = data.id;
-      $("#loginInfo").text("access token: " + data.id + " userID: " + data.userId);
+      $("#show").append("access token: " + data.id + " userID: " + data.userId);
     });
   });
 
