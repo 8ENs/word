@@ -44,6 +44,7 @@ $(function() {
         );
       });
       
+    list(pins);
 
     });
   }
@@ -76,10 +77,6 @@ $(function() {
       iterator(data);
     });
 
-    // only display results if still on the appropriate view
-    if ($("h3:visible")[0].innerText == "List all") {
-      list(pins);
-    }
   });
 
   // added delay on keyup to avoid multiple ajax calls stacking up and printing results multiple times
