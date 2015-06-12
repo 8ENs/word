@@ -1,10 +1,10 @@
 $(function() {
-
   // initializing
   var accessToken = null;
   var currentUser = null;
   var pins = [];
 
+  //hide all main views and loads one on any nav button click
   $( "#navbar button" ).on( "click", function() {
     // hide all visible '.main' views
     $( ".main" ).hide();
@@ -24,13 +24,11 @@ $(function() {
   function iterator(data) {
     pins = [];
     $.getJSON( "/api/wUsers/", function( users ) {
-      
-      $.each( data, function( key, val ) {
 
+      $.each( data, function( key, val ) {
         user = users.filter(function(user) {
           return user.id == val.wUserId;
         })[0];
-
         var fullname = user.firstname + ' ' + user.lastname;
 
         pins.push( 
@@ -45,7 +43,7 @@ $(function() {
           + "</ul>"
         );
       });
-      
+
       list(pins);
     });
   }
@@ -73,6 +71,7 @@ $(function() {
     }
   }
 
+  // lists all pins
   $( "#b_list_all" ).on( "click", function() {
     $.getJSON( "/api/Pins", function( data ) {
       iterator(data);
@@ -135,21 +134,37 @@ $(function() {
     }
   });
   
-    // logs in user
+  // logs in user
   $( "#loginNow" ).on( "click", function() {
     var url = "/api/wUsers/login"
     var loginEmail = $( "#loginEmail" ).val();
     var password = $( "#password" ).val();
-
     var loginData = {email: loginEmail, password: password, ttl: 1209600000};
+    
     $.post( url, loginData, function (data) {
       accessToken = data.id;
-      $("#show").append("access token: " + data.id + " userID: " + data.userId);
+      $('#b_login').hide();
+      $('#b_logout').show();
       $.get( "/api/wUsers/" + data.userId, function( userJson ) {
         currentUser = userJson;
+        $("#status").text("Logged in as " + currentUser.firstname + " " + currentUser.lastname);
       });
 
     });
+  });
+
+  // logs out user
+  $( "#b_logout" ).on( "click", function() {
+    var url = "/api/wUsers/logout?access_token=" + accessToken
+    $.post(url, null, function(){
+      console.log('logout successful')
+      accessToken = null;
+      currentUser = null;
+      $('#b_login').show();
+      $('#b_logout').hide();
+      $("#status").text("Not Logged In");
+    })
+
   });
 
 });
