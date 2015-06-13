@@ -38,7 +38,6 @@ $(function() {
           + "</ul>"
         );
       });
-
       list(pins);
     });
   }
@@ -138,6 +137,7 @@ $(function() {
     $.post( url, loginData, function(auth) {
       accessToken = auth.id;
       $('#nav_login').hide();
+      $('#nav_register').hide();
       $('#nav_logout').show();
       $.get( "/api/wUsers/" + auth.userId, function(userJson) {
         currentUser = userJson;
@@ -175,7 +175,7 @@ $(function() {
     
     $.post( url, regData, function (data) {
       console.log("user: " + userName + " created!");
-      $("#status").text('account created! Please login now.');
+      $("#status").text('Account created! Please login now.');
       $(".view").hide();
       $("#div_welcome").show();
     });
