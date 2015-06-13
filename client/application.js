@@ -136,6 +136,9 @@ $(function() {
       $('#nav_login').hide();
       $('#nav_register').hide();
       $('#nav_logout').show();
+      $('#nav_drop').show();
+      $('#nav_explore').show();
+      $('#nav_delete').show();
       $.get( "/api/wUsers/" + auth.userId, function(userJson) {
         currentUser = userJson;
         $("#status").text("Hey " + currentUser.firstname + "!");
@@ -159,6 +162,9 @@ $(function() {
       accessToken = null;
       currentUser = null;
       $('#nav_logout').hide();
+      $('#nav_drop').hide();
+      $('#nav_explore').hide();
+      $('#nav_delete').hide();
       $('#nav_login').show();
       $('#nav_register').show();
       $("#status").text("Welcome. Please login (or register).");
