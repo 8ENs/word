@@ -34,10 +34,10 @@ function initialize() {
       });
 
       // Add a current location to the Map
-      var marker = new google.maps.Marker({
+      var currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        // draggable: true, // need to update lat/lng if draggable enabled
+        draggable: true, // need to update lat/lng if draggable enabled
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
@@ -46,6 +46,12 @@ function initialize() {
 
       // var mapDiv = $('#map');
       // google.maps.event.addDomListener(mapDiv, 'click', showAlert);
+
+      // need to update if draggable
+      google.maps.event.addListener(currentLocation, 'dragend', function(event) {
+        $("#lat").val(event.latLng.A);
+        $("#lng").val(event.latLng.F);
+      });
 
     }, function() {
       handleNoGeolocation(true);
@@ -76,9 +82,3 @@ function handleNoGeolocation(errorFlag) {
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
-
-// need to update if draggable
-// google.maps.event.addListener(marker, 'dragend', function(event) {
-//   $("#currentLat").val(event.latLng.A);
-//   $("#currentLon").val(event.latLng.F);
-// });

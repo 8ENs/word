@@ -29,10 +29,10 @@ $(function() {
         pins.push( 
           "<b><li id='" + idx + "'>" + pin.id + "</li></b>"
           + "<ul>"
-            + "<li>FROM: " + sender.firstname + ' ' + sender.lastname + "</li>"
-            + "<li>TO (recipient): " + pin.recipient + "</li>"
+            + "<li>From: " + sender.firstname + ' ' + sender.lastname + "</li>"
+            + "<li>To: " + pin.recipient + "</li>"
             + "<li>Message: " + pin.message + "</li>"
-            + "<li>Coords: " + " (" + pin.coords.lat + ", " + pin.coords.lng + ")" + "</li>"
+            // + "<li>Coords: " + " (" + pin.coords.lat + ", " + pin.coords.lng + ")" + "</li>"
             + "<li>Type: " + pin.type + "</li>"
             + "<li>Status: " + pin.status + "</li>"
           + "</ul>"

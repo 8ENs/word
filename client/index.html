@@ -34,20 +34,20 @@
   <div id="div_drop" class="view" style="display: none">
     <h3>Drop</h3>
     <div>
-      <label>TO:</label>
+      <label>To:</label>
       <input id="recipient" type="text" name="recipient" placeholder="(need to validate username)" required="true">
     </div>
     <div>
       <label>Message:</label>
       <input id="message" type="text" name="message" placeholder="write msg here..." required="true">
     </div>
-    <div>
+    <div style="display: none">
       <label>Lat:</label>
-      <input id="lat" type="text" name="lat" value="49.282112" required="true">
+      <input id="lat" type="text" name="lat" placeholder="49.282112" required="true">
     </div>
-    <div>
+    <div style="display: none">
       <label>Lng:</label>
-      <input id="lng" type="text" name="lng" value="-123.108313" required="true">
+      <input id="lng" type="text" name="lng" placeholder="-123.108313" required="true">
     </div>
     <div>
       <label>Type:</label>
@@ -57,6 +57,30 @@
       <button id="drop">Drop</button>
       <span class="dropped" style="display: none">Dropped!</span>
     </div>
+  </div>
+
+  <!-- Explore -->
+  <div id="div_explore" class="view" style="display: none">
+    <h3>Explore</h3>
+    <div id="pin_list"></div>
+  </div>
+
+  <!-- Find -->
+  <div id="div_find" class="view" style="display: none">
+    <h3>Find</h3>
+    <input id="search_box" type="text" name="query" placeholder="by first/last/email">
+  </div>
+
+  <!-- Delete -->
+  <div id="div_delete" class="view" style="display: none">
+    <h3>Delete</h3>
+    <div>
+      <label>ID #:</label>
+      <input id="delete_id" type="text" name="id" placeholder="by id #" required="true">
+      <button id="delete">Delete</button>
+      <span id="msg_deleted" style="display: none">Pin deleted!</span>
+    </div>  
+    </form>
   </div>
 
   <!-- Register user -->
@@ -86,30 +110,6 @@
       <button id="register_submit">Save</button>
       <span class="saved" style="display: none">Saved!</span>
     </div>
-  </div>
-
-  <!-- Explore -->
-  <div id="div_explore" class="view" style="display: none">
-    <h3>Explore</h3>
-    <div id="pin_list"></div>
-  </div>
-
-  <!-- Find -->
-  <div id="div_find" class="view" style="display: none">
-    <h3>Find</h3>
-    <input id="search_box" type="text" name="query" placeholder="by first/last/email">
-  </div>
-
-  <!-- Delete -->
-  <div id="div_delete" class="view" style="display: none">
-    <h3>Delete</h3>
-    <div>
-      <label>ID #:</label>
-      <input id="delete_id" type="text" name="id" placeholder="by id #" required="true">
-      <button id="delete">Delete</button>
-      <span id="msg_deleted" style="display: none">Pin deleted!</span>
-    </div>  
-    </form>
   </div>
 
   <!-- Login -->
