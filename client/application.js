@@ -127,12 +127,9 @@ $(function() {
     }
   });
   
-  // login
-  $( "#login" ).on( "click", function() {
+  function login(email, pwd) {
     var url = "/api/wUsers/login"
-    var loginEmail = $( "#loginEmail" ).val();
-    var password = $( "#loginPassword" ).val();
-    var loginData = {email: loginEmail, password: password, ttl: 1209600000};
+    var loginData = {email: email, password: pwd, ttl: 1209600000};
 
     $.post( url, loginData, function(auth) {
       accessToken = auth.id;
@@ -146,7 +143,13 @@ $(function() {
         $("#div_welcome").show();
       });
     });
+  }
 
+  // login
+  $( "#login" ).on( "click", function() {
+    var loginEmail = $( "#loginEmail" ).val();
+    var password = $( "#loginPassword" ).val();
+    login(loginEmail, password);
   });
 
   // logout
@@ -157,7 +160,8 @@ $(function() {
       currentUser = null;
       $('#nav_logout').hide();
       $('#nav_login').show();
-      $("#status").text("Welcome. Please login.");
+      $('#nav_register').show();
+      $("#status").text("Welcome. Please login (or register).");
       $(".view").hide();
       $("#div_welcome").show();
     })
@@ -174,12 +178,8 @@ $(function() {
     var regData = {email: email, password: password, firstname: firstName, lastname: lastName, username: userName};
     
     $.post( url, regData, function (data) {
-      console.log("user: " + userName + " created!");
-      $("#status").text('Account created! Please login now.');
-      $(".view").hide();
-      $("#div_welcome").show();
+      login(email, password);
     });
   });
-
 
 });
