@@ -1,3 +1,9 @@
+var pos = new google.maps.LatLng(0,0);
+var map;
+var markers = [];
+var pin_icon = 'http://www.google.com/mapmaker/mapfiles/marker-k.png'
+var current_loc_icon = 'https://www.google.com/support/enterprise/static/geo/cdate/art/dots/blue_dot.png'
+
 function initialize() {
   var mapOptions = {
     zoom: 14
@@ -7,31 +13,11 @@ function initialize() {
   // Try HTML5 geolocation
   if(navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
-      
-      var pos = new google.maps.LatLng(position.coords.latitude,
-                                       position.coords.longitude);
 
       // Initialize
       var pins = [];
-      var pin_icon = 'http://www.google.com/mapmaker/mapfiles/marker-k.png'
-      var current_loc_icon = 'https://www.google.com/support/enterprise/static/geo/cdate/art/dots/blue_dot.png'
-
-      // Add a pins to the Map
-      $.getJSON( "/api/Pins", function( data ) {
-        pins = data;
-
-        pins.forEach(function(pin) {
-
-          var location = new google.maps.LatLng(pin.coords.lat, pin.coords.lng);
-          var marker = new google.maps.Marker({
-            position: location,
-            map: map,
-            icon: pin_icon
-            // animation: google.maps.Animation.DROP
-          });
-        });
-
-      });
+      pos = new google.maps.LatLng(position.coords.latitude,
+                                       position.coords.longitude);
 
       // Add a current location to the Map
       var currentLocation = new google.maps.Marker({
@@ -44,11 +30,25 @@ function initialize() {
 
       map.setCenter(pos);
 
-      // var mapDiv = $('#map');
-      // google.maps.event.addDomListener(mapDiv, 'click', showAlert);
+      // Add a pins to the Map
+      $.getJSON( "/api/Pins", function( data ) {
+        pins = data;
 
-      // need to update if draggable
+        // loop through all pins and add them to map with 'title' as their id
+        pins.forEach(function(pin) {
+          var location = new google.maps.LatLng(pin.coords.lat, pin.coords.lng);
+          var marker = new google.maps.Marker({
+            position: location,
+            title: pin.id,
+            map: map,
+            icon: pin_icon
+          });
+          markers.push(marker);
+        });
+      });
+
       google.maps.event.addListener(currentLocation, 'dragend', function(event) {
+        pos = new google.maps.LatLng(event.latLng.A, event.latLng.F);
         $("#lat").val(event.latLng.A);
         $("#lng").val(event.latLng.F);
       });

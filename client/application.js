@@ -101,13 +101,24 @@ $(function() {
       url: '/api/Pins/' + id,
       type: 'DELETE',
       success: function(response) {
+
+        // must be an easier way to search through or filter for specific pin
+        for (var i = 0; i < markers.length; i++) {
+          if (markers[i].title == $("#delete_id").val()) {
+            // remove the marker from map
+            markers[i].setMap(null);
+            // remove the instance from array
+            markers.splice(i, 1);
+          }
+        }
+
         $("#delete_id").val('');
         $("#msg_deleted").fadeIn('slow').fadeOut('slow');
       }
     });
   });
 
-  // creates new pin in DB
+  // create new pin
   $( "#drop" ).on( "click", function() {
     if (currentUser != null) {
       var recipient = $( "#recipient" ).val();
@@ -122,6 +133,25 @@ $(function() {
       $.post( url, newPin, function (data) {
         process(data);
       });
+
+      // seems I need a delay or the marker will flash in final location before doing animation (bug?)
+      window.setTimeout(function() {
+        $.getJSON( "/api/Pins", function(pins) {
+          // grab id of last pin from db (one we just added) - could be a buggy way long-term
+          var pin_id = pins[pins.length - 1].id;
+          var marker = new google.maps.Marker({
+            position: pos,
+            title: pin_id,
+            map: map,
+            icon: pin_icon,
+            animation: google.maps.Animation.DROP
+          });
+          // update marker array
+          markers.push(marker);
+        });
+        
+      }, 20);
+
     } else {
       $( "#message" ).val('ERR - NOT LOGGED IN')
     }
