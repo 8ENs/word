@@ -150,7 +150,7 @@ $(function() {
           markers.push(marker);
         });
         
-      }, 20);
+      }, 50);
 
     } else {
       $( "#message" ).val('ERR - NOT LOGGED IN')
