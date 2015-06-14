@@ -42,22 +42,22 @@ $(function() {
 
         $.post( "/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
           newPinId = pin.id;
-        });
 
-        $.getJSON("/api/Pins/" + newPinId, function(pin) {
-          if (pin.type == 'public')
-            ico = green_pin
-          else
-            ico = red_pin
+          $.getJSON("/api/Pins/" + newPinId, function(pin) {
+            if (pin.type == 'public')
+              ico = yellow_pin
+            else
+              ico = red_pin
 
-          markers.push( new google.maps.Marker({
-            position: pos,
-            title: newPinId,
-            map: map,
-            icon: ico,
-            type: pin.type,
-            animation: google.maps.Animation.DROP
-          }));
+            markers.push( new google.maps.Marker({
+              position: pos,
+              title: newPinId,
+              map: map,
+              icon: ico,
+              type: pin.type,
+              animation: google.maps.Animation.DROP
+            }));
+          });
         });
 
         $(".dropped" ).fadeIn('slow').fadeOut('slow');
@@ -74,32 +74,35 @@ $(function() {
   // lists all pins
   $( "#nav_explore" ).on( "click", function() {
     // get all pins which were dropped TO/FOR the currentUser (including public)
-    $.getJSON( "/api/Pins?filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
+    var here = pos.A + "," + pos.F
+    $.getJSON( "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
       iterator(pins);
     });
   });
 
   // generate list
   function iterator(pins) {
-    pin_array = [];
     $.each( pins, function( idx, pin ) {
-      pin_array.push( 
-        "<b><li id='" + pin.id + "'>" + pin.message + "</li></b>"
-        + "<ul>"
-          + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
-          + "<li>Type: " + pin.type + "</li>"
-          + "<li>Status: " + pin.status + "</li>"
-        + "</ul>"
-      );
+      $.getJSON("/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+        var pin_formatted =
+          "<b><li id='" + pin.id + "'>" + pin.message + "</li></b>"
+          + "<ul>"
+            + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
+            + "<li>Type: " + pin.type + "</li>"
+            + "<li>Status: " + pin.status + "</li>"
+            + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
+          + "</ul>"
+        ;
+        list(pin_formatted);
+      });
     });
-    list(pin_array);
   }
 
   // display list
-  function list(pins) {
+  function list(line) {
     $( "<ul/>", {
       "class": "view",
-      html: pins.join( "" )
+      html: line
     }).appendTo( "#pin_list" );
   }
 

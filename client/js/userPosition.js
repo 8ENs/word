@@ -1,6 +1,7 @@
 var markers = [];
 var red_pin = '../images/red_pin.png'
 var green_pin = '../images/green_pin.png'
+var yellow_pin = '../images/yellow_pin.png'
 var current_loc_icon = '../images/blue_dot.png'
 
 function initialize() {
@@ -36,7 +37,7 @@ function initialize() {
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
             title: pin.id,
             map: map,
-            icon: green_pin,
+            icon: yellow_pin,
             type: pin.type
           }));
         });
