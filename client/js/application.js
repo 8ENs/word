@@ -33,7 +33,7 @@ $(function() {
     $.getJSON("/api/wUsers?filter[where][username]=" + recipient, function(user) {
       if (currentUser != null && user.length > 0) {
         var message = $("#message").val();
-        var type = $("#type").val().toLowerCase();
+        var type = $("#pinType").val().toLowerCase();
         var status = 'discovered';
         var coords = {lat: pos.A, lng: pos.F};
 
@@ -44,10 +44,7 @@ $(function() {
           newPinId = pin.id;
 
           $.getJSON("/api/Pins/" + newPinId, function(pin) {
-            if (pin.type == 'public')
-              ico = yellow_pin
-            else
-              ico = red_pin
+            ico = (pin.type == 'public') ? yellow_pin : red_pin;
 
             markers.push( new google.maps.Marker({
               position: pos,
@@ -63,7 +60,7 @@ $(function() {
         $(".dropped" ).fadeIn('slow').fadeOut('slow');
         $("#recipient" ).val('');
         $("#message" ).val('');
-        $("#type" ).val('private');
+        $("#pinType" ).val('private');
       } else {
         $("#recipient").val('NEED VALID USERNAME');
       }
@@ -211,11 +208,6 @@ function list(line) {
 
 function addMarkerWithTimeout(pin, timeout) {
   window.setTimeout(function() {
-    // if (pin.type == 'public')
-    //   ico = green_pin
-    // else
-    //   ico = red_pin
-
     markers.push(new google.maps.Marker({
       position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
       title: pin.id,
