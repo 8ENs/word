@@ -29,23 +29,6 @@ function initialize() {
 
       map.setCenter(pos);
 
-      // Add a pins to the Map
-      $.getJSON( "/api/Pins", function( data ) {
-        pins = data;
-
-        // loop through all pins and add them to map with 'title' as their id
-        pins.forEach(function(pin) {
-          var location = new google.maps.LatLng(pin.coords.lat, pin.coords.lng);
-          var marker = new google.maps.Marker({
-            position: location,
-            title: pin.id,
-            map: map,
-            icon: pin_icon
-          });
-          markers.push(marker);
-        });
-      });
-
       google.maps.event.addListener(currentLocation, 'dragend', function(event) {
         pos = new google.maps.LatLng(event.latLng.A, event.latLng.F);
       });

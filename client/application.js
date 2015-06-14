@@ -27,6 +27,54 @@ $(function() {
     // $( "#search_box" ).val('');
   });
 
+  // create new pin
+  $( "#drop" ).on( "click", function() {
+    var recipient = $("#recipient").val();
+    $.getJSON("/api/wUsers?filter[where][username]=" + recipient, function(user) {
+      if (currentUser != null && user.length > 0) {
+        var message = $("#message").val();
+        var type = $( "#type" ).val();
+        var status = 'discovered';
+        var coords = {lat: pos.A, lng: pos.F};
+
+        var newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
+        var newPinId = '';
+
+        $.post( "/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
+          newPinId = pin.id;
+        });
+
+        $.getJSON("/api/Pins/" + newPinId, function() {
+          var marker = new google.maps.Marker({
+            position: pos,
+            title: newPinId,
+            map: map,
+            icon: pin_icon,
+            animation: google.maps.Animation.DROP
+          });
+          // update marker array
+          markers.push(marker);
+        });
+
+        $(".dropped" ).fadeIn('slow').fadeOut('slow');
+        $("#recipient" ).val('');
+        $("#message" ).val('');
+        $("#type" ).val('private');
+      } else {
+        $("#recipient").val('NEED VALID USERNAME');
+      }
+    });
+    $("#recipient").focus();
+  });
+
+  // lists all pins
+  $( "#nav_explore" ).on( "click", function() {
+    // NEED TO CHANGE THIS TO DISPLAY ONLY PINS WHERE CURRENTUSER WAS RECIPIENT (NOT CREATOR)
+    $.getJSON( "/api/wUsers/" + currentUser.id + "/pins", function(pins) {
+      iterator(pins);
+    });
+  });
+
   // generate list
   function iterator(pins) {
     pin_array = [];
@@ -52,27 +100,6 @@ $(function() {
       html: pins.join( "" )
     }).appendTo( "#pin_list" );
   }
-
-  // if .save (success), clear input boxes and flash a 'Success!' message (this covers two views)
-  function process(data) {
-    if (data) {
-      // $( "#firstname" ).val('');
-      // $( "#lastname" ).val('');
-      $( "#message" ).val('');
-      // $( "#phone" ).val('');
-      // $( "#label" ).val('');
-      $( ".dropped" ).fadeIn('slow').fadeOut('slow');
-    } else {
-      alert("STB");
-    }
-  }
-
-  // lists all pins
-  $( "#nav_explore" ).on( "click", function() {
-    $.getJSON( "/api/wUsers/" + currentUser.id + "/pins", function(pins) {
-      iterator(pins);
-    });
-  });
 
   // added delay on keyup to avoid multiple ajax calls stacking up and printing results multiple times
   // var delay = (function(){
@@ -106,8 +133,8 @@ $(function() {
       success: function(response) {
 
         // must be an easier way to search through or filter for specific pin
-        for (var i = 0; i < markers.length; i++) {
-          if (markers[i].title == $("#delete_id").val()) {
+        for (var i = markers.length - 1; i >= 0; i--) {
+          if (markers[i].title == id) {
             // remove the marker from map
             markers[i].setMap(null);
             // remove the instance from array
@@ -121,50 +148,22 @@ $(function() {
     });
   });
 
-  // create new pin
-  $( "#drop" ).on( "click", function() {
-    if (currentUser != null) {
-      var recipient = $( "#recipient" ).val();
-      var message = $( "#message" ).val();
-      var type = $( "#type" ).val();
-      var status = 'discovered';
-      var coords = {lat: pos.A, lng: pos.F};
-
-      var newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
-
-      $.post( "/api/wUsers/" + currentUser.id + "/pins", newPin, function (data) {
-        debugger
-        process(data);
-      });
-
-      // seems I need a delay or the marker will flash in final location before doing animation (bug?)
-      window.setTimeout(function() {
-        $.getJSON( "/api/Pins", function(pins) {
-          // grab id of last pin from db (one we just added) - could be a buggy way long-term
-          var pin_id = pins[pins.length - 1].id;
-          var marker = new google.maps.Marker({
-            position: pos,
-            title: pin_id,
-            map: map,
-            icon: pin_icon,
-            animation: google.maps.Animation.DROP
-          });
-          // update marker array
-          markers.push(marker);
-        });
-        
-      }, 50);
-
-    } else {
-      $( "#message" ).val('ERR - NOT LOGGED IN')
-    }
-  });
+  function addMarkerWithTimeout(pin, timeout) {
+    window.setTimeout(function() {
+      markers.push(new google.maps.Marker({
+        position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
+        title: pin.id,
+        map: map,
+        icon: pin_icon,
+        animation: google.maps.Animation.DROP
+      }));
+    }, timeout);
+  }
   
   function login(email, pwd) {
-    var url = "/api/wUsers/login"
     var loginData = {email: email, password: pwd, ttl: 1209600000};
 
-    $.post( url, loginData, function(auth) {
+    $.post( "/api/wUsers/login", loginData, function(auth) {
       accessToken = auth.id;
       $('#nav_login').hide();
       $('#nav_register').hide();
@@ -174,9 +173,21 @@ $(function() {
       $('#nav_delete').show();
       $.get( "/api/wUsers/" + auth.userId, function(userJson) {
         currentUser = userJson;
-        $("#status").text("Hey " + currentUser.firstname + "!");
+        if (currentUser != null) {
+          $( "#loginEmail" ).val('');
+          $( "#loginPassword" ).val('');
+        }
         $(".view").hide();
+        $("#status").text("Hey " + currentUser.firstname + "!");
         $("#div_welcome").show();
+
+        $.getJSON("/api/wUsers/" + currentUser.id + "/pins", function(pins) {
+          
+          // loop through all pins and add them to map with 'title' as their id
+          for (var i = 0; i < pins.length; i++)
+            addMarkerWithTimeout(pins[i], i * 200);
+        });
+
       });
     });
   }
@@ -204,16 +215,22 @@ $(function() {
       $(".view").hide();
       $("#div_welcome").show();
     })
+
+    // there is a .setAllMap(null) option but I think it will clear the blue dot too
+    markers.forEach(function(marker) {
+      marker.setMap(null);
+    });
+    markers = [];
   });
 
   //user registration
   $( "#register_submit" ).on( "click", function() {
     var url = "/api/wUsers"
-    var firstName = $( "#regFirstname" ).val();
-    var lastName = $( "#regLastname" ).val();
-    var email = $( "#regEmail" ).val();
-    var userName = $( "#regUsername" ).val();
-    var password = $( "#regPassword" ).val();
+    var firstName = $("#regFirstname").val();
+    var lastName = $("#regLastname").val();
+    var email = $("#regEmail").val();
+    var userName = $("#regUsername").val().toLowerCase();
+    var password = $("#regPassword").val();
     var regData = {email: email, password: password, firstname: firstName, lastname: lastName, username: userName};
     
     $.post( url, regData, function (data) {
