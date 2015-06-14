@@ -47,6 +47,7 @@ function initialize() {
 
       google.maps.event.addListener(currentLocation, 'dragend', function(event) {
         pos = new google.maps.LatLng(event.latLng.A, event.latLng.F);
+        renderPins();
       });
 
     }, function() {

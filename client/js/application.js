@@ -1,13 +1,13 @@
 $(function() {
   // initializing
 
-  var accessToken = null;
+  accessToken = null;
   currentUser = null;
   var pins = [];
 
   $( "#navbar button" ).on( "click", function() {
     // hide all currently visible view
-    $( ".view" ).hide();
+    $(".view").hide();
     
     // navbar redirect (eg. click on #nav_drop points to #div_drop)
     var id = this.id.substring(4, this.id.length);
@@ -72,39 +72,9 @@ $(function() {
   });
 
   // lists all pins
-  $( "#nav_explore" ).on( "click", function() {
-    // get all pins which were dropped TO/FOR the currentUser (including public)
-    var here = pos.A + "," + pos.F
-    $.getJSON( "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
-      iterator(pins);
-    });
+  $("#nav_explore").on( "click", function() {
+    renderPins();
   });
-
-  // generate list
-  function iterator(pins) {
-    $.each( pins, function( idx, pin ) {
-      $.getJSON("/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
-        var pin_formatted =
-          "<b><li id='" + pin.id + "'>" + pin.message + "</li></b>"
-          + "<ul>"
-            + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
-            + "<li>Type: " + pin.type + "</li>"
-            + "<li>Status: " + pin.status + "</li>"
-            + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
-          + "</ul>"
-        ;
-        list(pin_formatted);
-      });
-    });
-  }
-
-  // display list
-  function list(line) {
-    $( "<ul/>", {
-      "class": "view",
-      html: line
-    }).appendTo( "#pin_list" );
-  }
 
   // added delay on keyup to avoid multiple ajax calls stacking up and printing results multiple times
   // var delay = (function(){
@@ -153,57 +123,6 @@ $(function() {
     });
   });
 
-  function addMarkerWithTimeout(pin, timeout) {
-    window.setTimeout(function() {
-      // if (pin.type == 'public')
-      //   ico = green_pin
-      // else
-      //   ico = red_pin
-
-      markers.push(new google.maps.Marker({
-        position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
-        title: pin.id,
-        map: map,
-        icon: green_pin,
-        type: pin.type,
-        animation: google.maps.Animation.DROP
-      }));
-    }, timeout);
-  }
-  
-  function login(email, pwd) {
-    var loginData = {email: email, password: pwd, ttl: 1209600000};
-
-    $.post( "/api/wUsers/login", loginData, function(auth) {
-      accessToken = auth.id;
-      $('#nav_login').hide();
-      $('#nav_register').hide();
-      $('#nav_logout').show();
-      $('#nav_drop').show();
-      $('#nav_explore').show();
-      $('#nav_delete').show();
-      $.get( "/api/wUsers/" + auth.userId, function(userJson) {
-        currentUser = userJson;
-        if (currentUser != null) {
-          $( "#loginEmail" ).val('');
-          $( "#loginPassword" ).val('');
-        }
-        $(".view").hide();
-        $("#status").text("Hey " + currentUser.firstname + "!");
-        $("#div_welcome").show();
-
-        // grab all pins (+ wUser) where type=private && recipient=currentUser
-        $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
-          
-          // loop through all pins and add them to map with 'title' as their id
-          for (var i = 0; i < pins.length; i++)
-            addMarkerWithTimeout(pins[i], i * 200);
-        });
-
-      });
-    });
-  }
-
   // login
   $( "#login" ).on( "click", function() {
     var loginEmail = $( "#loginEmail" ).val();
@@ -213,8 +132,7 @@ $(function() {
 
   // logout
   $( "#nav_logout" ).on( "click", function() {
-    var url = "/api/wUsers/logout?access_token=" + accessToken
-    $.post(url, null, function(){
+    $.post("/api/wUsers/logout?access_token=" + accessToken, null, function(){
       accessToken = null;
       currentUser = null;
       $('#nav_logout').hide();
@@ -252,5 +170,92 @@ $(function() {
       login(email, password);
     });
   });
-
 });
+
+function renderPins() {
+  // clear old list of pins
+  $("#pin_list").empty();
+
+  // get all pins which were dropped TO/FOR the currentUser (including public)
+  var here = pos.A + "," + pos.F
+  $.getJSON( "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
+    iterator(pins);
+  });
+}
+
+// generate list
+function iterator(pins) {
+  $.each( pins, function( idx, pin ) {
+    $.getJSON("/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+      var pin_formatted =
+        "<b><li id='" + pin.id + "'>" + pin.message + "</li></b>"
+        + "<ul>"
+          + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
+          + "<li>Type: " + pin.type + "</li>"
+          + "<li>Status: " + pin.status + "</li>"
+          + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
+        + "</ul>"
+      ;
+      list(pin_formatted);
+    });
+  });
+}
+
+// display list
+function list(line) {
+  $("<ul/>", {
+    "class": "view",
+    html: line
+  }).appendTo("#pin_list");
+}
+
+function addMarkerWithTimeout(pin, timeout) {
+  window.setTimeout(function() {
+    // if (pin.type == 'public')
+    //   ico = green_pin
+    // else
+    //   ico = red_pin
+
+    markers.push(new google.maps.Marker({
+      position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
+      title: pin.id,
+      map: map,
+      icon: green_pin,
+      type: pin.type,
+      animation: google.maps.Animation.DROP
+    }));
+  }, timeout);
+}
+  
+function login(email, pwd) {
+  var loginData = {email: email, password: pwd, ttl: 1209600000};
+
+  $.post( "/api/wUsers/login", loginData, function(auth) {
+    accessToken = auth.id;
+    $('#nav_login').hide();
+    $('#nav_register').hide();
+    $('#nav_logout').show();
+    $('#nav_drop').show();
+    $('#nav_explore').show();
+    $('#nav_delete').show();
+    $.get( "/api/wUsers/" + auth.userId, function(userJson) {
+      currentUser = userJson;
+      if (currentUser != null) {
+        $( "#loginEmail" ).val('');
+        $( "#loginPassword" ).val('');
+      }
+      $(".view").hide();
+      $("#status").text("Hey " + currentUser.firstname + "!");
+      $("#div_welcome").show();
+
+      // grab all pins (+ wUser) where type=private && recipient=currentUser
+      $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
+        
+        // loop through all pins and add them to map with 'title' as their id
+        for (var i = 0; i < pins.length; i++)
+          addMarkerWithTimeout(pins[i], i * 200);
+      });
+
+    });
+  });
+}
