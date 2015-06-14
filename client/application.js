@@ -33,7 +33,7 @@ $(function() {
     $.getJSON("/api/wUsers?filter[where][username]=" + recipient, function(user) {
       if (currentUser != null && user.length > 0) {
         var message = $("#message").val();
-        var type = $( "#type" ).val();
+        var type = $("#type").val().toLowerCase();
         var status = 'discovered';
         var coords = {lat: pos.A, lng: pos.F};
 
@@ -44,12 +44,13 @@ $(function() {
           newPinId = pin.id;
         });
 
-        $.getJSON("/api/Pins/" + newPinId, function() {
+        $.getJSON("/api/Pins/" + newPinId, function(pin) {
           var marker = new google.maps.Marker({
             position: pos,
             title: newPinId,
             map: map,
             icon: pin_icon,
+            type: pin.type,
             animation: google.maps.Animation.DROP
           });
           // update marker array
@@ -69,8 +70,8 @@ $(function() {
 
   // lists all pins
   $( "#nav_explore" ).on( "click", function() {
-    // NEED TO CHANGE THIS TO DISPLAY ONLY PINS WHERE CURRENTUSER WAS RECIPIENT (NOT CREATOR)
-    $.getJSON( "/api/wUsers/" + currentUser.id + "/pins", function(pins) {
+    // get all pins which were dropped TO/FOR the currentUser
+    $.getJSON( "/api/Pins?filter[include]=wUser&filter[where][recipient]=" + currentUser.username, function(pins) {
       iterator(pins);
     });
   });
@@ -79,12 +80,11 @@ $(function() {
   function iterator(pins) {
     pin_array = [];
     $.each( pins, function( idx, pin ) {
+
       pin_array.push( 
-        "<b><li id='" + idx + "'>" + pin.id + "</li></b>"
+        "<b><li id='" + pin.id + "'>" + pin.message + "</li></b>"
         + "<ul>"
-          + "<li>From: " + currentUser.firstname + ' ' + currentUser.lastname + "</li>"
-          + "<li>To: " + pin.recipient + "</li>"
-          + "<li>Message: " + pin.message + "</li>"
+          + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
           + "<li>Type: " + pin.type + "</li>"
           + "<li>Status: " + pin.status + "</li>"
         + "</ul>"
@@ -155,6 +155,7 @@ $(function() {
         title: pin.id,
         map: map,
         icon: pin_icon,
+        type: pin.type,
         animation: google.maps.Animation.DROP
       }));
     }, timeout);
@@ -181,7 +182,7 @@ $(function() {
         $("#status").text("Hey " + currentUser.firstname + "!");
         $("#div_welcome").show();
 
-        $.getJSON("/api/wUsers/" + currentUser.id + "/pins", function(pins) {
+        $.getJSON("/api/Pins?filter[include]=wUser&filter[where][recipient]=" + currentUser.username, function(pins) {
           
           // loop through all pins and add them to map with 'title' as their id
           for (var i = 0; i < pins.length; i++)
@@ -217,10 +218,11 @@ $(function() {
     })
 
     // there is a .setAllMap(null) option but I think it will clear the blue dot too
-    markers.forEach(function(marker) {
-      marker.setMap(null);
-    });
-    markers = [];
+    var i = markers.length;
+    while (i--) {
+      markers[i].setMap(null);
+      markers.splice(i, 1);
+    }
   });
 
   //user registration

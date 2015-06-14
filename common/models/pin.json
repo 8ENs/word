@@ -32,7 +32,7 @@
   },
   "validations": [],
   "relations": {
-    "wUsers": {
+    "wUser": {
       "type": "belongsTo",
       "model": "wUser",
       "foreignKey": "wUserId"
