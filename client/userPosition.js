@@ -1,5 +1,3 @@
-var pos = new google.maps.LatLng(0,0);
-var map;
 var markers = [];
 var pin_icon = 'http://www.google.com/mapmaker/mapfiles/marker-k.png'
 var current_loc_icon = 'https://www.google.com/support/enterprise/static/geo/cdate/art/dots/blue_dot.png'
@@ -16,8 +14,9 @@ function initialize() {
 
       // Initialize
       var pins = [];
-      pos = new google.maps.LatLng(position.coords.latitude,
-                                       position.coords.longitude);
+      var lat = position.coords.latitude;
+      var lng = position.coords.longitude;
+      pos = new google.maps.LatLng(lat, lng);
 
       // Add a current location to the Map
       var currentLocation = new google.maps.Marker({
@@ -49,8 +48,6 @@ function initialize() {
 
       google.maps.event.addListener(currentLocation, 'dragend', function(event) {
         pos = new google.maps.LatLng(event.latLng.A, event.latLng.F);
-        $("#lat").val(event.latLng.A);
-        $("#lng").val(event.latLng.F);
       });
 
     }, function() {

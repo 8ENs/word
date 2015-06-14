@@ -1,7 +1,8 @@
 $(function() {
   // initializing
+
   var accessToken = null;
-  var currentUser = null;
+  currentUser = null;
   var pins = [];
 
   $( "#navbar button" ).on( "click", function() {
@@ -12,34 +13,36 @@ $(function() {
     var id = this.id.substring(4, this.id.length);
     $( "#div_" + id ).show();
 
+    if (id == 'login') {
+      $("#loginEmail").focus();
+    } else if (id == 'drop') {
+      $("#recipient").focus();
+    } else if (id == 'delete') {
+      $("#delete_id").focus();
+    } else if (id == 'register') {
+      $("#regFirstname").focus();
+    }
+    
     // empty search box on 'find' view
-    $( "#search_box" ).val('');
+    // $( "#search_box" ).val('');
   });
 
   // generate list
-  function iterator(data) {
-    pins = [];
-    $.getJSON( "/api/wUsers/", function(users) {
-      $.each( data, function( idx, pin ) {
-
-        sender = users.filter(function(user) {
-          return user.id == pin.wUserId;
-        })[0];
-
-        pins.push( 
-          "<b><li id='" + idx + "'>" + pin.id + "</li></b>"
-          + "<ul>"
-            + "<li>From: " + sender.firstname + ' ' + sender.lastname + "</li>"
-            + "<li>To: " + pin.recipient + "</li>"
-            + "<li>Message: " + pin.message + "</li>"
-            // + "<li>Coords: " + " (" + pin.coords.lat + ", " + pin.coords.lng + ")" + "</li>"
-            + "<li>Type: " + pin.type + "</li>"
-            + "<li>Status: " + pin.status + "</li>"
-          + "</ul>"
-        );
-      });
-      list(pins);
+  function iterator(pins) {
+    pin_array = [];
+    $.each( pins, function( idx, pin ) {
+      pin_array.push( 
+        "<b><li id='" + idx + "'>" + pin.id + "</li></b>"
+        + "<ul>"
+          + "<li>From: " + currentUser.firstname + ' ' + currentUser.lastname + "</li>"
+          + "<li>To: " + pin.recipient + "</li>"
+          + "<li>Message: " + pin.message + "</li>"
+          + "<li>Type: " + pin.type + "</li>"
+          + "<li>Status: " + pin.status + "</li>"
+        + "</ul>"
+      );
     });
+    list(pin_array);
   }
 
   // display list
@@ -66,8 +69,8 @@ $(function() {
 
   // lists all pins
   $( "#nav_explore" ).on( "click", function() {
-    $.getJSON( "/api/Pins", function( data ) {
-      iterator(data);
+    $.getJSON( "/api/wUsers/" + currentUser.id + "/pins", function(pins) {
+      iterator(pins);
     });
   });
 
@@ -125,12 +128,12 @@ $(function() {
       var message = $( "#message" ).val();
       var type = $( "#type" ).val();
       var status = 'discovered';
-      var coords = {lat: $("#lat").val(), lng: $("#lng").val()};
+      var coords = {lat: pos.A, lng: pos.F};
 
-      var url = "/api/Pins"
-      var newPin = {wUserId: currentUser.id, recipient: recipient, message: message, coords: coords, type: type, status: status};
+      var newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
 
-      $.post( url, newPin, function (data) {
+      $.post( "/api/wUsers/" + currentUser.id + "/pins", newPin, function (data) {
+        debugger
         process(data);
       });
 

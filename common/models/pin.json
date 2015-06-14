@@ -32,10 +32,10 @@
   },
   "validations": [],
   "relations": {
-    "_id": {
+    "wUsers": {
       "type": "belongsTo",
       "model": "wUser",
-      "foreignKey": ""
+      "foreignKey": "wUserId"
     }
   },
   "acls": [],
