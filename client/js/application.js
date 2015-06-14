@@ -45,16 +45,19 @@ $(function() {
         });
 
         $.getJSON("/api/Pins/" + newPinId, function(pin) {
-          var marker = new google.maps.Marker({
+          if (pin.type == 'public')
+            ico = green_pin
+          else
+            ico = red_pin
+
+          markers.push( new google.maps.Marker({
             position: pos,
             title: newPinId,
             map: map,
-            icon: pin_icon,
+            icon: ico,
             type: pin.type,
             animation: google.maps.Animation.DROP
-          });
-          // update marker array
-          markers.push(marker);
+          }));
         });
 
         $(".dropped" ).fadeIn('slow').fadeOut('slow');
@@ -70,8 +73,8 @@ $(function() {
 
   // lists all pins
   $( "#nav_explore" ).on( "click", function() {
-    // get all pins which were dropped TO/FOR the currentUser
-    $.getJSON( "/api/Pins?filter[include]=wUser&filter[where][recipient]=" + currentUser.username, function(pins) {
+    // get all pins which were dropped TO/FOR the currentUser (including public)
+    $.getJSON( "/api/Pins?filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
       iterator(pins);
     });
   });
@@ -80,7 +83,6 @@ $(function() {
   function iterator(pins) {
     pin_array = [];
     $.each( pins, function( idx, pin ) {
-
       pin_array.push( 
         "<b><li id='" + pin.id + "'>" + pin.message + "</li></b>"
         + "<ul>"
@@ -150,11 +152,16 @@ $(function() {
 
   function addMarkerWithTimeout(pin, timeout) {
     window.setTimeout(function() {
+      // if (pin.type == 'public')
+      //   ico = green_pin
+      // else
+      //   ico = red_pin
+
       markers.push(new google.maps.Marker({
         position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
         title: pin.id,
         map: map,
-        icon: pin_icon,
+        icon: green_pin,
         type: pin.type,
         animation: google.maps.Animation.DROP
       }));
@@ -182,7 +189,8 @@ $(function() {
         $("#status").text("Hey " + currentUser.firstname + "!");
         $("#div_welcome").show();
 
-        $.getJSON("/api/Pins?filter[include]=wUser&filter[where][recipient]=" + currentUser.username, function(pins) {
+        // grab all pins (+ wUser) where type=private && recipient=currentUser
+        $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
           
           // loop through all pins and add them to map with 'title' as their id
           for (var i = 0; i < pins.length; i++)
@@ -220,8 +228,10 @@ $(function() {
     // there is a .setAllMap(null) option but I think it will clear the blue dot too
     var i = markers.length;
     while (i--) {
-      markers[i].setMap(null);
-      markers.splice(i, 1);
+      if (markers[i].type != 'public') {
+        markers[i].setMap(null);
+        markers.splice(i, 1);
+      }
     }
   });
 
