@@ -1,8 +1,12 @@
 var markers = [];
-var red_pin = '../images/red_pin.png'
-var green_pin = '../images/green_pin.png'
-var yellow_pin = '../images/yellow_pin.png'
-var current_loc_icon = '../images/blue_dot.png'
+var red_pin = '../images/red_pin.png';
+var green_pin = '../images/green_pin.png';
+var yellow_pin = '../images/yellow_pin.png';
+var red_pin_50 = '../images/red_pin_50.png';
+var green_pin_50 = '../images/green_pin_50.png';
+var yellow_pin_50 = '../images/yellow_pin_50.png';
+var gray_pin_50 = '../images/gray_pin_50.png';
+var current_loc_icon = '../images/blue_dot.png';
 
 function initialize() {
   var mapOptions = {
