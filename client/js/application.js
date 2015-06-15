@@ -180,7 +180,7 @@ function iterator(pins) {
     $.getJSON("/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
       var distToPin = Math.round(dist.distance);
 
-      if (distToPin < 250 || pin.status == 'saved') {
+      if (pin.status == 'saved') {
         var pin_formatted =
           "<b><li id='" + pin.id + "'>" + pin.message + " (" + pin.id + ")</li></b>"
           + "<ul>"
@@ -190,6 +190,8 @@ function iterator(pins) {
             + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
           + "</ul>";
         list(pin_formatted);
+      } else if (distToPin < 250) {
+        $("#pin_list").append("<b>You are close enough! Touch the pin to open.");
       } else {
         $("#pin_list").append("<b>You need to be " + (distToPin - 250) + " m closer to open this pin!");
       }

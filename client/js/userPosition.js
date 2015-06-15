@@ -134,27 +134,23 @@ function onPinClick(marker) {
 
         var distToPin = Math.round(dist.distance);
 
-        if (distToPin < 250 || pin.status == 'saved') {
-          if (pin.status == 'discovered') {
-            pin.status = 'saved';
+        if (distToPin < 250 && pin.status == 'discovered') {
+          pin.status = 'saved';
 
-            $.ajax({
-              url: "/api/Pins/" + pin.id,
-              type: 'PUT',
-              data: {"status": "saved"}
-            });
+          $.ajax({
+            url: "/api/Pins/" + pin.id,
+            type: 'PUT',
+            data: {"status": "saved"}
+          });
 
-            if (marker.type == 'private') {
-              marker.setIcon(green_pin);
-            } else if (marker.type == 'public') {
-              marker.setIcon(blue_pin);
-            }
-            
-          }
-          iterator([pin]);
-        } else {
-          $("#pin_list").append("<b>You need to be " + (distToPin - 250) + " m closer to open this pin!");
-        }
+          if (marker.type == 'private') {
+            marker.setIcon(green_pin);
+          } else if (marker.type == 'public') {
+            marker.setIcon(blue_pin);
+          } 
+        } 
+        
+        iterator([pin]);
 
         $("#div_explore").show();
       });
