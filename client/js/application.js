@@ -143,7 +143,6 @@ $(function() {
       $("#div_welcome").show();
     })
 
-    // there is a .setAllMap(null) option but I think it will clear the blue dot too
     var i = markers.length;
     while (i--) {
       if (markers[i].type != 'public') {

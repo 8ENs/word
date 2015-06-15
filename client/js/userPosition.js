@@ -38,7 +38,25 @@ function initialize() {
 
       google.maps.event.addListener(currentLocation, 'dragend', function(event) {
         pos = new google.maps.LatLng(event.latLng.A, event.latLng.F);
+        
+        // if on Explore tab this re-orders the current list dynamically by new order
         renderPins();
+
+        // clear all markers, re-add current location & public markers, then add others in relation to new pos
+        for (var i = 0; i < markers.length; i++) {
+          markers[i].setMap(null);
+        }
+        addPublicMarkers();
+        upgradePublicSaved();
+
+        // grab all pins (+ wUser) where type=private && recipient=currentUser
+        $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
+        
+          // loop through all pins and add them to map with 'title' as their id
+          for (var i = 0; i < pins.length; i++)
+            addMarkerWithTimeout(pins[i], i * 200);
+
+        });
       });
 
     }, function() {
