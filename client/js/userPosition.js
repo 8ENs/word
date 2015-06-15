@@ -47,16 +47,19 @@ function initialize() {
           markers[i].setMap(null);
         }
         addPublicMarkers();
-        upgradePublicSaved();
 
-        // grab all pins (+ wUser) where type=private && recipient=currentUser
-        $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
-        
-          // loop through all pins and add them to map with 'title' as their id
-          for (var i = 0; i < pins.length; i++)
-            addMarkerWithTimeout(pins[i], i * 200)
+        if (currentUser != null) {
+          upgradePublicSaved();
 
-        });
+          // grab all pins (+ wUser) where type=private && recipient=currentUser
+          $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
+          
+            // loop through all pins and add them to map with 'title' as their id
+            for (var i = 0; i < pins.length; i++)
+              addMarkerWithTimeout(pins[i], i * 200)
+
+          });
+        }
       });
 
     }, function() {
@@ -100,15 +103,23 @@ function addCurrentGeo() {
 function addPublicMarkers() {
   $.getJSON("/api/Pins?filter[where][type]=public", function(pins) {
     pins.forEach(function(pin) {
-      markers.push(new google.maps.Marker({
+      var marker = new google.maps.Marker({
         position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
         title: pin.id,
         map: map,
         icon: blue_pin_50,
         type: pin.type
-      }));
+      });
+      markers.push(marker);
+      google.maps.event.addListener(marker, 'click', function() {
+        onPinClick(marker);
+      });
     });
   });
+}
+
+function onPinClick(marker) {
+  window.alert(marker.title);
 }
 
 function upgradePublicSaved() {

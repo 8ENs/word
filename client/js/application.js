@@ -46,14 +46,18 @@ $(function() {
           $.getJSON("/api/Pins/" + newPinId, function(pin) {
             ico = (pin.type == 'public') ? yellow_pin : red_pin;
 
-            markers.push( new google.maps.Marker({
+            var marker = new google.maps.Marker({
               position: pos,
               title: newPinId,
               map: map,
               icon: ico,
               type: pin.type,
               animation: google.maps.Animation.DROP
-            }));
+            });
+            markers.push(marker);
+            google.maps.event.addListener(marker, 'click', function() {
+              onPinClick(marker);
+            });
           });
         });
 
@@ -196,6 +200,10 @@ function addMarkerWithTimeout(pin, timeout) {
         icon: green_pin,
         type: pin.type
       });
+      markers.push(marker);
+      google.maps.event.addListener(marker, 'click', function() {
+        onPinClick(marker);
+      });
 
       if (pin.status == 'saved') {
         // do nothing
@@ -205,7 +213,6 @@ function addMarkerWithTimeout(pin, timeout) {
         marker.setIcon(gray_pin_50);
       }
 
-      markers.push(marker);
     });
   // }, timeout);
 }
