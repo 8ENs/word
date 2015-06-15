@@ -149,6 +149,8 @@ $(function() {
       if (markers[i].type != 'public') {
         markers[i].setMap(null);
         markers.splice(i, 1);
+      } else {
+        markers[i].setIcon(blue_pin_50)
       }
     }
   });
