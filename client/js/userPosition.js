@@ -54,7 +54,7 @@ function initialize() {
         
           // loop through all pins and add them to map with 'title' as their id
           for (var i = 0; i < pins.length; i++)
-            addMarkerWithTimeout(pins[i], i * 200);
+            addMarkerWithTimeout(pins[i], i * 200)
 
         });
       });

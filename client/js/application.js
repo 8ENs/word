@@ -220,11 +220,13 @@ function addMarkerWithTimeout(pin, timeout) {
         type: pin.type
       });
 
-      if (pin.status == 'discovered')
-        marker.setIcon(gray_pin_50);
-
-      if (Math.round(dist.distance) < 250) 
+      if (pin.status == 'saved') {
+        // do nothing
+      } else if (Math.round(dist.distance) < 250) {
         marker.setIcon(green_pin_50);
+      } else if (pin.status == 'discovered') {
+        marker.setIcon(gray_pin_50);
+      }
 
       markers.push(marker);
     });
