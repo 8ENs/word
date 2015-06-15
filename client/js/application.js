@@ -73,29 +73,6 @@ $(function() {
     renderPins();
   });
 
-  // added delay on keyup to avoid multiple ajax calls stacking up and printing results multiple times
-  // var delay = (function(){
-  //   var timer = 0;
-  //   return function(callback, ms){
-  //     clearTimeout (timer);
-  //     timer = setTimeout(callback, ms);
-  //   };
-  // })();
-
-  // find dynamically from search box
-  // $( "#search_box" ).on( "keyup", function() {
-  //   var self = this;
-  //   delay(function(){
-  //     var search_string = $( self ).val();
-  //     var query_hash = {query: search_string};
-  //     $( ".div_show").remove();
-
-  //     $.getJSON( "/api/Pins", query_hash, function( data ) {
-  //       iterator(data);
-  //     });
-  //   }, 500 );
-  // });
-
   // destroy the database entry (no error handling for id not found)
   $( "#delete" ).on( "click", function() {
     var id = $( "#delete_id" ).val();
