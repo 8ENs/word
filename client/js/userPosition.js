@@ -1,12 +1,15 @@
 var markers = [];
-var red_pin = '../images/red_pin.png';
+var blue_pin = '../images/blue_pin.png';
+var blue_pin_50 = '../images/blue_pin_50.png';
 var green_pin = '../images/green_pin.png';
-var yellow_pin = '../images/yellow_pin.png';
-var red_pin_50 = '../images/red_pin_50.png';
 var green_pin_50 = '../images/green_pin_50.png';
+var yellow_pin = '../images/yellow_pin.png';
 var yellow_pin_50 = '../images/yellow_pin_50.png';
+var red_pin = '../images/red_pin.png';
+var red_pin_50 = '../images/red_pin_50.png';
 var gray_pin_50 = '../images/gray_pin_50.png';
 var current_loc_icon = '../images/blue_dot.png';
+pos = new google.maps.LatLng(0, 0);
 
 function initialize() {
   var mapOptions = {
@@ -26,26 +29,10 @@ function initialize() {
       pos = new google.maps.LatLng(lat, lng);
 
       // Add a current location to the Map
-      var currentLocation = new google.maps.Marker({
-        map: map,
-        position: pos,
-        draggable: true, // need to update lat/lng if draggable enabled
-        icon: current_loc_icon,
-        zIndex: google.maps.Marker.MAX_ZINDEX + 1
-      });
+      addCurrentGeo();
 
       // Add public markers to map
-      $.getJSON("/api/Pins?filter[where][type]=public", function(pins) {
-        pins.forEach(function(pin) {
-          markers.push(new google.maps.Marker({
-            position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
-            title: pin.id,
-            map: map,
-            icon: yellow_pin,
-            type: pin.type
-          }));
-        });
-      });
+      addPublicMarkers();
 
       map.setCenter(pos);
 
@@ -80,6 +67,42 @@ function handleNoGeolocation(errorFlag) {
 
   var infowindow = new google.maps.InfoWindow(options);
   map.setCenter(options.position);
+}
+
+function addCurrentGeo() {
+  currentLocation = new google.maps.Marker({
+    map: map,
+    position: pos,
+    draggable: true, // need to update lat/lng if draggable enabled
+    icon: current_loc_icon,
+    zIndex: google.maps.Marker.MAX_ZINDEX + 1
+  });
+}
+
+function addPublicMarkers() {
+  $.getJSON("/api/Pins?filter[where][type]=public", function(pins) {
+    pins.forEach(function(pin) {
+      markers.push(new google.maps.Marker({
+        position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
+        title: pin.id,
+        map: map,
+        icon: blue_pin_50,
+        type: pin.type
+      }));
+    });
+  });
+}
+
+function upgradePublicSaved() {
+  $.getJSON("/api/Pins?filter[where][type]=public&filter[where][status]=saved", function(pins) {
+    pins.forEach(function(pin) {
+      markers.forEach(function(marker) {
+        if (marker.title == pin.id) {
+          marker.setIcon(blue_pin);
+        }
+      });
+    });
+  });
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);

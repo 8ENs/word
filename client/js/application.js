@@ -175,9 +175,11 @@ function renderPins() {
 
   // get all pins which were dropped TO/FOR the currentUser (including public)
   var here = pos.A + "," + pos.F
-  $.getJSON( "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
-    iterator(pins);
-  });
+  if (currentUser != null) {
+    $.getJSON( "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
+      iterator(pins);
+    });
+  }
 }
 
 // generate list
@@ -185,7 +187,7 @@ function iterator(pins) {
   $.each( pins, function( idx, pin ) {
     $.getJSON("/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
       var pin_formatted =
-        "<b><li id='" + pin.id + "'>" + pin.message + "</li></b>"
+        "<b><li id='" + pin.id + "'>" + pin.message + " (" + pin.id + ")</li></b>"
         + "<ul>"
           + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
           + "<li>Type: " + pin.type + "</li>"
@@ -207,16 +209,25 @@ function list(line) {
 }
 
 function addMarkerWithTimeout(pin, timeout) {
-  window.setTimeout(function() {
-    markers.push(new google.maps.Marker({
-      position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
-      title: pin.id,
-      map: map,
-      icon: green_pin,
-      type: pin.type,
-      animation: google.maps.Animation.DROP
-    }));
-  }, timeout);
+  // window.setTimeout(function() {
+    $.getJSON("/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+      var marker = new google.maps.Marker({
+        position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
+        title: pin.id,
+        map: map,
+        icon: green_pin,
+        type: pin.type
+      });
+
+      if (pin.status == 'discovered')
+        marker.setIcon(gray_pin_50);
+
+      if (Math.round(dist.distance) < 250) 
+        marker.setIcon(green_pin_50);
+
+      markers.push(marker);
+    });
+  // }, timeout);
 }
   
 function login(email, pwd) {
@@ -250,4 +261,5 @@ function login(email, pwd) {
 
     });
   });
+  upgradePublicSaved();
 }
