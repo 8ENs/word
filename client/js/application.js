@@ -11,7 +11,7 @@ $(function() {
     
     // navbar redirect (eg. click on #nav_drop points to #div_drop)
     var id = this.id.substring(4, this.id.length);
-    $( "#div_" + id ).show();
+    $("#div_" + id).show();
 
     if (id == 'login') {
       $("#loginEmail").focus();
@@ -73,9 +73,9 @@ $(function() {
   });
 
   // lists all pins
-  $("#nav_explore").on( "click", function() {
-    renderPins();
-  });
+  // $("#nav_explore").on( "click", function() {
+  //   renderPins();
+  // });
 
   // destroy the database entry (no error handling for id not found)
   $( "#delete" ).on( "click", function() {
@@ -164,20 +164,35 @@ function renderPins() {
   }
 }
 
+function renderPin(pin) {
+  // clear old list
+  // $(".view").hide();
+  $("#pin_list").empty();
+
+  if (currentUser != null) {
+    iterator([pin]);
+  }
+}
+
 // generate list
 function iterator(pins) {
-  $.each( pins, function( idx, pin ) {
+  $.each(pins, function(idx, pin) {
     $.getJSON("/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
-      var pin_formatted =
-        "<b><li id='" + pin.id + "'>" + pin.message + " (" + pin.id + ")</li></b>"
-        + "<ul>"
-          + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
-          + "<li>Type: " + pin.type + "</li>"
-          + "<li>Status: " + pin.status + "</li>"
-          + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
-        + "</ul>"
-      ;
-      list(pin_formatted);
+      var distToPin = Math.round(dist.distance);
+
+      if (distToPin < 250 || pin.status == 'saved') {
+        var pin_formatted =
+          "<b><li id='" + pin.id + "'>" + pin.message + " (" + pin.id + ")</li></b>"
+          + "<ul>"
+            + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
+            + "<li>Type: " + pin.type + "</li>"
+            + "<li>Status: " + pin.status + "</li>"
+            + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
+          + "</ul>";
+        list(pin_formatted);
+      } else {
+        $("#pin_list").append("<b>You need to be " + (distToPin - 250) + " m closer to open this pin!");
+      }
     });
   });
 }

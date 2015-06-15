@@ -9,6 +9,7 @@ var red_pin = '../images/red_pin.png';
 var red_pin_50 = '../images/red_pin_50.png';
 var gray_pin_50 = '../images/gray_pin_50.png';
 var current_loc_icon = '../images/blue_dot.png';
+currentPin = null;
 pos = new google.maps.LatLng(0, 0);
 
 function initialize() {
@@ -40,7 +41,11 @@ function initialize() {
         pos = new google.maps.LatLng(event.latLng.A, event.latLng.F);
         
         // if on Explore tab this re-orders the current list dynamically by new order
-        renderPins();
+        // renderPins();
+
+        if (currentPin != null) {
+          renderPin(currentPin);
+        };
 
         // clear all markers, re-add current location & public markers, then add others in relation to new pos
         for (var i = 0; i < markers.length; i++) {
@@ -119,7 +124,42 @@ function addPublicMarkers() {
 }
 
 function onPinClick(marker) {
-  window.alert(marker.title);
+  if (currentUser != null) {
+    $.getJSON("/api/Pins/" + marker.title + "?filter[include]=wUser", function(pin) {
+      currentPin = pin;
+      $.getJSON("/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+
+        $(".view").hide();
+        $("#pin_list").empty();
+
+        var distToPin = Math.round(dist.distance);
+
+        if (distToPin < 250 || pin.status == 'saved') {
+          if (pin.status == 'discovered') {
+            pin.status = 'saved';
+
+            $.ajax({
+              url: "/api/Pins/" + pin.id,
+              type: 'PUT',
+              data: {"status": "saved"}
+            });
+
+            if (marker.type == 'private') {
+              marker.setIcon(green_pin);
+            } else if (marker.type == 'public') {
+              marker.setIcon(blue_pin);
+            }
+            
+          }
+          iterator([pin]);
+        } else {
+          $("#pin_list").append("<b>You need to be " + (distToPin - 250) + " m closer to open this pin!");
+        }
+
+        $("#div_explore").show();
+      });
+    });
+  }
 }
 
 function upgradePublicSaved() {
