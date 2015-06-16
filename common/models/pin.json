@@ -15,8 +15,7 @@
       "required": true
     },
     "recipient": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "media": {
       "type": "string"
@@ -32,10 +31,10 @@
   },
   "validations": [],
   "relations": {
-    "_id": {
+    "wUser": {
       "type": "belongsTo",
       "model": "wUser",
-      "foreignKey": ""
+      "foreignKey": "wUserId"
     }
   },
   "acls": [],

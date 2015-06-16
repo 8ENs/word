@@ -17,7 +17,7 @@
   },
   "validations": [],
   "relations": {
-    "user_id": {
+    "pins": {
       "type": "hasMany",
       "model": "Pin",
       "foreignKey": ""
