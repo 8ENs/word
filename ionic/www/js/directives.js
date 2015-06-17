@@ -2,16 +2,16 @@ angular.module('starter.directives', [])
 
 .directive('map', function() {
   markers = [];
-  var blue_pin = 'http://localhost:3000/images/blue_pin.png';
-  var blue_pin_50 = 'http://localhost:3000/images/blue_pin_50.png';
-  var green_pin = 'http://localhost:3000/images/green_pin.png';
-  var green_pin_50 = 'http://localhost:3000/images/green_pin_50.png';
-  var yellow_pin = 'http://localhost:3000/images/yellow_pin.png';
-  var yellow_pin_50 = 'http://localhost:3000/images/yellow_pin_50.png';
-  var red_pin = 'http://localhost:3000/images/red_pin.png';
-  var red_pin_50 = 'http://localhost:3000/images/red_pin_50.png';
-  var gray_pin_50 = 'http://localhost:3000/images/gray_pin_50.png';
-  var current_loc_icon = 'http://localhost:3000/images/blue_dot.png';
+  var blue_pin = API_HOST + '/images/blue_pin.png';
+  var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
+  var green_pin = API_HOST + '/images/green_pin.png';
+  var green_pin_50 = API_HOST + '/images/green_pin_50.png';
+  var yellow_pin = API_HOST + '/images/yellow_pin.png';
+  var yellow_pin_50 = API_HOST + '/images/yellow_pin_50.png';
+  var red_pin = API_HOST + '/images/red_pin.png';
+  var red_pin_50 = API_HOST + '/images/red_pin_50.png';
+  var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
+  var current_loc_icon = API_HOST + '/images/blue_dot.png';
   currentPin = null;
   pos = new google.maps.LatLng(0, 0);
   
@@ -72,7 +72,7 @@ angular.module('starter.directives', [])
               addPublicMarkers();
 
               if (currentUser != null) {
-                $.getJSON("http://localhost:3000/api/Pins?filter[where][type]=public&filter[where][status]=saved", function(pins) {
+                $.getJSON(API_HOST + "/api/Pins?filter[where][type]=public&filter[where][status]=saved", function(pins) {
                   pins.forEach(function(pin) {
                     markers.forEach(function(marker) {
                       if (marker.title == pin.id) {
@@ -83,7 +83,7 @@ angular.module('starter.directives', [])
                 });
 
                 // grab all pins (+ wUser) where type=private && recipient=currentUser
-                $.getJSON("http://localhost:3000/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
+                $.getJSON(API_HOST + "/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
                 
                   // loop through all pins and add them to map with 'title' as their id
                   for (var i = 0; i < pins.length; i++) {
@@ -105,7 +105,7 @@ angular.module('starter.directives', [])
       } // initialize end
 
       function addMarkerWithTimeout2(pin, timeout) {
-        $.getJSON("http://localhost:3000/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+        $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
             title: pin.id,
@@ -158,7 +158,7 @@ angular.module('starter.directives', [])
       }
 
       function addPublicMarkers() {
-        $.getJSON("http://localhost:3000/api/Pins?filter[where][type]=public", function(pins) {
+        $.getJSON(API_HOST + "/api/Pins?filter[where][type]=public", function(pins) {
           pins.forEach(function(pin) {
             var marker = new google.maps.Marker({
               position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
@@ -177,9 +177,9 @@ angular.module('starter.directives', [])
 
       function onPinClick(marker) {
         if (currentUser != null) {
-          $.getJSON("http://localhost:3000/api/Pins/" + marker.title + "?filter[include]=wUser", function(pin) {
+          $.getJSON(API_HOST + "/api/Pins/" + marker.title + "?filter[include]=wUser", function(pin) {
             currentPin = pin;
-            $.getJSON("http://localhost:3000/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+            $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
 
               $(".view").hide();
               $("#pin_list").empty();
@@ -190,7 +190,7 @@ angular.module('starter.directives', [])
                 pin.status = 'saved';
 
                 $.ajax({
-                  url: "http://localhost:3000/api/Pins/" + pin.id,
+                  url: API_HOST + "/api/Pins/" + pin.id,
                   type: 'PUT',
                   data: {"status": "saved"}
                 });

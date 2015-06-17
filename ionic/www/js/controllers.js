@@ -1,16 +1,16 @@
 angular.module('starter.controllers', [])
 
 .controller('MapCtrl', function($scope, $state) {
-  var blue_pin = 'http://localhost:3000/images/blue_pin.png';
-  var blue_pin_50 = 'http://localhost:3000/images/blue_pin_50.png';
-  var green_pin = 'http://localhost:3000/images/green_pin.png';
-  var green_pin_50 = 'http://localhost:3000/images/green_pin_50.png';
-  var yellow_pin = 'http://localhost:3000/images/yellow_pin.png';
-  var yellow_pin_50 = 'http://localhost:3000/images/yellow_pin_50.png';
-  var red_pin = 'http://localhost:3000/images/red_pin.png';
-  var red_pin_50 = 'http://localhost:3000/images/red_pin_50.png';
-  var gray_pin_50 = 'http://localhost:3000/images/gray_pin_50.png';
-  var current_loc_icon = 'http://localhost:3000/images/blue_dot.png';
+  var blue_pin = API_HOST + '/images/blue_pin.png';
+  var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
+  var green_pin = API_HOST + '/images/green_pin.png';
+  var green_pin_50 = API_HOST + '/images/green_pin_50.png';
+  var yellow_pin = API_HOST + '/images/yellow_pin.png';
+  var yellow_pin_50 = API_HOST + '/images/yellow_pin_50.png';
+  var red_pin = API_HOST + '/images/red_pin.png';
+  var red_pin_50 = API_HOST + '/images/red_pin_50.png';
+  var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
+  var current_loc_icon = API_HOST + '/images/blue_dot.png';
 
   accessToken = null;
   currentUser = null;
@@ -25,11 +25,11 @@ angular.module('starter.controllers', [])
     var loginPassword = $( "#loginPassword" ).val();
     var loginData = {email: loginEmail, password: loginPassword};
     
-    $.post( "http://localhost:3000/api/wUsers/login", loginData, function(auth) {
+    $.post( API_HOST + "/api/wUsers/login", loginData, function(auth) {
       accessToken = auth.id;
-      $.get( "http://localhost:3000/api/wUsers/" + auth.userId, function(userJson) {
+      $.get( API_HOST + "/api/wUsers/" + auth.userId, function(userJson) {
         currentUser = userJson;
-        $.getJSON("http://localhost:3000/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
+        $.getJSON(API_HOST + "/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
 
         for (var i = 0; i < pins.length; i++)
           addMarkerWithTimeout(pins[i], i * 200);
@@ -43,7 +43,7 @@ angular.module('starter.controllers', [])
   };
 
   function upgradePublicSaved() {
-    $.getJSON("http://localhost:3000/api/Pins?filter[where][type]=public&filter[where][status]=saved", function(pins) {
+    $.getJSON(API_HOST + "/api/Pins?filter[where][type]=public&filter[where][status]=saved", function(pins) {
       pins.forEach(function(pin) {
         markers.forEach(function(marker) {
           if (marker.title == pin.id) {
@@ -55,7 +55,7 @@ angular.module('starter.controllers', [])
   }
 
   $scope.logout = function () {
-    // $.post("http://localhost:3000/api/wUsers/logout?access_token=" + accessToken, null, function(){
+    // $.post(API_HOST + "/api/wUsers/logout?access_token=" + accessToken, null, function(){
       accessToken = null;
       currentUser = null;
     // })
@@ -77,7 +77,7 @@ angular.module('starter.controllers', [])
     var recipient = $("#recipient").val();
     var newPin;
     var newPinId;
-    $.getJSON("http://localhost:3000/api/wUsers?filter[where][username]=" + recipient, function(user) {
+    $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
       if (currentUser != null && user.length > 0) {
         var message = $("#message").val();
         var type = "private".toLowerCase();
@@ -89,10 +89,10 @@ angular.module('starter.controllers', [])
       }
     })
     .then(function() {
-      $.post( "http://localhost:3000/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
+      $.post( API_HOST + "/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
         newPinId = pin.id;
 
-        $.getJSON("http://localhost:3000/api/Pins/" + newPinId, function(pin) {
+        $.getJSON(API_HOST + "/api/Pins/" + newPinId, function(pin) {
           ico = (pin.type == 'public') ? yellow_pin : red_pin;
 
           var marker = new google.maps.Marker({
@@ -160,7 +160,7 @@ angular.module('starter.controllers', [])
   // generate list
   // function iterator(pins) {
   //   $.each(pins, function(idx, pin) {
-  //     $.getJSON("http://localhost:3000/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+  //     $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
   //       var distToPin = Math.round(dist.distance);
 
   //       if (pin.status == 'saved') {
@@ -191,7 +191,7 @@ angular.module('starter.controllers', [])
   // }
 
   function addMarkerWithTimeout(pin, timeout) {
-    $.getJSON("http://localhost:3000/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+    $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
       var marker = new google.maps.Marker({
         position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
         title: pin.id,
@@ -217,9 +217,9 @@ angular.module('starter.controllers', [])
 
   function onPinClick2(marker) {
     if (currentUser != null) {
-      $.getJSON("http://localhost:3000/api/Pins/" + marker.title + "?filter[include]=wUser", function(pin) {
+      $.getJSON(API_HOST + "/api/Pins/" + marker.title + "?filter[include]=wUser", function(pin) {
         currentPin = pin;
-        $.getJSON("http://localhost:3000/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+        $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
 
           $(".view").hide();
           $("#pin_list").empty();
@@ -230,7 +230,7 @@ angular.module('starter.controllers', [])
             pin.status = 'saved';
 
             $.ajax({
-              url: "http://localhost:3000/api/Pins/" + pin.id,
+              url: API_HOST + "/api/Pins/" + pin.id,
               type: 'PUT',
               data: {"status": "saved"}
             });
