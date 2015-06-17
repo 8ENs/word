@@ -1,0 +1,23 @@
+<ion-view title="Word on the Street">
+  <ion-nav-buttons side="right">
+    <button class="button button-icon button-clear ion-plus" ng-click="openModal()"></button>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="left">
+    <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
+  </ion-nav-buttons>        
+  <ion-tabs class="tabs-positive">
+    <ion-tab title="DROP">
+      <ion-content>
+        <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>
+      </ion-content>
+    </ion-tab>
+    <ion-tab title="EXPLORE">
+      <ion-content class="has-header">
+        <h4>EXPLORE</h4>
+        <ion-list>
+          <ion-item ng-repeat="ABC">LIST</ion-item>
+        </ion-list>
+      </ion-content>
+    </ion-tab>
+  </ion-tabs>
+</ion-view>
