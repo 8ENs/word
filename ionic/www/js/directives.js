@@ -1,7 +1,8 @@
 angular.module('starter.directives', [])
 
 .directive('map', function() {
-  markers = [];
+
+
   var blue_pin = API_HOST + '/images/blue_pin.png';
   var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
   var green_pin = API_HOST + '/images/green_pin.png';

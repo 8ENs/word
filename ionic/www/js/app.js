@@ -5,6 +5,11 @@
 
   app.config(function($stateProvider, $urlRouterProvider) {
 
+    $stateProvider.state('master', {
+      url: '/master',
+      templateUrl: 'templates/master.html'
+    })
+
     $stateProvider.state('welcome', {
       url: '/welcome',
       templateUrl: 'templates/welcome.html'
@@ -35,7 +40,7 @@
       templateUrl: 'templates/explore.html'
     })
 
-    $urlRouterProvider.otherwise('/welcome');
+    $urlRouterProvider.otherwise('/master');
   })
 
   app.run(function($ionicPlatform) {
