@@ -25,6 +25,11 @@
         url: '/:item',
         controller: 'ItemCtrl',
         templateUrl: 'item.html'
+      })
+      .state('explore', {
+        url: '/explore',
+        // controller: 'HomeCtrl',
+        templateUrl: 'templates/explore.html'
       });
 
     $urlRouterProvider.otherwise('/');
@@ -284,46 +289,6 @@
       }
     }
 
-    $scope.iterator = function(pins) {
-      $.each(pins, function(idx, pin) {
-        $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
-          var distToPin = Math.round(dist.distance);
-            // $("#pin_list").empty();
-          if (pin.status == 'saved') {
-            $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
-            // var pin_formatted =
-            //   "<b><li id='" + pin.id + "'>" + pin.message + " (" + pin.id + ")</li></b>"
-            //   + "<ul>"
-            //     + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
-            //     + "<li>Type: " + pin.type + "</li>"
-            //     + "<li>Status: " + pin.status + "</li>"
-            //     + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
-            //   + "</ul>";
-            // list(pin_formatted);
-          } else if (distToPin < 250) {
-            $("#pin_list").text("You are close enough! Touch the pin to open.");
-          } else {
-            $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
-          }
-        });
-      });
-    }
-
-    // display list
-    $scope.list = function (line) {
-      $("#pin_list").append(line);
-    }
-
-    $scope.renderPin = function (pin) {
-      // clear old list
-      // $(".view").hide();
-      // $("#pin_list").empty();
-
-      if (currentUser != null) {
-        $scope.iterator([pin]);
-      }
-    }
-
     $scope.dropPin = function () {
       var recipient = $("#recipient").val();
       var newPin;
@@ -363,7 +328,70 @@
         // } else {
         //   $("#recipient").val('NEED VALID USERNAME');
         // }
+      })
+    }
+
+    $scope.renderPin = function (pin) {
+      // clear old list
+      // $(".view").hide();
+      // $("#pin_list").empty();
+
+      if (currentUser != null) {
+        $scope.iterator([pin]);
+      }
+    }
+
+    $scope.renderPins = function () {
+      // clear old list of pins
+      // $("#pin_list").empty();
+
+      // get all pins which were dropped TO/FOR the currentUser (including public)
+      
+      var here = pos.A + "," + pos.F
+      if (currentUser != null) {
+        $.getJSON( "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
+          $scope.list(pins);
+        });
+      }
+    }
+
+    $scope.iterator = function(pins) {
+      $.each(pins, function(idx, pin) {
+        $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+          var distToPin = Math.round(dist.distance);
+            // $("#pin_list").empty();
+          if (pin.status == 'saved') {
+            $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
+          } else if (distToPin < 250) {
+            $("#pin_list").text("You are close enough! Touch the pin to open.");
+          } else {
+            $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
+          }
+        });
       });
+    }
+
+    // display list
+    // $scope.list = function (pins) {
+    //   $.each(pins, function(idx, pin) {
+    //     $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+    //       var distToPin = Math.round(dist.distance);
+    //       var pin_formatted =
+    //         "<b><li id='" + pin.id + "'>" + pin.message + " (" + pin.id + ")</li></b>"
+    //         + "<ul>"
+    //           + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
+    //           + "<li>Type: " + pin.type + "</li>"
+    //           + "<li>Status: " + pin.status + "</li>"
+    //           + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
+    //         + "</ul>";
+    //       $("#pin_list_all").append(pin_formatted);
+    //     });
+    //   });
+    // }
+
+    // display list
+    $scope.list = function (line) {
+      $("#pin_list").append(line);
     }
 
     $scope.logout = function () {

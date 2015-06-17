@@ -18,61 +18,25 @@
     <script src="js/main.js"></script>
   </head>
 
-<!--   <body ng-controller="MapCtrl">
-
-
-    <ion-view title="Word on the Street">
-      <ion-nav-bar class="bar-stable"></ion-nav-bar>
-
-      <ion-content>
-        <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>
-      </ion-content>
-
-      <ion-footer-bar class="bar-subfooter" style="margin: 5px; height: 32px; text-align: center;">
-        <div id="feed">Welcome. Please login.</div>
-      </ion-footer-bar>
-
-      <ion-footer-bar class="bar-stable">
-        <a href="#/login" class="button button-icon icon ion-log-in"> Login</a>
-        <a href="#/register"class="button button-icon icon ion-person-add"> Register</a>
-        <a href="#/droppin" class="button button-icon icon ion-location"> Drop Pin</a>
-        <a ng-click="renderPins()" href="#/explore"class="button button-icon icon ion-social-buffer"> Explore</a>
-        <a ng-click="logout()" class="button button-icon icon ion-log-out"> Logout</a>
-      </ion-footer-bar>
-    </ion-view> -->
-
-
   <body ng-controller="MapCtrl">
     
-     <ion-side-menus>
+    <ion-side-menus>
       <ion-nav-bar class="bar-stable"></ion-nav-bar>
       <ion-nav-view></ion-nav-view>
     </ion-side-menus>
     
     <script id="home.html" type="text/ng-template">
       <ion-view title="Word on the Street">
-        <ion-nav-buttons side="right">
-          <a href="#/register" id="nav_register" class="button button-icon icon ion-person-add"> Register</a>
-          <a ng-click="openModal()" id="nav_login" class="button button-icon icon ion-log-in"> Login</a>
-        </ion-nav-buttons>
         <ion-nav-buttons side="left">
-          <button class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
-        </ion-nav-buttons>        
-        <ion-tabs class="tabs-positive">
-          <ion-tab title="DROP">
-            <ion-content>
-              <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>
-            </ion-content>
-          </ion-tab>
-          <ion-tab title="EXPLORE">
-            <ion-content class="has-header">
-              <h4>EXPLORE</h4>
-              <ion-list>
-                <ion-item ng-repeat="ABC">LIST</ion-item>
-              </ion-list>
-            </ion-content>
-          </ion-tab>
-        </ion-tabs>
+          <button class="button button-icon button-clear ion-navicon" menu-toggle="left" disabled></button>
+        </ion-nav-buttons>
+        <ion-nav-buttons side="right">
+          <a hng-click="openModal(2)" id="nav_register" class="button button-icon icon ion-person-add" disabled>Register</a>
+          <a ng-click="openModal(1)" id="nav_login" class="button button-icon icon ion-log-in">Login</a>
+          <a ng-click="logout()" id="nav_logout" class="button button-icon icon ion-log-out" style="display: none">Logout</a>
+        </ion-nav-buttons> 
+
+        <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>  
       </ion-view>
     </script>
     
@@ -100,16 +64,15 @@
       </div>
     </script>
     
-
-
     <ion-footer-bar class="bar-subfooter" style="margin: 5px; height: 32px; text-align: center;">
       <div id="pin_list">Welcome. Please login.</div>
     </ion-footer-bar>
 
-    <ion-footer-bar class="bar-stable">
-      <a ng-click="dropPin()" id="nav_drop" class="button button-icon icon ion-location" style="display: none"> Drop Pin</a>
-      <a ng-click="renderPins()" id="nav_explore" href="#/explore"class="button button-icon icon ion-social-buffer" style="display: none"> Explore</a>
-      <a ng-click="logout()" id="nav_logout" class="button button-icon icon ion-log-out" style="display: none"> Logout</a>
+    <ion-footer-bar align-title="center" class="bar-stable">
+      <!-- <h1 id="pin_list" class="title">Welcome. Please login.</h1> -->
+      <a ng-click="dropPin()" id="nav_drop" class="button button-icon icon ion-location" style="display: none" disabled>Drop Pin</a>
+      <a ng-click="renderPins()" id="nav_explore" class="button button-icon icon ion-social-buffer" style="display: none" disabled>Explore</a>
+
     </ion-footer-bar>
 
   </body>
