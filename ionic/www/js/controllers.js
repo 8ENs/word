@@ -15,10 +15,11 @@ angular.module('starter.controllers', [])
   accessToken = null;
   currentUser = null;
   var pins = [];
+  pos = new google.maps.LatLng(49.282123, -123.108421); 
 
   $scope.mapCreated = function(map) {
     $scope.map = map;
-  };
+  }
 
   $scope.login = function () {
     var loginEmail = $( "#loginEmail" ).val();
@@ -40,7 +41,7 @@ angular.module('starter.controllers', [])
       });
     });
     upgradePublicSaved();
-  };
+  }
 
   function upgradePublicSaved() {
     $.getJSON(API_HOST + "/api/Pins?filter[where][type]=public&filter[where][status]=saved", function(pins) {
@@ -123,6 +124,20 @@ angular.module('starter.controllers', [])
     });
   }
 
+  $scope.renderPins = function () {
+    // clear old list of pins
+    $("#pin_list").empty();
+
+    // get all pins which were dropped TO/FOR the currentUser (including public)
+    
+    var here = pos.A + "," + pos.F
+    if (currentUser != null) {
+      $.getJSON( "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username, function(pins) {
+        iterator(pins);
+      });
+    }
+  }
+
   // destroy the database entry (no error handling for id not found)
   // $( "#delete" ).on( "click", function() {
   //   var id = $( "#delete_id" ).val();
@@ -158,37 +173,35 @@ angular.module('starter.controllers', [])
   // }
 
   // generate list
-  // function iterator(pins) {
-  //   $.each(pins, function(idx, pin) {
-  //     $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
-  //       var distToPin = Math.round(dist.distance);
+  function iterator(pins) {
+    $.each(pins, function(idx, pin) {
+      
+      $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+        var distToPin = Math.round(dist.distance);
 
-  //       if (pin.status == 'saved') {
-  //         var pin_formatted =
-  //           "<b><li id='" + pin.id + "'>" + pin.message + " (" + pin.id + ")</li></b>"
-  //           + "<ul>"
-  //             + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
-  //             + "<li>Type: " + pin.type + "</li>"
-  //             + "<li>Status: " + pin.status + "</li>"
-  //             + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
-  //           + "</ul>";
-  //         list(pin_formatted);
-  //       } else if (distToPin < 250) {
-  //         $("#pin_list").append("<b>You are close enough! Touch the pin to open.");
-  //       } else {
-  //         $("#pin_list").append("<b>You need to be " + (distToPin - 250) + " m closer to open this pin!");
-  //       }
-  //     });
-  //   });
-  // }
+        // if (pin.status == 'saved') {
+          var pin_formatted =
+            "<b><li id='" + pin.id + "'>" + pin.message + " (" + pin.id + ")</li></b>"
+            + "<ul>"
+              + "<li>From: " + pin.wUser.firstname + ' ' + pin.wUser.lastname + "</li>"
+              + "<li>Type: " + pin.type + "</li>"
+              + "<li>Status: " + pin.status + "</li>"
+              + "<li>Distance: " + Math.round(dist.distance) + " m</li>"
+            + "</ul>";
+          list(pin_formatted);
+        // } else if (distToPin < 250) {
+        //   $("#pin_list").append("<b>You are close enough! Touch the pin to open.");
+        // } else {
+        //   $("#pin_list").append("<b>You need to be " + (distToPin - 250) + " m closer to open this pin!");
+        // }
+      });
+    });
+  }
 
   // display list
-  // function list(line) {
-  //   $("<ul/>", {
-  //     "class": "view",
-  //     html: line
-  //   }).appendTo("#pin_list");
-  // }
+  function list(line) {
+    $("#pin_list").append(line);
+  }
 
   function addMarkerWithTimeout(pin, timeout) {
     $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
@@ -249,4 +262,33 @@ angular.module('starter.controllers', [])
       });
     }
   }
+
+  // function initialize2() {
+  //   if(navigator.geolocation) {
+  //     navigator.geolocation.getCurrentPosition(function(position) {
+
+  //       // Initialize
+  //       var lat = position.coords.latitude;
+  //       var lng = position.coords.longitude;
+  //       pos = new google.maps.LatLng(lat, lng);
+
+  //       google.maps.event.addListener(currentLocation, 'dragend', function(event) {
+  //         pos = new google.maps.LatLng(event.latLng.A, event.latLng.F);
+  //       });
+
+  //     }, function() {
+  //       handleNoGeolocation(true);
+  //     });
+  //   } else {
+  //     // Browser doesn't support Geolocation
+  //     handleNoGeolocation(false);
+  //   }
+  // }
+
+  // if (document.readyState === "complete") {
+  //   initialize2();
+  // } else {
+  //   google.maps.event.addDomListener(window, 'load', initialize2);
+  // }
+
 });
