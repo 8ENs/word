@@ -1,10 +1,7 @@
 {
   "db": {
-    "host": "localhost",
-    "port": 27017,
-    "database": "wordDB",
-    "name": "db",
+    "defaultForType": "mongodb",
     "connector": "loopback-connector-mongodb",
-    "url": "mongodb://localhost:27017/mydb"
+    "url": "mongodb://heroku_0k8nm758:ujsbp3cn9fktndnmpuie3fe2b9@ds031751.mongolab.com:31751/heroku_0k8nm758"
   }
 }
