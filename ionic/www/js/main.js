@@ -43,27 +43,40 @@
     currentPin = null;
     pos = new google.maps.LatLng(49.282123, -123.108421); 
 
-    $ionicModal.fromTemplateUrl('modal.html', {
+    $ionicModal.fromTemplateUrl('modal1.html', {
+      id: '1',
       animation: 'slide-in-up',
       scope: $scope
     }).then(function (modal) {
-      $scope.modal = modal;
+      $scope.oModal1 = modal;
+    });
+
+    $ionicModal.fromTemplateUrl('modal2.html', {
+      id: '2',
+      animation: 'slide-in-up',
+      scope: $scope
+    }).then(function (modal) {
+      $scope.oModal2 = modal;
     });
     
-    $scope.openMenu = function () {
-      $ionicSideMenuDelegate.toggleLeft();
-    }
+    // $scope.openMenu = function () {
+    //   $ionicSideMenuDelegate.toggleLeft();
+    // }
     
-    $scope.openModal = function () {
-      $scope.modal.show();
+    $scope.openModal = function (index) {
+      if (index == 1) $scope.oModal1.show();
+      else $scope.oModal2.show();
+    }
+
+    $scope.closeModal = function (index) {
+      if (index == 1) $scope.oModal1.hide();
+      else $scope.oModal2.hide();
     }
     
     $scope.form = {};  // ???
     
-    $scope.login = function () {
-      var loginEmail = $( "#loginEmail" ).val();
-      var loginPassword = $( "#loginPassword" ).val();
-      var loginData = {email: loginEmail, password: loginPassword};
+    $scope.login = function (email, password) {
+      var loginData = {email: email, password: password};
       
       $.post( API_HOST + "/api/wUsers/login", loginData, function(auth) {
         accessToken = auth.id;
@@ -76,7 +89,7 @@
           });
         });
       });
-      $scope.modal.hide();
+      $scope.closeModal(2);
       $scope.upgradePublicSaved();
       $("#nav_drop").show();
       $("#nav_explore").show();
@@ -84,9 +97,31 @@
       $("#nav_login").hide();
       $("#nav_register").hide();
     }
+
+    $scope.loginButton = function () {
+      var loginEmail = $( "#loginEmail" ).val();
+      var loginPassword = $( "#loginPassword" ).val();
+      $scope.login(loginEmail, loginPassword);
+    }
+
+    $scope.register = function () {
+      var url = "/api/wUsers"
+      var firstName = $("#regFirstname").val();
+      var lastName = $("#regLastname").val();
+      var email = $("#regEmail").val();
+      var userName = $("#regUsername").val().toLowerCase();
+      var password = $("#regPassword").val();
+      var regData = {email: email, password: password, firstname: firstName, lastname: lastName, username: userName};
+      
+      $.post( url, regData, function (data) {
+        $scope.login(email, password);
+      })
+      $scope.closeModal(1);
+    }
     
     $scope.$on('$destroy', function() {
-        $scope.modal.remove();
+        $scope.oModal1.remove();
+        $scope.oModal2.remove();
     });
 
   })
