@@ -58,19 +58,37 @@
     }).then(function (modal) {
       $scope.oModal2 = modal;
     });
+
+    $ionicModal.fromTemplateUrl('modal3.html', {
+      id: '3',
+      animation: 'slide-in-up',
+      scope: $scope
+    }).then(function (modal) {
+      $scope.oModal3 = modal;
+    });
     
     // $scope.openMenu = function () {
     //   $ionicSideMenuDelegate.toggleLeft();
     // }
     
     $scope.openModal = function (index) {
-      if (index == 1) $scope.oModal1.show();
-      else $scope.oModal2.show();
+      if (index == 1) {
+        $scope.oModal1.show()
+      } else if (index == 2) {
+        $scope.oModal2.show();
+      } else {
+        $scope.oModal3.show();
+      }
     }
 
     $scope.closeModal = function (index) {
-      if (index == 1) $scope.oModal1.hide();
-      else $scope.oModal2.hide();
+      if (index == 1) {
+        $scope.oModal1.hide()
+      } else if (index == 2) {
+        $scope.oModal2.hide();
+      } else {
+        $scope.oModal3.hide();
+      }
     }
     
     $scope.form = {};  // ???
@@ -118,11 +136,54 @@
       })
       $scope.closeModal(1);
     }
+
+    $scope.dropPin = function () {
+      var recipient = $("#recipient").val();
+      var newPin;
+      var newPinId;
+      $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
+        if (currentUser != null && user.length > 0) {
+          var message = $("#message").val();
+          var type = "private".toLowerCase();
+          var status = 'discovered';
+          var coords = {lat: pos.A, lng: pos.F};
+
+          newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
+        }
+      })
+      .then(function() {
+        $.post( API_HOST + "/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
+          newPinId = pin.id;
+
+          $.getJSON(API_HOST + "/api/Pins/" + newPinId, function(pin) {
+            ico = (pin.type == 'public') ? yellow_pin : red_pin;
+
+            var marker = new google.maps.Marker({
+              position: pos,
+              title: newPinId,
+              map: map,
+              icon: ico,
+              type: pin.type,
+              animation: google.maps.Animation.DROP
+            });
+            markers.push(marker);
+            google.maps.event.addListener(marker, 'click', function() {
+              onPinClick(marker);
+            });
+          });
+        });
+
+        // } else {
+        //   $("#recipient").val('NEED VALID USERNAME');
+        // }
+      })
+      $scope.closeModal(3);
+    }
     
-    $scope.$on('$destroy', function() {
-        $scope.oModal1.remove();
-        $scope.oModal2.remove();
-    });
+    // $scope.$on('$destroy', function() {
+    //     $scope.oModal1.remove();
+    //     $scope.oModal2.remove();
+    // });
 
   })
   .controller('ItemCtrl', function ($scope, $stateParams) {
@@ -322,48 +383,6 @@
           });
         });
       }
-    }
-
-    $scope.dropPin = function () {
-      var recipient = $("#recipient").val();
-      var newPin;
-      var newPinId;
-      $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
-        if (currentUser != null && user.length > 0) {
-          var message = $("#message").val();
-          var type = "private".toLowerCase();
-          var status = 'discovered';
-          var coords = {lat: pos.A, lng: pos.F};
-
-          newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
-        }
-      })
-      .then(function() {
-        $.post( API_HOST + "/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
-          newPinId = pin.id;
-
-          $.getJSON(API_HOST + "/api/Pins/" + newPinId, function(pin) {
-            ico = (pin.type == 'public') ? yellow_pin : red_pin;
-
-            var marker = new google.maps.Marker({
-              position: pos,
-              title: newPinId,
-              map: map,
-              icon: ico,
-              type: pin.type,
-              animation: google.maps.Animation.DROP
-            });
-            markers.push(marker);
-            google.maps.event.addListener(marker, 'click', function() {
-              onPinClick(marker);
-            });
-          });
-        });
-
-        // } else {
-        //   $("#recipient").val('NEED VALID USERNAME');
-        // }
-      })
     }
 
     $scope.renderPin = function (pin) {

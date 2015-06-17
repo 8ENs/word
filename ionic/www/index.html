@@ -33,6 +33,7 @@
         <ion-nav-buttons side="right">
           <a ng-click="openModal(1)" id="nav_register" class="button button-icon icon ion-person-add">Register</a>
           <a ng-click="openModal(2)" id="nav_login" class="button button-icon icon ion-log-in">Login</a>
+          <a ng-click="openModal(3)" id="nav_drop" class="button button-icon icon ion-location" style="display: none">Drop Pin</a>
           <a ng-click="logout()" id="nav_logout" class="button button-icon icon ion-log-out" style="display: none">Logout</a>
         </ion-nav-buttons> 
 
@@ -95,6 +96,41 @@
         </ion-content>
       </div>
     </script>
+
+    <script id="modal3.html" type="text/ng-template">
+      <div class="modal">
+        <ion-header-bar>
+          <h1 class="title">LOGIN</h1>
+          <button class="button button-clear button-primary" ng-click="closeModal(3)">Cancel</button>
+        </ion-header-bar>
+        <ion-content>
+
+          <div class="list">
+            <label class="item item-input">
+              <input type="text" placeholder="username" id="recipient">
+            </label>
+            <label class="item item-input">
+              <textarea placeholder="Message..." rows="5" id="message"></textarea>
+            </label>
+
+            <li class="item item-toggle">
+              Private
+              <label class="toggle toggle-assertive">
+                <input type="checkbox" id="type">
+                <div class="track">
+                  <div class="handle"></div>
+                </div>
+              </label>
+            </li>
+          </div>
+
+          <button class="button button-block button-positive" ng-click="dropPin()">
+            Drop Pin
+          </button>
+
+        </ion-content>
+      </div>
+    </script>
     
     <ion-footer-bar class="bar-subfooter" style="margin: 5px; height: 32px; text-align: center;">
       <div id="pin_list">Welcome. Please login.</div>
@@ -102,7 +138,7 @@
 
     <ion-footer-bar align-title="center" class="bar-stable">
       <!-- <h1 id="pin_list" class="title">Welcome. Please login.</h1> -->
-      <a ng-click="dropPin()" id="nav_drop" class="button button-icon icon ion-location" style="display: none" disabled>Drop Pin</a>
+      
       <a ng-click="renderPins()" id="nav_explore" class="button button-icon icon ion-social-buffer" style="display: none" disabled>Explore</a>
 
     </ion-footer-bar>
