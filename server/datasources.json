@@ -4,6 +4,7 @@
     "port": 27017,
     "database": "wordDB",
     "name": "db",
-    "connector": "mongodb"
+    "connector": "loopback-connector-mongodb",
+    "url": "mongodb://localhost:27017/mydb"
   }
 }
