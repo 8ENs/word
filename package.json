@@ -9,7 +9,7 @@
     "compression": "^1.0.3",
     "cors": "^2.5.2",
     "errorhandler": "^1.1.1",
-    "loopback": "^2.14.0",
+    "loopback": "git+https://github.com/jebididas/loopback.git",
     "loopback-boot": "^2.6.5",
     "loopback-connector-mongodb": "^1.11.0",
     "loopback-datasource-juggler": "^2.19.0",
