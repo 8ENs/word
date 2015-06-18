@@ -26,7 +26,7 @@
   })
 
 
-  .controller('MapCtrl', function($scope, $ionicModal, Pins) {
+  .controller('MapCtrl', function($scope, $ionicModal, Pins, $ionicActionSheet) {
     accessToken = null;
     currentUser = null;
     markers = [];
@@ -424,7 +424,8 @@
               } 
             } 
             
-            $scope.iterator([pin]);
+            // $scope.iterator([pin]);
+            $scope.show([pin]);
           });
         });
       }
@@ -454,6 +455,7 @@
       }
     }
 
+    // OLD version to show in subFooter, new actionSheet with $scope.show() below
     $scope.iterator = function(pins) {
       $.each(pins, function(idx, pin) {
         $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
@@ -469,6 +471,52 @@
         });
       });
     }
+
+    // Triggered on pin click
+    $scope.show = function(pins) {
+
+       $.each(pins, function(idx, pin) {
+        $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+          var distToPin = Math.round(dist.distance);
+          var titleText = ''; 
+            // $("#pin_list").empty();
+            // This section immediately below should stay for demo purposes to show a constant update in subFooter
+          if (pin.status == 'saved') {
+            $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
+            titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
+          } else if (distToPin < 250) {
+            $("#pin_list").text("You are close enough! Touch the pin to open.");
+            titleText = '"' + pin.message + '" - ' + pin.wUser.firstname + ' (Pin Found!)';
+          } else {
+            $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
+            titleText = 'You need to be ' + (distToPin - 250) + ' m closer to open this pin!';
+          }
+
+           // Show the action sheet
+           var hideSheet = $ionicActionSheet.show({
+              titleText: titleText,
+              destructiveText: 'Delete',
+              cancelText: 'Cancel',
+              cancel: function() {
+                  // add cancel code..
+                },
+              buttonClicked: function(index) {
+               return true;
+              }
+           });
+
+           // For example's sake, hide the sheet after two seconds
+           $timeout(function() {
+             hideSheet();
+           }, 2000);
+
+
+        });
+      });     
+
+
+
+    };    
 
     // display list
     $scope.list = function (line) {
