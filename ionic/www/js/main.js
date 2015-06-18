@@ -128,12 +128,10 @@
       }
     }
 
-
     $scope.login = function (email, password) {
       var loginData = {email: email, password: password};
       
       $.post( API_HOST + "/api/wUsers/login", loginData, function(auth) {
-        debugger
         if (auth.id != undefined) {
           accessToken = auth.id;
           sessionStorage.setItem('token', accessToken);
