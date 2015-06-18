@@ -147,12 +147,8 @@
             <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="pin in pins" type="item-text-wrap" href="#/tab/pins/{{pin.id}}">
               <img ng-src="{{pin.face}}">
               <h2>{{pin.name}}</h2>
-              <p>{{pin.lastText}}</p>
+              <p>{{pin.message}}</p>
               <i class="icon ion-chevron-right icon-accessory"></i>
-
-              <ion-option-button class="button-assertive" ng-click="remove(pin)">
-                Delete
-              </ion-option-button>
             </ion-item>
           </ion-list>
         </ion-content>
