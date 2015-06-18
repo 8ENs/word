@@ -1,7 +1,9 @@
 angular.module('word.services', [])
 
 .factory('Pins', function() {
-  var initialPullPinsURL = "/api/Pins?filter[where][type]=public&filter[where][status]=saved";
+  // no access to pos, we need the initial coords to be saved globally somewhere
+  // var initialPullPinsURL = "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng + "filter[where][type]=public&filter[where][status]=saved";
+  var initialPullPinsURL = "/api/Pins/distance?currentLat?filter[where][type]=public&filter[where][status]=saved";
   currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
   if (currentUser != null || currentUser != undefined){
     initialPullPinsURL = "/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.firstname.toLowerCase();
