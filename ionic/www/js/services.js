@@ -1,12 +1,11 @@
-angular.module('word.services', ['word'])
+angular.module('word.services', [])
 
 .factory('Pins', function() {
-  // Might use a resource here that returns a JSON array
+  currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
 
-  // Some fake testing data
   var pins = [];
   var ctr = 0;
-  $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=jody", function(pulledPins) {
+  $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.firstname.toLowerCase(), function(pulledPins) {
     pulledPins.forEach(function(onePin){
       pins.push({
         id: ctr,
@@ -18,10 +17,6 @@ angular.module('word.services', ['word'])
     });
   });
 
-    //   id: 0,
-    // name: 'Ben Sparrow',
-    // lastText: 'You on your way?',
-    // face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
 
   return {
     all: function() {
