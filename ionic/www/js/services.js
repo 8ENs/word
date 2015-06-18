@@ -10,12 +10,13 @@ angular.module('word.services', [])
   var ctr = 0;
   $.getJSON(initialPullPinsURL, function(pulledPins) {
     pulledPins.forEach(function(onePin){
-      pins.push({
+      pins.push($.extend(onePin, {
         id: ctr,
+        internalId: onePin.id,
         senderName: onePin.wUser.firstname,
         message: onePin.message,
         face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
-      });
+      }));
       ctr++;
     });
   });

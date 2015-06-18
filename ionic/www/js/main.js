@@ -26,7 +26,8 @@
   })
 
 
-  .controller('MapCtrl', function($scope, $ionicModal, Pins, $ionicActionSheet) {
+  .controller('MapCtrl', ['$scope', '$ionicModal', 'Pins', '$ionicActionSheet', '$timeout', 
+    function($scope, $ionicModal, Pins, $ionicActionSheet, $timeout) { // Putting these in strings allows minification not to break
     accessToken = null;
     currentUser = null;
     markers = [];
@@ -221,7 +222,8 @@
               map: map,
               icon: ico,
               type: pin.type,
-              animation: google.maps.Animation.DROP
+              animation: google.maps.Animation.DROP,
+              pinId: pin.id
             });
             markers.push(marker);
             google.maps.event.addListener(marker, 'click', function() {
@@ -474,7 +476,6 @@
 
     // Triggered on pin click
     $scope.show = function(pins) {
-
        $.each(pins, function(idx, pin) {
         $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
           var distToPin = Math.round(dist.distance);
@@ -506,18 +507,18 @@
               }
            });
 
-           // For example's sake, hide the sheet after two seconds
+           // hide the sheet after two seconds (this doesn't work)
            $timeout(function() {
-             hideSheet();
+             //hideSheet.hide();
            }, 2000);
-
-
         });
       });     
+    };   
 
-
-
-    };    
+    $scope.goToPinPopUp = function(pin){
+      $scope.closeModal(4); // Close the Explore Modal
+      $scope.show([pin]); // Show the pin actionSheet
+    } 
 
     // display list
     $scope.list = function (line) {
@@ -525,6 +526,6 @@
     }
 
     loadSession();
-  });
+  }]);
 
 }());
