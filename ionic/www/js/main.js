@@ -12,7 +12,7 @@
   var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
   var current_loc_icon = API_HOST + '/images/blue_dot.png';
 
-  angular.module('word', ['ionic'])
+  angular.module('word', ['ionic','word.services'])
   .config(function($stateProvider, $urlRouterProvider) {
 
     $stateProvider
@@ -26,13 +26,15 @@
   })
 
 
-  .controller('MapCtrl', function($scope, $ionicModal) {
+  .controller('MapCtrl', function($scope, $ionicModal, Pins) {
     accessToken = null;
     currentUser = null;
     markers = [];
     currentPin = null;
     pos = new google.maps.LatLng(49.282123, -123.108421); 
 
+    // services.js
+    $scope.pins = Pins.all();
 
 
     //MODAL STUFF
@@ -60,14 +62,24 @@
     }).then(function (modal) {
       $scope.oModal3 = modal;
     });
+
+    $ionicModal.fromTemplateUrl('modal4.html', {
+      id: '4',
+      animation: 'slide-in-up',
+      scope: $scope
+    }).then(function (modal) {
+      $scope.oModal4 = modal;
+    });    
     
     $scope.openModal = function (index) {
       if (index == 1) {
         $scope.oModal1.show()
       } else if (index == 2) {
-        $scope.oModal2.show();
-      } else {
+        $scope.oModal2.show();        
+      } else if (index == 3) {
         $scope.oModal3.show();
+      } else {
+        $scope.oModal4.show();
       }
     }
 
@@ -75,9 +87,11 @@
       if (index == 1) {
         $scope.oModal1.hide()
       } else if (index == 2) {
-        $scope.oModal2.hide();
-      } else {
+        $scope.oModal2.hide();        
+      } else if (index == 3) {
         $scope.oModal3.hide();
+      } else {
+        $scope.oModal4.hide();
       }
     }
 
