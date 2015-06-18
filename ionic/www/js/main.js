@@ -36,6 +36,7 @@
     // services.js
     $scope.pins = Pins.all();
 
+
     //MODAL STUFF
 
     $ionicModal.fromTemplateUrl('modal1.html', {
@@ -96,27 +97,52 @@
 
     // LOGIN AND REGISTER STUFF
 
+    var displayPrivatePins = function() {
+      $.getJSON(API_HOST + "/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
+        $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
+        for (var i = 0; i < pins.length; i++)
+          $scope.addMarkerWithTimeout(pins[i], i * 200)
+      });
+    }
+
+    var displayLoggedInMenus = function() {
+      $scope.upgradePublicSaved();
+      $(function () {
+        $("#nav_drop").show();
+        $("#nav_explore").show();
+        $("#nav_logout").show();
+        $("#nav_login").hide();
+        $("#nav_register").hide();
+      })
+
+    }
+
+
+    //check session
+    var loadSession = function(){
+      if(sessionStorage.getItem("currentUser")) {
+        currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+        accessToken = sessionStorage.getItem("token");
+        displayPrivatePins();
+        displayLoggedInMenus();
+      }
+    }
+
+
     $scope.login = function (email, password) {
       var loginData = {email: email, password: password};
       
       $.post( API_HOST + "/api/wUsers/login", loginData, function(auth) {
         accessToken = auth.id;
+        sessionStorage.setItem('token', accessToken);
         $.get( API_HOST + "/api/wUsers/" + auth.userId, function(userJson) {
           currentUser = userJson;
-          $.getJSON(API_HOST + "/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
-            $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
-            for (var i = 0; i < pins.length; i++)
-              $scope.addMarkerWithTimeout(pins[i], i * 200)
-          });
+          sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+          displayPrivatePins();
         });
       });
       $scope.closeModal(2);
-      $scope.upgradePublicSaved();
-      $("#nav_drop").show();
-      $("#nav_explore").show();
-      $("#nav_logout").show();
-      $("#nav_login").hide();
-      $("#nav_register").hide();
+      displayLoggedInMenus();
     }
 
     $scope.loginButton = function () {
@@ -139,6 +165,32 @@
       })
       $scope.closeModal(1);
     }
+
+    $scope.logout = function () {
+      $.post(API_HOST + "/api/wUsers/logout?access_token=" + accessToken, null, function(){
+        accessToken = null;
+        currentUser = null;
+        sessionStorage.clear();
+      })
+
+        var i = markers.length;
+        while (i--) {
+          if (markers[i].type != 'public') {
+            markers[i].setMap(null);
+            markers.splice(i, 1);
+          } else {
+            markers[i].setIcon(blue_pin_50)
+          }
+        }
+      $("#pin_list").text("Welcome. Please login.")
+      $("#nav_drop").hide();
+      $("#nav_explore").hide();
+      $("#nav_logout").hide();
+      $("#nav_login").show();
+      $("#nav_register").show();
+      }
+
+
 
     // DROP PIN
 
@@ -423,27 +475,7 @@
       $("#pin_list").append(line);
     }
 
-    $scope.logout = function () {
-      $.post(API_HOST + "/api/wUsers/logout?access_token=" + accessToken, null, function(){
-        accessToken = null;
-        currentUser = null;
-      })
-
-        var i = markers.length;
-        while (i--) {
-          if (markers[i].type != 'public') {
-            markers[i].setMap(null);
-            markers.splice(i, 1);
-          } else {
-            markers[i].setIcon(blue_pin_50)
-          }
-        }
-      $("#pin_list").text("Welcome. Please login.")
-      $("#nav_drop").hide();
-      $("#nav_explore").hide();
-      $("#nav_logout").hide();
-      $("#nav_login").show();
-      $("#nav_register").show();
-      }
+    loadSession();
   });
+
 }());
