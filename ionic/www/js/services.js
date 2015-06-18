@@ -1,11 +1,14 @@
 angular.module('word.services', [])
 
 .factory('Pins', function() {
+  var initialPullPinsURL = "/api/Pins?filter[where][type]=public&filter[where][status]=saved";
   currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-
+  if (currentUser != null || currentUser != undefined){
+    initialPullPinsURL = "/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.firstname.toLowerCase();
+  }
   var pins = [];
   var ctr = 0;
-  $.getJSON("/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.firstname.toLowerCase(), function(pulledPins) {
+  $.getJSON(initialPullPinsURL, function(pulledPins) {
     pulledPins.forEach(function(onePin){
       pins.push({
         id: ctr,
