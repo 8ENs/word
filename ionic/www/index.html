@@ -48,6 +48,7 @@
           <button class="button button-clear button-primary" ng-click="closeModal(1)">Cancel</button>
         </ion-header-bar>
           <ion-content>
+            <form>
               <div class="list">
                 <label class="item item-input">
                   <input type="text" placeholder="First" id="regFirstname">
@@ -68,7 +69,7 @@
               <button class="button button-block button-positive" ng-click="register()">
                 Create Account
               </button>
-            </ion-content>
+          </form>
         </ion-content>
       </div>
     </script>
@@ -80,19 +81,20 @@
           <button class="button button-clear button-primary" ng-click="closeModal(2)">Cancel</button>
         </ion-header-bar>
         <ion-content>
-          <div class="list">
-            <label class="item item-input">
-              <input type="text" placeholder="Email" id="loginEmail">
-            </label>
-            <label class="item item-input">
-              <input type="password" id="loginPassword" placeholder="Password">
-            </label>
-          </div>
+          <form>
+            <div class="list">
+              <label class="item item-input">
+                <input type="text" placeholder="Email" id="loginEmail" required="true">
+              </label>
+              <label class="item item-input">
+                <input type="password" id="loginPassword" placeholder="Password" required="true">
+              </label>
+            </div>
 
-          <button class="button button-block button-positive" ng-click="loginButton()">
-            Login
-          </button>
-
+            <button class="button button-block button-positive" ng-click="loginButton()">
+              Login
+            </button>
+          </form>
         </ion-content>
       </div>
     </script>
@@ -100,34 +102,34 @@
     <script id="modal3.html" type="text/ng-template">
       <div class="modal">
         <ion-header-bar>
-          <h1 class="title">LOGIN</h1>
+          <h1 class="title">DROP PIN</h1>
           <button class="button button-clear button-primary" ng-click="closeModal(3)">Cancel</button>
         </ion-header-bar>
         <ion-content>
-
-          <div class="list">
-            <label class="item item-input">
-              <input type="text" placeholder="username" id="recipient">
-            </label>
-            <label class="item item-input">
-              <textarea placeholder="Message..." rows="5" id="message"></textarea>
-            </label>
-
-            <li class="item item-toggle">
-              Private
-              <label class="toggle toggle-assertive">
-                <input type="checkbox" id="type">
-                <div class="track">
-                  <div class="handle"></div>
-                </div>
+          <form>
+            <div class="list">
+              <label class="item item-input">
+                <input type="text" placeholder="username" id="recipient" required>
               </label>
-            </li>
-          </div>
+              <label class="item item-input">
+                <textarea placeholder="Message..." rows="5" id="message" required></textarea>
+              </label>
 
-          <button class="button button-block button-positive" ng-click="dropPin()">
-            Drop Pin
-          </button>
+              <li class="item item-toggle">
+                Private
+                <label class="toggle toggle-assertive">
+                  <input type="checkbox" id="type">
+                  <div class="track">
+                    <div class="handle"></div>
+                  </div>
+                </label>
+              </li>
+            </div>
 
+            <button class="button button-block button-positive" ng-click="dropPin()">
+              Drop Pin
+            </button>
+          </form>
         </ion-content>
       </div>
     </script>
