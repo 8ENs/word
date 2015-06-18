@@ -12,7 +12,7 @@ angular.module('word.services', [])
     pulledPins.forEach(function(onePin){
       pins.push({
         id: ctr,
-        name: onePin.name,
+        senderName: onePin.wUser.firstname,
         message: onePin.message,
         face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
       });

@@ -491,6 +491,7 @@
             $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
             titleText = 'You need to be ' + (distToPin - 250) + ' m closer to open this pin!';
           }
+          titleText += "12:45pm";
 
            // Show the action sheet
            var hideSheet = $ionicActionSheet.show({
