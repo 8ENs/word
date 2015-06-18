@@ -21,10 +21,8 @@
         controller: 'MapCtrl',
         templateUrl: 'home.html'
       })
-
     $urlRouterProvider.otherwise('/');
   })
-
 
   .controller('MapCtrl', function($scope, $ionicModal) {
     accessToken = null;
@@ -32,8 +30,6 @@
     markers = [];
     currentPin = null;
     pos = new google.maps.LatLng(49.282123, -123.108421); 
-
-
 
     //MODAL STUFF
 
@@ -83,7 +79,7 @@
 
     // LOGIN AND REGISTER STUFF
 
-    var displayPrivatePins = function() {
+    var addPrivateMarkers = function() {
       $.getJSON(API_HOST + "/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
         $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
         for (var i = 0; i < pins.length; i++)
@@ -100,31 +96,42 @@
         $("#nav_login").hide();
         $("#nav_register").hide();
       })
-
     }
 
+    var displayLoggedOutMenus = function() {
+      $(function () {
+        $("#nav_drop").hide();
+        $("#nav_explore").hide();
+        $("#nav_logout").hide();
+        $("#nav_login").show();
+        $("#nav_register").show();
+      })
+    }
 
     //check session
     var loadSession = function(){
       if(sessionStorage.getItem("currentUser")) {
         currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
         accessToken = sessionStorage.getItem("token");
-        displayPrivatePins();
+        addPrivateMarkers();
         displayLoggedInMenus();
       }
     }
 
-
     $scope.login = function (email, password) {
       var loginData = {email: email, password: password};
-      
+      var authData;
+
       $.post( API_HOST + "/api/wUsers/login", loginData, function(auth) {
+        authData = auth;
         accessToken = auth.id;
         sessionStorage.setItem('token', accessToken);
-        $.get( API_HOST + "/api/wUsers/" + auth.userId, function(userJson) {
+      })
+      .then(function() {
+        $.get( API_HOST + "/api/wUsers/" + authData.userId, function(userJson) {
           currentUser = userJson;
           sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-          displayPrivatePins();
+          addPrivateMarkers();
         });
       });
       $scope.closeModal(2);
@@ -169,14 +176,8 @@
           }
         }
       $("#pin_list").text("Welcome. Please login.")
-      $("#nav_drop").hide();
-      $("#nav_explore").hide();
-      $("#nav_logout").hide();
-      $("#nav_login").show();
-      $("#nav_register").show();
-      }
-
-
+      displayLoggedOutMenus();
+    } 
 
     // DROP PIN
 
@@ -246,10 +247,10 @@
          pos = new google.maps.LatLng(lat, lng);
 
         // Add a current location to the Map
-        addCurrentGeo();
+        $scope.addCurrentGeo();
 
         // Add public markers to map
-        addPublicMarkers();
+        $scope.addPublicMarkers();
 
         // Center
         map.setCenter(pos);
@@ -265,30 +266,21 @@
           };
 
           // clear all markers, re-add current location & public markers, then add others in relation to new pos
-          for (var i = 0; i < markers.length; i++) {
-            markers[i].setMap(null);
-          }
-          addPublicMarkers();
+          // for (var i = 0; i < markers.length; i++) {
+          //   markers[i].setMap(null);
+          // }
+          // $scope.addPublicMarkers();
 
           if (currentUser != null) {
-            $.getJSON(API_HOST + "/api/Pins?filter[where][type]=public&filter[where][status]=saved", function(pins) {
-              pins.forEach(function(pin) {
-                markers.forEach(function(marker) {
-                  if (marker.title == pin.id) {
-                    marker.setIcon(blue_pin);
-                  }
-                });
-              });
-            });
+            $scope.upgradePublicSaved();
 
             // grab all pins (+ wUser) where type=private && recipient=currentUser
             $.getJSON(API_HOST + "/api/Pins?filter[include]=wUser&filter[where][type]=private&filter[where][recipient]=" + currentUser.username, function(pins) {
-          
-              // loop through all pins and add them to map with 'title' as their id
+              // loop through all pins and add them to map
               for (var i = 0; i < pins.length; i++) {
-                $scope.addMarkerWithTimeout(pins[i], i * 200)
+                $scope.redrawPrivatePin(pins[i]);
+                // $scope.addMarkerWithTimeout(pins[i], i * 200)
               }
-
             });
           }
         });
@@ -319,7 +311,7 @@
       map.setCenter(options.position);
     }
 
-    function addCurrentGeo() {
+    $scope.addCurrentGeo = function() {
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
@@ -329,16 +321,15 @@
       });
     }
 
-    function addPublicMarkers() {
+    $scope.addPublicMarkers = function() {
       $.getJSON(API_HOST + "/api/Pins?filter[where][type]=public", function(pins) {
         pins.forEach(function(pin) {
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
-            title: pin.id,
             map: map,
-            icon: blue_pin_50,
-            type: pin.type
+            icon: blue_pin_50
           });
+          marker.pin = pin;
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', function() {
             $scope.onPinClick(marker);
@@ -351,7 +342,7 @@
       $.getJSON(API_HOST + "/api/Pins?filter[where][type]=public&filter[where][status]=saved", function(pins) {
         pins.forEach(function(pin) {
           markers.forEach(function(marker) {
-            if (marker.title == pin.id) {
+            if (marker.pin.id == pin.id) {
               marker.setIcon(blue_pin);
             }
           });
@@ -363,29 +354,22 @@
       $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
         var marker = new google.maps.Marker({
           position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
-          title: pin.id,
           map: map,
-          icon: green_pin,
-          type: pin.type
+          icon: green_pin
         });
+        marker.pin = pin;
         markers.push(marker);
         google.maps.event.addListener(marker, 'click', function() {
           $scope.onPinClick(marker);
         });
 
-        if (pin.status == 'saved') {
-          // do nothing
-        } else if (Math.round(dist.distance) < 250) {
-          marker.setIcon(green_pin_50);
-        } else if (pin.status == 'discovered') {
-          marker.setIcon(gray_pin_50);
-        }
+        $scope.redrawPrivatePin(pin);
       });
     }
 
     $scope.onPinClick = function(marker){
       if (currentUser != null) {
-        $.getJSON(API_HOST + "/api/Pins/" + marker.title + "?filter[include]=wUser", function(pin) {
+        $.getJSON(API_HOST + "/api/Pins/" + marker.pin.id + "?filter[include]=wUser", function(pin) {
           currentPin = pin;
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
 
@@ -403,9 +387,9 @@
                 data: {"status": "saved"}
               });
 
-              if (marker.type == 'private') {
+              if (marker.pin.type == 'private') {
                 marker.setIcon(green_pin);
-              } else if (marker.type == 'public') {
+              } else if (marker.pin.type == 'public') {
                 marker.setIcon(blue_pin);
               } 
             } 
