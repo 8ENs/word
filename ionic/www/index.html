@@ -16,6 +16,7 @@
 
     <!-- your app's js -->
     <script src="js/main.js"></script>
+    <script src="js/services.js"></script>
   </head>
 
   <body>
@@ -31,6 +32,7 @@
           <button class="button button-icon button-clear ion-navicon" menu-toggle="left" disabled></button>
         </ion-nav-buttons>
         <ion-nav-buttons side="right">
+          <a ng-click="openModal(4)" id="nav_explore" class="button button-icon icon ion-social-buffer" style="display: none">Explore</a>
           <a ng-click="openModal(1)" id="nav_register" class="button button-icon icon ion-person-add">Register</a>
           <a ng-click="openModal(2)" id="nav_login" class="button button-icon icon ion-log-in">Login</a>
           <a ng-click="openModal(3)" id="nav_drop" class="button button-icon icon ion-location" style="display: none">Drop Pin</a>
@@ -133,6 +135,29 @@
         </ion-content>
       </div>
     </script>
+
+    <script id="modal4.html" type="text/ng-template">
+      <div class="modal">
+        <ion-header-bar>
+          <h1 class="title">EXPLORE PINS</h1>
+          <button class="button button-clear button-primary" ng-click="closeModal(4)">Cancel</button>
+        </ion-header-bar>
+        <ion-content>
+          <ion-list>
+            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="pin in pins" type="item-text-wrap" href="#/tab/pins/{{pin.id}}">
+              <img ng-src="{{pin.face}}">
+              <h2>{{pin.name}}</h2>
+              <p>{{pin.lastText}}</p>
+              <i class="icon ion-chevron-right icon-accessory"></i>
+
+              <ion-option-button class="button-assertive" ng-click="remove(pin)">
+                Delete
+              </ion-option-button>
+            </ion-item>
+          </ion-list>
+        </ion-content>
+      </div>
+    </script> 
     
     <ion-footer-bar class="bar-subfooter" style="margin: 5px; height: 32px; text-align: center;">
       <div id="pin_list">Welcome. Please login.</div>
@@ -141,7 +166,8 @@
     <ion-footer-bar align-title="center" class="bar-stable">
       <!-- <h1 id="pin_list" class="title">Welcome. Please login.</h1> -->
       
-      <a ng-click="renderPins()" id="nav_explore" class="button button-icon icon ion-social-buffer" style="display: none" disabled>Explore</a>
+      <!-- This should be here eventually, but it is not wrapped in a script tag... -->
+      <!--  <a ng-click="openModal(4)" id="nav_explore" class="button button-icon icon ion-social-buffer" style="display: none">Explore</a>  --> 
 
     </ion-footer-bar>
 
