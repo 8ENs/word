@@ -26,7 +26,8 @@
   })
 
 
-  .controller('MapCtrl', function($scope, $ionicModal, Pins) {
+  .controller('MapCtrl', ['$scope', '$ionicModal', 'Pins', '$ionicActionSheet', '$timeout', 
+    function($scope, $ionicModal, Pins, $ionicActionSheet, $timeout) { // Putting these in strings allows minification not to break
     accessToken = null;
     currentUser = null;
     markers = [];
@@ -225,7 +226,8 @@
               map: map,
               icon: ico,
               type: pin.type,
-              animation: google.maps.Animation.DROP
+              animation: google.maps.Animation.DROP,
+              pinId: pin.id
             });
             markers.push(marker);
             google.maps.event.addListener(marker, 'click', function() {
@@ -259,8 +261,8 @@
 
         // Initialize
         var pins = [];
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
+        lat = position.coords.latitude;
+        lng = position.coords.longitude;
          pos = new google.maps.LatLng(lat, lng);
 
         // Add a current location to the Map
@@ -428,7 +430,8 @@
               } 
             } 
             
-            $scope.iterator([pin]);
+            // $scope.iterator([pin]);
+            $scope.show([pin]);
           });
         });
       }
@@ -458,6 +461,7 @@
       }
     }
 
+    // OLD version to show in subFooter, new actionSheet with $scope.show() below
     $scope.iterator = function(pins) {
       $.each(pins, function(idx, pin) {
         $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
@@ -474,12 +478,57 @@
       });
     }
 
+    // Triggered on pin click
+    $scope.show = function(pins) {
+       $.each(pins, function(idx, pin) {
+        $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+          var distToPin = Math.round(dist.distance);
+          var titleText = ''; 
+            // $("#pin_list").empty();
+            // This section immediately below should stay for demo purposes to show a constant update in subFooter
+          if (pin.status == 'saved') {
+            $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
+            titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
+          } else if (distToPin < 250) {
+            $("#pin_list").text("You are close enough! Touch the pin to open.");
+            titleText = '"' + pin.message + '" - ' + pin.wUser.firstname + ' (Pin Found!)';
+          } else {
+            $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
+            titleText = 'You need to be ' + (distToPin - 250) + ' m closer to open this pin!';
+          }
+
+           // Show the action sheet
+           var hideSheet = $ionicActionSheet.show({
+              titleText: titleText,
+              // destructiveText: 'Delete',
+              cancelText: 'Cancel',
+              cancel: function() {
+                  // add cancel code..
+                },
+              buttonClicked: function(index) {
+               return true;
+              }
+           });
+
+           // hide the sheet after two seconds (this doesn't work)
+           $timeout(function() {
+             //hideSheet.hide();
+           }, 2000);
+        });
+      });     
+    };   
+
+    $scope.goToPinPopUp = function(pin){
+      $scope.closeModal(4); // Close the Explore Modal
+      $scope.show([pin]); // Show the pin actionSheet
+    } 
+
     // display list
     $scope.list = function (line) {
       $("#pin_list").append(line);
     }
 
     loadSession();
-  });
+  }]);
 
 }());

@@ -144,11 +144,10 @@
         </ion-header-bar>
         <ion-content>
           <ion-list>
-            <ion-item class="item-remove-animate item-avatar item-icon-right" ng-repeat="pin in pins" type="item-text-wrap" href="#/tab/pins/{{pin.id}}">
+            <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="goToPinPopUp({{pin}})" href="#">
               <img ng-src="{{pin.face}}">
-              <h2>{{pin.name}}</h2>
-              <p>{{pin.message}}</p>
-              <i class="icon ion-chevron-right icon-accessory"></i>
+              <h2>{{pin.message}}</h2>
+              <p>{{pin.senderName}}</p>
             </ion-item>
           </ion-list>
         </ion-content>
