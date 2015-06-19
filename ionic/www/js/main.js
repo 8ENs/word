@@ -528,6 +528,18 @@
       $("#pin_list").append(line);
     }
 
+    function updateCurrentLocation() {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        newLatlng = new google.maps.LatLng(lat,lng);
+        currentLocation.setPosition(newLatlng);
+        console.log("position updated!");
+      });
+    }
+
+    
+    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
     loadSession();
   }]);
 
