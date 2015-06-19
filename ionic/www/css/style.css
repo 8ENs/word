@@ -2,18 +2,10 @@
   /*display: block;*/
   width: 100%;
   height: 100%;
-  background:url('../images/map-loading.gif') no-repeat center center fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;  
+  background: #66ceff url('../images/map-loading.gif') no-repeat center;
 }
 .gm-style{
-  background:url('../images/map-loading.gif') no-repeat center center fixed;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
+  background: #66ceff url('../images/map-loading.gif')no-repeat center;
 }
 .scroll {
   height: 100%;
