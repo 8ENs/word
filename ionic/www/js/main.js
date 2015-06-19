@@ -112,11 +112,14 @@
     }
 
     //check session
+    // not upgrading public/saved to full blue, and not paiting immediate inRange pins
     var loadSession = function(){
       if(sessionStorage.getItem("currentUser")) {
         currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
         accessToken = sessionStorage.getItem("token");
+        $scope.upgradePublicSaved();
         $scope.loadPrivatePins();
+        $scope.paintDiscoveredMarkers();
         $scope.displayLoggedInMenus();
       }
     }
@@ -136,6 +139,7 @@
           sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
           $scope.upgradePublicSaved();
           $scope.loadPrivatePins();
+          // might need to fully load before painting...if pins near immediate location, they may not turn half-green/blue
           $scope.paintDiscoveredMarkers();
           $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
         });
@@ -203,12 +207,11 @@
 
             var marker = new google.maps.Marker({
               position: pos,
-              title: newPinId,
               map: map,
               icon: ico,
-              type: pin.type,
               animation: google.maps.Animation.DROP
             });
+            marker.pin = pin;
             markers.push(marker);
             google.maps.event.addListener(marker, 'click', function() {
               onPinClick(marker);
@@ -258,6 +261,12 @@
 
           if (currentUser != null) {
             $scope.iterator([currentPin]);
+
+            markers.forEach(function(marker) {
+              if (marker.icon.includes('red_pin'))
+                marker.setIcon()
+            });
+
             $scope.paintDiscoveredMarkers();
 
             // TODO: need to add some sort of refresh where db is queried for new pins not currently in memory
@@ -416,7 +425,7 @@
       }
     }
 
-    // loadSession();
+    loadSession();
   });
 
 }());
