@@ -129,21 +129,25 @@
       }
     }
 
-
     $scope.login = function (email, password) {
       var loginData = {email: email, password: password};
       
       $.post( API_HOST + "/api/wUsers/login", loginData, function(auth) {
-        accessToken = auth.id;
-        sessionStorage.setItem('token', accessToken);
-        $.get( API_HOST + "/api/wUsers/" + auth.userId, function(userJson) {
-          currentUser = userJson;
-          sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
-          displayPrivatePins();
-        });
+        if (auth.id != undefined) {
+          accessToken = auth.id;
+          sessionStorage.setItem('token', accessToken);
+          $.get( API_HOST + "/api/wUsers/" + auth.userId, function(userJson) {
+            currentUser = userJson;
+            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            displayPrivatePins();
+          });
+          $scope.closeModal(2);
+          displayLoggedInMenus();
+        } else {
+          alert('login failed');
+        }
+        
       });
-      $scope.closeModal(2);
-      displayLoggedInMenus();
     }
 
     $scope.loginButton = function () {
@@ -524,6 +528,18 @@
       $("#pin_list").append(line);
     }
 
+    function updateCurrentLocation() {
+      navigator.geolocation.getCurrentPosition(function(position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        newLatlng = new google.maps.LatLng(lat,lng);
+        currentLocation.setPosition(newLatlng);
+        console.log("position updated!");
+      });
+    }
+
+    
+    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
     loadSession();
   }]);
 
