@@ -26,16 +26,21 @@
   })
 
 
-  .controller('MapCtrl', ['$scope', '$ionicModal', 'Pins', '$ionicActionSheet', '$timeout', 
-    function($scope, $ionicModal, Pins, $ionicActionSheet, $timeout) { // Putting these in strings allows minification not to break
+  .controller('MapCtrl', ['$scope', '$ionicModal', 'Pins', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', 
+    function($scope, $ionicModal, Pins, $ionicActionSheet, $timeout, $ionicSideMenuDelegate) { // Putting these in strings allows minification not to break
     accessToken = null;
     currentUser = null;
     markers = [];
     currentPin = null;
     pos = new google.maps.LatLng(49.282123, -123.108421); 
 
-    // services.js
+    // bring in pins from Pins factory in services.js
     $scope.pins = Pins.all();
+
+    // side menu toggle ability
+    $scope.toggleLeft = function() {
+      $ionicSideMenuDelegate.toggleLeft();
+    };
 
 
     //MODAL STUFF

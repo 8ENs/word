@@ -27,15 +27,14 @@
     </ion-side-menus>
     
     <script id="home.html" type="text/ng-template">
-      <ion-view title="Word on the Street">
+      <ion-view>
         <ion-nav-buttons side="left">
-          <button class="button button-icon button-clear ion-navicon" menu-toggle="left" disabled></button>
+          <a ng-click="openModal(3)" id="nav_drop" class="button button-icon icon ion-location" style="display: none">Drop Pin</a>
         </ion-nav-buttons>
         <ion-nav-buttons side="right">
           <a ng-click="openModal(4)" id="nav_explore" class="button button-icon icon ion-social-buffer" style="display: none">Explore</a>
           <a ng-click="openModal(1)" id="nav_register" class="button button-icon icon ion-person-add">Register</a>
           <a ng-click="openModal(2)" id="nav_login" class="button button-icon icon ion-log-in">Login</a>
-          <a ng-click="openModal(3)" id="nav_drop" class="button button-icon icon ion-location" style="display: none">Drop Pin</a>
           <a ng-click="logout()" id="nav_logout" class="button button-icon icon ion-log-out" style="display: none">Logout</a>
         </ion-nav-buttons> 
 
@@ -154,11 +153,11 @@
       </div>
     </script> 
     
-    <ion-footer-bar class="bar-subfooter" style="margin: 5px; height: 32px; text-align: center;">
-      <div id="pin_list">Welcome. Please login.</div>
+    <ion-footer-bar class="bar-subfooter">
+      <div id="pin_list">Welcome. Please login.</div> 
     </ion-footer-bar>
 
-    <ion-footer-bar align-title="center" class="bar-stable">
+    <ion-footer-bar class="bar-stable">
       <!-- <h1 id="pin_list" class="title">Welcome. Please login.</h1> -->
       
       <!-- This should be here eventually, but it is not wrapped in a script tag... -->
