@@ -76,6 +76,8 @@
       if (index == 1) {
         $scope.oModal1.show()
       } else if (index == 2) {
+        $("#loginEmail").val('');
+        $("#loginPassword").val('');
         $scope.oModal2.show();        
       } else if (index == 3) {
         $scope.oModal3.show();
@@ -242,6 +244,7 @@
             marker.pin = pin;
             markers.push(marker);
             google.maps.event.addListener(marker, 'click', function() {
+              pinClicked = true;
               onPinClick(marker);
             });
           });
@@ -356,6 +359,7 @@
           marker.pin = pin;
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', function() {
+            pinClicked = true;
             $scope.onPinClick(marker);
           });
         });
@@ -391,6 +395,7 @@
           marker.pin = pin;
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', function() {
+            pinClicked = true;
             $scope.onPinClick(marker);
           });
         });
@@ -456,17 +461,12 @@
     }
 
     $scope.iterator = function(pins) {
+      console.log('iterator');
       if (currentPin != null) {
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
-            // if (pin.status == 'saved') {
-            //   $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
-            // } else if (distToPin < 250) {
-            //   $("#pin_list").text("You are close enough! Touch the pin to open.");
-            // } else {
-            //   $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
-            // }
+            console.log('titleText defined');
             if (pin.status == 'saved') {
               $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
@@ -477,6 +477,10 @@
               $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
               titleText = 'You need to be ' + (distToPin - 250) + ' m closer to open this pin!';
             }
+            if (pinClicked) {
+              $scope.pinPopUp(pin);
+              pinClicked = false;
+            }
           });
         });
       }
@@ -484,26 +488,58 @@
 
     // Triggered on pin click
     $scope.pinPopUp = function(pin) {
-       
-       $scope.iterator([pin]);
-       
-       // Show the action sheet
-       var hideSheet = $ionicActionSheet.show({
-          titleText: titleText,
-          // destructiveText: 'Delete',
-          cancelText: 'Cancel',
-          cancel: function() {
-              // add cancel code..
-            },
-          buttonClicked: function(index) {
-           return true;
-          }
-       });    
-    };   
+      console.log('pinPopUp');
+
+      // Show the action sheet
+      var hideSheet = $ionicActionSheet.show({
+        titleText: titleText,
+        destructiveText: 'Delete',
+        delete: function() {
+            // add delete code..
+          },
+        cancelText: 'Cancel',
+        cancel: function() {
+            // add cancel code..
+          },
+        buttonClicked: function(index) {
+         return true;
+        }
+      });    
+    }; 
+
+
+  // destroy the database entry (no error handling for id not found)
+  // $( "#delete" ).on( "click", function() {
+  //   var id = $( "#delete_id" ).val();
+  //   $.ajax({
+  //     url: '/api/Pins/' + id,
+  //     type: 'DELETE',
+  //     success: function(response) {
+
+  //       // must be an easier way to search through or filter for specific pin
+  //       for (var i = markers.length - 1; i >= 0; i--) {
+  //         if (markers[i].title == id) {
+  //           // remove the marker from map
+  //           markers[i].setMap(null);
+  //           // remove the instance from array
+  //           markers.splice(i, 1);
+  //         }
+  //       }
+
+  //       $("#delete_id").val('');
+  //       $("#msg_deleted").fadeIn('slow').fadeOut('slow');
+  //     }
+  //   });
+  // });  
 
     $scope.exploreToPinPopUp = function(pin){
       $scope.closeModal(4); // Close the Explore Modal
-      $scope.pinPopUp(pin); // Show the pin actionSheet
+      pinClicked = true;
+      markers.forEach(function(marker) {
+        if (marker.pin.id == pin.internalId) {
+          $scope.onPinClick(marker); // Show the pin actionSheet
+        }
+      });
     } 
 
     // display list
