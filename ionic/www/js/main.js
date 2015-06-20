@@ -1,5 +1,5 @@
 (function() {
-  window.API_HOST = 'http://wots.herokuapp.com';
+  window.API_HOST = '';
 
   var blue_pin = API_HOST + '/images/blue_pin.png';
   var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
@@ -263,6 +263,7 @@
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
       map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
       $scope.map = map;
     }
     google.maps.event.addDomListener(window, 'load', initializeMap);
