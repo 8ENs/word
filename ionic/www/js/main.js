@@ -489,48 +489,50 @@
     // Triggered on pin click
     $scope.pinPopUp = function(pin) {
       console.log('pinPopUp');
-
+      pinId = pin.id;
+      
       // Show the action sheet
-      var hideSheet = $ionicActionSheet.show({
-        titleText: titleText,
-        destructiveText: 'Delete',
-        delete: function() {
-            // add delete code..
+      if (pin.status == 'saved' && pin.type != 'public') {
+        var hideSheet = $ionicActionSheet.show({
+          titleText: titleText,
+          destructiveText: 'Delete',
+          cancelText: 'Cancel',
+          cancel: function() {
           },
-        cancelText: 'Cancel',
-        cancel: function() {
-            // add cancel code..
-          },
-        buttonClicked: function(index) {
-         return true;
-        }
-      });    
+          destructiveButtonClicked: function() {
+            $scope.deletePin(pinId);
+            return true;
+          }
+        });    
+      } else {
+        var hideSheet = $ionicActionSheet.show({
+          titleText: titleText,
+          cancelText: 'Cancel',
+          cancel: function() {
+          }
+        });    
+      }
     }; 
 
+    // destroy the database entry (no error handling for id not found)
+    $scope.deletePin = function(pinId) {
+      $.ajax({
+        url: '/api/Pins/' + pinId,
+        type: 'DELETE',
+        success: function(response) {
 
-  // destroy the database entry (no error handling for id not found)
-  // $( "#delete" ).on( "click", function() {
-  //   var id = $( "#delete_id" ).val();
-  //   $.ajax({
-  //     url: '/api/Pins/' + id,
-  //     type: 'DELETE',
-  //     success: function(response) {
-
-  //       // must be an easier way to search through or filter for specific pin
-  //       for (var i = markers.length - 1; i >= 0; i--) {
-  //         if (markers[i].title == id) {
-  //           // remove the marker from map
-  //           markers[i].setMap(null);
-  //           // remove the instance from array
-  //           markers.splice(i, 1);
-  //         }
-  //       }
-
-  //       $("#delete_id").val('');
-  //       $("#msg_deleted").fadeIn('slow').fadeOut('slow');
-  //     }
-  //   });
-  // });  
+          // must be an easier way to search through or filter for specific pin
+          for (var i = markers.length - 1; i >= 0; i--) {
+            if (markers[i].pin.id == pinId) {
+              // remove the marker from map
+              markers[i].setMap(null);
+              // remove the instance from array
+              markers.splice(i, 1);
+            }
+          }
+        }
+      });
+    }
 
     $scope.exploreToPinPopUp = function(pin){
       $scope.closeModal(4); // Close the Explore Modal
