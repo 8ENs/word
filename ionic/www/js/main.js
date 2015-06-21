@@ -235,14 +235,12 @@
     };
 
     $scope.pinHiddenChange = function() {
-      if ($('#pinHidden').text() == 'Hidden'){
-        status = 'discovered';
+      if ($('#pinVisibility').text() == 'Hidden'){
         console.log(status);
-        $('#pinHidden').text('Visible')
+        $('#pinVisibility').text('Discovered');
       } else {
-        status = 'hidden';
         console.log(status);
-        $('#pinHidden').text('Hidden');
+        $('#pinVisibility').text('Hidden');
       }
       console.log('Pin Type Changed');
     };   
@@ -255,10 +253,8 @@
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
           var coords = {lat: pos.A, lng: pos.F};
-          
-          // TODO: clean-up (Jody)
-          $scope.pinTypeChange();
-          $scope.pinHiddenChange();
+          type = $('#pinType').text().toLowerCase();
+          status = $('#pinVisibility').text().toLowerCase();
           
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
         }
@@ -540,7 +536,7 @@
 
     $scope.explore = function() {
       console.log('explore');
-      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username;
+      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][status]=discovered&filter[where][or][2][recipient]=" + currentUser.username;
       $.getJSON(url, function(pins) {
         $scope.pins = pins;
         $.each(pins, function(idx, pin) {
@@ -550,7 +546,9 @@
               pic = blue_pin;
             } else if (pin.type == 'private'){
               pic = green_pin;
-            } 
+            } else if (pin.type == 'discovered'){
+              pic = gray_pin_50;
+            }
             $.extend(pin, {
               pic: pic,
               dist: distToPin
