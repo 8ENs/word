@@ -221,19 +221,31 @@
     // DROP PIN
 
     // Toggle switches
-  $scope.pinTypeChange = function() {
-    if ($('#pinType').text() == 'Private'){
-      type = 'public';
-      console.log(type);
-      $('#pinType').text('Public')
-    } else {
-      type = 'private';
-      console.log(type);
-      // $('#pinType').text('Private');
-      // This needs to change the fuckin toggle as well.
-    }
-    console.log('Pin Type Changed');
-  };   
+    $scope.pinTypeChange = function() {
+      if ($('#pinType').text() == 'Private'){
+        type = 'public';
+        console.log(type);
+        $('#pinType').text('Public')
+      } else {
+        type = 'private';
+        console.log(type);
+        $('#pinType').text('Private');
+      }
+      console.log('Pin Type Changed');
+    };
+
+    $scope.pinHiddenChange = function() {
+      if ($('#pinHidden').text() == 'Hidden'){
+        status = 'discovered';
+        console.log(status);
+        $('#pinHidden').text('Visible')
+      } else {
+        status = 'hidden';
+        console.log(status);
+        $('#pinHidden').text('Hidden');
+      }
+      console.log('Pin Type Changed');
+    };   
 
     $scope.dropPin = function () {
       var recipient = $("#recipient").val();
@@ -242,7 +254,6 @@
       $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
-          var status = 'discovered';
           var coords = {lat: pos.A, lng: pos.F};
 
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
