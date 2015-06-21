@@ -39,5 +39,13 @@
         },
         "is_top_level": true,
         "variables": {}
+    },
+    "de.appplant.cordova.plugin.background-mode": {
+        "source": {
+            "type": "registry",
+            "id": "de.appplant.cordova.plugin.background-mode"
+        },
+        "is_top_level": true,
+        "variables": {}
     }
 }

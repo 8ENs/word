@@ -47,6 +47,9 @@
         });
     };
 
+  
+
+
     //MODAL STUFF
 
     $ionicModal.fromTemplateUrl('modal1.html', {
@@ -282,9 +285,7 @@
       $scope.map = map;
     }
 
-    // $ionicPlatform.ready(initializeMap);
     $ionicPlatform.ready(loadSession);
-
     google.maps.event.addDomListener(window, 'load', initializeMap);
 
 
@@ -596,6 +597,15 @@
         console.log("position updated!");
       });
     }
+
+    // Enable Background Mode on Device Ready.
+    document.addEventListener('deviceready', function () {
+        // Android customization
+        cordova.plugins.backgroundMode.setDefaults({ text:'Word on the Street Listening'});
+        // Enable background mode
+        cordova.plugins.backgroundMode.enable();
+
+    }, false);
 
     // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
     

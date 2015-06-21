@@ -47,6 +47,8 @@
 		D761146C1FC24D3FA5A49A9B /* APPLocalNotificationOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 91EEAA86DFC340B3B2078944 /* APPLocalNotificationOptions.m */; };
 		07CCE497B1DC4EDDB9B3995B /* UIApplication+APPLocalNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 02FDFB86C5334B25B3F36A9A /* UIApplication+APPLocalNotification.m */; };
 		AA9D77A73B3B4747BB47C170 /* UILocalNotification+APPLocalNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 85BA5A213BF3401495079B58 /* UILocalNotification+APPLocalNotification.m */; };
+		1A5B4B6AF4A549AABD5DC94A /* APPBackgroundMode.m in Sources */ = {isa = PBXBuildFile; fileRef = 846FBBE88F9A409F9E9E34B7 /* APPBackgroundMode.m */; };
+		F3218AF7DD9B463C961D1BDA /* appbeep.wav in Resources */ = {isa = PBXBuildFile; fileRef = 3952719332AE4380A6C2549A /* appbeep.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +129,9 @@
 		75A03E31EC0E4A75AA710C9D /* APPLocalNotificationOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "APPLocalNotificationOptions.h"; path = "de.appplant.cordova.plugin.local-notification/APPLocalNotificationOptions.h"; sourceTree = "<group>"; fileEncoding = 4; };
 		FD4E8D72A309499A8D780669 /* UIApplication+APPLocalNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UIApplication+APPLocalNotification.h"; path = "de.appplant.cordova.plugin.local-notification/UIApplication+APPLocalNotification.h"; sourceTree = "<group>"; fileEncoding = 4; };
 		4C1F70B3C83440FEB529312E /* UILocalNotification+APPLocalNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UILocalNotification+APPLocalNotification.h"; path = "de.appplant.cordova.plugin.local-notification/UILocalNotification+APPLocalNotification.h"; sourceTree = "<group>"; fileEncoding = 4; };
+		846FBBE88F9A409F9E9E34B7 /* APPBackgroundMode.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "APPBackgroundMode.m"; path = "de.appplant.cordova.plugin.background-mode/APPBackgroundMode.m"; sourceTree = "<group>"; fileEncoding = 4; };
+		4CF45367015A446783BAEA36 /* APPBackgroundMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "APPBackgroundMode.h"; path = "de.appplant.cordova.plugin.background-mode/APPBackgroundMode.h"; sourceTree = "<group>"; fileEncoding = 4; };
+		3952719332AE4380A6C2549A /* appbeep.wav */ = {isa = PBXFileReference; lastKnownFileType = unknown; name = "appbeep.wav"; path = "appbeep.wav"; sourceTree = "<group>"; fileEncoding = 4; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +205,7 @@
 				308D052D1370CCF300D202BF /* icons */,
 				308D05311370CCF300D202BF /* splash */,
 				8D1107310486CEB800E47090 /* maps-clean-Info.plist */,
+				3952719332AE4380A6C2549A /* appbeep.wav */,
 			);
 			name = Resources;
 			path = "maps-clean/Resources";
@@ -241,6 +247,8 @@
 				75A03E31EC0E4A75AA710C9D /* APPLocalNotificationOptions.h */,
 				FD4E8D72A309499A8D780669 /* UIApplication+APPLocalNotification.h */,
 				4C1F70B3C83440FEB529312E /* UILocalNotification+APPLocalNotification.h */,
+				846FBBE88F9A409F9E9E34B7 /* APPBackgroundMode.m */,
+				4CF45367015A446783BAEA36 /* APPBackgroundMode.h */,
 			);
 			name = Plugins;
 			path = "maps-clean/Plugins";
@@ -394,6 +402,7 @@
 				7E7966E11810823500FA85AD /* icon-50@2x.png in Resources */,
 				7E7966E51810823500FA85AD /* icon-76@2x.png in Resources */,
 				30FC414916E50CA1004E6F35 /* icon-72@2x.png in Resources */,
+				F3218AF7DD9B463C961D1BDA /* appbeep.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,6 +441,7 @@
 				D761146C1FC24D3FA5A49A9B /* APPLocalNotificationOptions.m in Sources */,
 				07CCE497B1DC4EDDB9B3995B /* UIApplication+APPLocalNotification.m in Sources */,
 				AA9D77A73B3B4747BB47C170 /* UILocalNotification+APPLocalNotification.m in Sources */,
+				1A5B4B6AF4A549AABD5DC94A /* APPBackgroundMode.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
