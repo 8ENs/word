@@ -255,7 +255,11 @@
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
           var coords = {lat: pos.A, lng: pos.F};
-
+          
+          // TODO: clean-up (Jody)
+          $scope.pinTypeChange();
+          $scope.pinHiddenChange();
+          
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
         }
       })
