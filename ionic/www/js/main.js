@@ -129,7 +129,7 @@
     var resetMarkers = function() {
       var i = markers.length;
       while (i--) {
-        if (markers[i].type != 'public') {
+        if (markers[i].pin.type != 'public') {
           markers[i].setMap(null);
           markers.splice(i, 1);
         } else {
@@ -215,7 +215,6 @@
       $("#pin_list").text("Welcome. Please login.");
       resetMarkers();
       displayLoggedOutMenus();
-      $scope.loadPublicPins();
     } 
 
     // DROP PIN
@@ -272,10 +271,12 @@
             });
             marker.pin = pin;
             markers.push(marker);
-
+            console.log(marker);
             window.setTimeout(function() {
-              if (marker.pin.recipient == currentUser || marker.pin.type == 'public') {
-                marker.setIcon(gray_pin_50);
+              if (marker.pin.type == 'public') {
+                marker.setIcon(blue_pin_50);
+              } else if (marker.pin.recipient == currentUser.username) {
+                marker.setIcon(green_pin_50);
               } else {
                 marker.setVisible(false);
               }
