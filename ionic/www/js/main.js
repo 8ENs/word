@@ -12,8 +12,10 @@
   var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
   var current_loc_icon = API_HOST + '/images/blue_dot.png';
 
-  angular.module('word', ['ionic','word.services'])
+  angular.module('word', ['ionic'])
+  
   .config(function($stateProvider, $urlRouterProvider) {
+    pos = new google.maps.LatLng(49.282123, -123.108421); 
 
     $stateProvider
       .state('home', {
@@ -24,20 +26,13 @@
     $urlRouterProvider.otherwise('/');
   })
 
-  .controller('MapCtrl', ['$scope', '$ionicModal', 'Pins', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', 
-    function($scope, $ionicModal, Pins, $ionicActionSheet, $timeout, $ionicSideMenuDelegate) { // Putting these in strings allows minification not to break
+  .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', 
+    function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate) { // Putting these in strings allows minification not to break
 
     accessToken = null;
     currentUser = null;
     markers = [];
     currentPin = null;
-
-    // hard-coded??????
-    pos = new google.maps.LatLng(49.282123, -123.108421); 
-    $scope.pos = pos;
-
-    // bring in pins from Pins factory in services.js
-    $scope.pins = Pins.all();
 
     //MODAL STUFF
 
@@ -282,7 +277,7 @@
         lat = position.coords.latitude;
         lng = position.coords.longitude;
         pos = new google.maps.LatLng(lat, lng);
-        $scope.pos = pos;
+        pos = pos;
 
         // Add a current location to the Map
         $scope.addCurrentGeo();
