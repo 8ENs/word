@@ -235,14 +235,12 @@
     };
 
     $scope.pinHiddenChange = function() {
-      if ($('#pinHidden').text() == 'Hidden'){
-        status = 'discovered';
+      if ($('#pinVisibility').text() == 'Hidden'){
         console.log(status);
-        $('#pinHidden').text('Visible')
+        $('#pinVisibility').text('Discovered');
       } else {
-        status = 'hidden';
         console.log(status);
-        $('#pinHidden').text('Hidden');
+        $('#pinVisibility').text('Hidden');
       }
       console.log('Pin Type Changed');
     };   
@@ -255,10 +253,8 @@
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
           var coords = {lat: pos.A, lng: pos.F};
-          
-          // TODO: clean-up (Jody)
-          $scope.pinTypeChange();
-          $scope.pinHiddenChange();
+          type = $('#pinType').text().toLowerCase();
+          status = $('#pinVisibility').text().toLowerCase();
           
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
         }
