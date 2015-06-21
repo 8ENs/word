@@ -276,6 +276,15 @@
             });
             marker.pin = pin;
             markers.push(marker);
+
+            window.setTimeout(function() {
+              if (marker.pin.recipient == currentUser || marker.pin.type == 'public') {
+                marker.setIcon(gray_pin_50);
+              } else {
+                marker.setVisible(false);
+              }
+            }, 2500);
+
             google.maps.event.addListener(marker, 'click', function() {
               pinClicked = true;
               $scope.onPinClick(marker);
@@ -330,11 +339,6 @@
 
           if (currentUser != null) {
             $scope.iterator([currentPin]);
-
-            markers.forEach(function(marker) {
-              if (marker.icon.includes('red_pin'))
-                marker.setIcon()
-            });
 
             if ($("#pin_list").text('Pin deleted.')) {
               $("#pin_list").text('');
@@ -397,9 +401,13 @@
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
             map: map,
-            icon: gray_pin_50
+            icon: gray_pin_50,
+            visible: false
           });
           marker.pin = pin;
+          if (marker.pin.status != 'hidden') {
+            marker.setVisible(true);
+          }
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', function() {
             pinClicked = true;
