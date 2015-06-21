@@ -17,9 +17,13 @@ textarea {
   font-size:20px;
 }
 
-.lowercase{
-  text-transform:lowercase;
+.explorePinType{
+  font-family:verdana;
+  font-size:12px;
+  text-transform:uppercase;
+  color:limegreen; /* Default is private */
 }
+
 
 #pin_list{
   color:#4a87ee;

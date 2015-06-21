@@ -538,8 +538,13 @@
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
+            if (pin.type == 'public'){
+              pic = blue_pin;
+            } else if (pin.type == 'private'){
+              pic = green_pin;
+            } 
             $.extend(pin, {
-              pic: "http://www.rantsports.com/clubhouse/wp-content/slideshow/2014/01/ranking-the-25-hottest-girls-who-have-dated-athletes/medium/Kate-Upton.jpg",
+              pic: pic,
               dist: distToPin
             });
             $scope.oModal4.show();

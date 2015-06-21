@@ -137,7 +137,7 @@
           <ion-list>
             <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp(pin)" href="#">
               <img ng-src={{pin.pic}}>
-              <h2>{{pin.message}}</h2>
+              <h2>{{pin.message}} <span class="explorePinType">[{{pin.type}}]</span></h2>
               <p> - {{pin.wUser.firstname}}   ({{pin.dist}} m)</p>
             </ion-item>
           </ion-list>
@@ -146,7 +146,7 @@
     </script> 
     
     <ion-footer-bar class="bar-subfooter">
-      <div id="pin_list">Welcome. Your map will arrive shortly.</div> 
+      <div id="pin_list">Welcome. Please login to view pin details.</div> 
     </ion-footer-bar>
 
     <ion-footer-bar class="bar-stable">
