@@ -534,12 +534,16 @@
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
-            if (pin.type == 'public'){
+            if (pin.type == 'public' && pin.status == 'saved'){
               pic = blue_pin;
-            } else if (pin.type == 'private'){
+            } else if (pin.type == 'private' && pin.status == 'saved'){
               pic = green_pin;
-            } else if (pin.type == 'discovered'){
+            } else if (pin.status == 'discovered'){
               pic = gray_pin_50;
+              pin.message = 'Discovered Pin!';
+            } else if (pin.status == 'hidden'){
+              pic = gray_pin_50;
+              pin.message = 'Hidden message!';
             }
             $.extend(pin, {
               pic: pic,
