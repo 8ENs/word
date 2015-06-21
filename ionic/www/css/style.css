@@ -19,9 +19,9 @@ textarea {
 
 .explorePinType{
   font-family:verdana;
-  font-size:12px;
+  font-size:10px;
   text-transform:uppercase;
-  color:limegreen; /* Default is private */
+  color:lightgrey; /* Default is private */
 }
 
 #pin_list{
