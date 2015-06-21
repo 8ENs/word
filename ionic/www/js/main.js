@@ -491,20 +491,19 @@
     $scope.explore = function() {
       console.log('explore');
       var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username;
-
       $.getJSON(url, function(pins) {
         $scope.pins = pins;
-        $scope.oModal4.show();
-        // $.each(pins, function(idx, pin) {
-        //   $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
-        //     var distToPin = Math.round(dist.distance);
-        //     // $scope.message = pin.message;
-        //     // $scope.fname = pin.wUser.firstname;
-        //     $scope.pin = pin;
-        //     // $scope.pics = "http://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png";
-        //   });
-        // });
+        $.each(pins, function(idx, pin) {
+          $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+            var distToPin = Math.round(dist.distance);
+            $.extend(pin, {
+              pic: "http://www.rantsports.com/clubhouse/wp-content/slideshow/2014/01/ranking-the-25-hottest-girls-who-have-dated-athletes/medium/Kate-Upton.jpg",
+              dist: distToPin
+            });
+          });
+        });
 
+        $scope.oModal4.show();
       });
     }
 
@@ -575,7 +574,7 @@
 
       pinClicked = true;
       markers.forEach(function(marker) {
-        if (marker.pin.id == pin.internalId) {
+        if (marker.pin.id == pin.id) {
           $scope.onPinClick(marker); // Show the pin actionSheet
         }
       });

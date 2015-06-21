@@ -145,9 +145,10 @@
         <ion-content id="explore_list">
           <ion-list>
             <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp(pin)" href="#">
-              <img ng-src="http://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png" />
+              <img ng-src={{pin.pic}}>
               <h2>{{pin.message}}</h2>
-              <p>{{pin.firstname}}</p>
+              <p>{{pin.wUser.firstname}}</p>
+              <p>{{pin.dist}}</p>
             </ion-item>
           </ion-list>
         </ion-content>
