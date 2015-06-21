@@ -31,6 +31,7 @@
     currentUser = null;
     markers = [];
     currentPin = null;
+
     // hard-coded??????
     pos = new google.maps.LatLng(49.282123, -123.108421); 
     $scope.pos = pos;
@@ -105,6 +106,7 @@
         $("#nav_drop").show();
         $("#nav_explore").show();
         $("#nav_logout").show();
+        $("#nav_center_loc").show();
         $("#nav_login").hide();
         $("#nav_register").hide();
       })
@@ -115,6 +117,7 @@
         $("#nav_drop").hide();
         $("#nav_explore").hide();
         $("#nav_logout").hide();
+        $("#nav_center_loc").hide();
         $("#nav_login").show();
         $("#nav_register").show();
       })
@@ -288,7 +291,7 @@
         // $scope.loadPublicPins();
 
         // Center
-        map.setCenter(pos);
+        $scope.centerCurrentLocation();
 
         google.maps.event.addListener(currentLocation, 'dragend', function(event) {
           console.log('dragend');
@@ -344,6 +347,10 @@
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
+    }
+
+    $scope.centerCurrentLocation = function() {
+      map.setCenter(pos);
     }
 
     $scope.loadPublicPins = function() {
@@ -430,6 +437,7 @@
     $scope.onPinClick = function(marker){
       console.log('pinClick');
       if (currentUser != null) {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
         $.getJSON(API_HOST + "/api/Pins/" + marker.pin.id + "?filter[include]=wUser", function(pin) {
           currentPin = pin;
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
@@ -490,6 +498,14 @@
     $scope.pinPopUp = function(pin) {
       console.log('pinPopUp');
       pinId = pin.id;
+      var marker;
+
+      i = markers.length;
+      while(i--) {
+        if (markers[i].pin.id == pinId) {
+          marker = markers[i];
+        }
+      }
       
       // Show the action sheet
       if (pin.status == 'saved' && pin.type != 'public') {
@@ -498,6 +514,7 @@
           destructiveText: 'Delete',
           cancelText: 'Cancel',
           cancel: function() {
+            marker.setAnimation(null);
           },
           destructiveButtonClicked: function() {
             $scope.deletePin(pinId);
@@ -509,6 +526,7 @@
           titleText: titleText,
           cancelText: 'Cancel',
           cancel: function() {
+            marker.setAnimation(null);
           }
         });    
       }
@@ -536,6 +554,10 @@
 
     $scope.exploreToPinPopUp = function(pin){
       $scope.closeModal(4); // Close the Explore Modal
+
+      var currentPinCoords = new google.maps.LatLng(pin.coords.lat, pin.coords.lng);
+      map.setCenter(currentPinCoords);
+
       pinClicked = true;
       markers.forEach(function(marker) {
         if (marker.pin.id == pin.internalId) {

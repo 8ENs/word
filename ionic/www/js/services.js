@@ -5,10 +5,9 @@ angular.module('word.services', [])
     // no access to pos, we need the initial coords to be saved globally somewhere
     // var initialPullPinsURL = "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng + "filter[where][type]=public&filter[where][status]=saved";
     var here = '43,-123'; // $scope.pos.A + "," + $scope.pos.F;
-    var initialPullPinsURL = API_HOST + "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][type]=public";
-    // API_HOST + "/api/Pins/distance?currentLat=" + "43" + "&currentLng=" + "-123" + "&filter[where][type]=public&filter[where][status]=saved";
+    
     currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-    if (currentUser != null || currentUser != undefined){
+    if (currentUser != null){
       initialPullPinsURL = API_HOST + "/api/Pins?filter[where][coords][near]=" + here + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username.toLowerCase();
     }
     var pins = [];
