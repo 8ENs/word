@@ -147,8 +147,7 @@
             <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp(pin)" href="#">
               <img ng-src={{pin.pic}}>
               <h2>{{pin.message}}</h2>
-              <p>{{pin.wUser.firstname}}</p>
-              <p>{{pin.dist}}</p>
+              <p> - {{pin.wUser.firstname}}   ({{pin.dist}} m)</p>
             </ion-item>
           </ion-list>
         </ion-content>

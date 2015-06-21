@@ -231,19 +231,17 @@
           newPinId = pin.id;
 
           $.getJSON(API_HOST + "/api/Pins/" + newPinId, function(pin) {
-            ico = (pin.type == 'public') ? yellow_pin : red_pin;
-
             var marker = new google.maps.Marker({
               position: pos,
               map: map,
-              icon: ico,
+              icon: red_pin,
               animation: google.maps.Animation.DROP
             });
             marker.pin = pin;
             markers.push(marker);
             google.maps.event.addListener(marker, 'click', function() {
               pinClicked = true;
-              onPinClick(marker);
+              $scope.onPinClick(marker);
             });
           });
         });
@@ -300,6 +298,10 @@
               if (marker.icon.includes('red_pin'))
                 marker.setIcon()
             });
+
+            if ($("#pin_list").text('Pin deleted.')) {
+              $("#pin_list").text('');
+            }
 
             $scope.paintDiscoveredMarkers();
 
@@ -440,7 +442,10 @@
             var distToPin = Math.round(dist.distance);
 
             if (distToPin < 250 && pin.status == 'discovered') {
+              
+              // two different pointers (sloppy)
               marker.pin.status = 'saved';
+              pin.status = 'saved';
 
               if (pin.type == 'public') {
                 marker.setIcon(blue_pin);
@@ -453,11 +458,9 @@
                 type: 'PUT',
                 data: {"status": "saved"}
               });
-              // $scope.paintDiscoveredMarkers();
             } 
-            
+
             $scope.iterator([pin]);
-            // $scope.pinPopUp(pin);
           });
         });
       }
@@ -500,10 +503,9 @@
               pic: "http://www.rantsports.com/clubhouse/wp-content/slideshow/2014/01/ranking-the-25-hottest-girls-who-have-dated-athletes/medium/Kate-Upton.jpg",
               dist: distToPin
             });
+            $scope.oModal4.show();
           });
         });
-
-        $scope.oModal4.show();
       });
     }
 
@@ -521,7 +523,7 @@
       }
       
       // Show the action sheet
-      if (pin.status == 'saved' && pin.type != 'public') {
+      if (marker.pin.status == 'saved' && pin.type != 'public') {
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
           destructiveText: 'Delete',
@@ -531,6 +533,8 @@
           },
           destructiveButtonClicked: function() {
             $scope.deletePin(pinId);
+            $("#pin_list").text('Pin deleted.');
+            currentPin = null;
             return true;
           }
         });    
