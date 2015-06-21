@@ -86,7 +86,7 @@
         $('#pinType').text('Private');
         $scope.oModal3.show();
       } else {
-        $scope.oModal4.show();
+        $scope.explore();
       }
     }
 
@@ -493,7 +493,6 @@
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
-            console.log('titleText defined');
             if (pin.status == 'saved') {
               $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
@@ -511,6 +510,25 @@
           });
         });
       }
+    }
+
+    $scope.explore = function() {
+      console.log('explore');
+      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username;
+      $.getJSON(url, function(pins) {
+        $scope.pins = pins;
+        $.each(pins, function(idx, pin) {
+          $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+            var distToPin = Math.round(dist.distance);
+            $.extend(pin, {
+              pic: "http://www.rantsports.com/clubhouse/wp-content/slideshow/2014/01/ranking-the-25-hottest-girls-who-have-dated-athletes/medium/Kate-Upton.jpg",
+              dist: distToPin
+            });
+          });
+        });
+
+        $scope.oModal4.show();
+      });
     }
 
     // Triggered on pin click
@@ -572,6 +590,7 @@
     }
 
     $scope.exploreToPinPopUp = function(pin){
+      console.log('exploreToPinPopUp');
       $scope.closeModal(4); // Close the Explore Modal
 
       var currentPinCoords = new google.maps.LatLng(pin.coords.lat, pin.coords.lng);
@@ -579,16 +598,11 @@
 
       pinClicked = true;
       markers.forEach(function(marker) {
-        if (marker.pin.id == pin.internalId) {
+        if (marker.pin.id == pin.id) {
           $scope.onPinClick(marker); // Show the pin actionSheet
         }
       });
     } 
-
-    // display list
-    $scope.list = function (line) {
-      $("#pin_list").append(line);
-    }
 
     function updateCurrentLocation() {
       navigator.geolocation.getCurrentPosition(function(position) {
