@@ -532,7 +532,7 @@
 
     $scope.explore = function() {
       console.log('explore');
-      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username;
+      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][status]=discovered&filter[where][or][2][recipient]=" + currentUser.username;
       $.getJSON(url, function(pins) {
         $scope.pins = pins;
         $.each(pins, function(idx, pin) {
@@ -542,7 +542,9 @@
               pic = blue_pin;
             } else if (pin.type == 'private'){
               pic = green_pin;
-            } 
+            } else if (pin.type == 'discovered'){
+              pic = gray_pin_50;
+            }
             $.extend(pin, {
               pic: pic,
               dist: distToPin
