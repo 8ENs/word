@@ -1,6 +1,37 @@
-2015-06-20 12:08:37.086 maps-clean[29649:16872938] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Data/Application/A54EC359-F8BB-4A7C-9AE7-D01CF0A458F4/Library/Cookies/Cookies.binarycookies
-2015-06-20 12:08:37.346 maps-clean[29649:16872938] Apache Cordova native platform version 3.8.0 is starting.
-2015-06-20 12:08:37.346 maps-clean[29649:16872938] Multi-tasking -> Device: YES, App: YES
-2015-06-20 12:08:37.360 maps-clean[29649:16872938] Unlimited access to network resources
-2015-06-20 12:08:38.373 maps-clean[29649:16872938] Resetting plugins due to page load.
-2015-06-20 12:08:39.407 maps-clean[29649:16872938] Finished load of: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Bundle/Application/EF60DBD0-CF2E-4C31-BD85-D6AB43CFE354/maps-clean.app/www/index.html#/
+2015-06-20 22:24:04.416 maps-clean[34716:19147856] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Data/Application/4763049E-910F-4BF8-B74D-D3E5AA55DAE0/Library/Cookies/Cookies.binarycookies
+2015-06-20 22:24:06.240 maps-clean[34716:19147856] Apache Cordova native platform version 3.8.0 is starting.
+2015-06-20 22:24:06.240 maps-clean[34716:19147856] Multi-tasking -> Device: YES, App: YES
+2015-06-20 22:24:06.286 maps-clean[34716:19147856] Unlimited access to network resources
+2015-06-20 22:24:07.141 maps-clean[34716:19147856] [CDVTimer][localnotification] 12.973011ms
+2015-06-20 22:24:07.142 maps-clean[34716:19147856] [CDVTimer][localnotification] 0.011027ms
+2015-06-20 22:24:07.142 maps-clean[34716:19147856] [CDVTimer][TotalPluginStartup] 13.561010ms
+2015-06-20 22:24:07.677 maps-clean[34716:19147856] Resetting plugins due to page load.
+2015-06-20 22:24:08.591 maps-clean[34716:19147856] Finished load of: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Bundle/Application/BED49AD5-3D61-4376-A46A-4B51990A4198/maps-clean.app/www/index.html#/
+2015-06-20 22:24:08.741 maps-clean[34716:19147856] THREAD WARNING: ['Device'] took '15.871094' ms. Plugin should use a background thread.
+2015-06-20 22:25:47.932 maps-clean[34918:19160047] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Data/Application/30D8BC0D-E823-46EB-BB74-01D1EE477892/Library/Cookies/Cookies.binarycookies
+2015-06-20 22:25:48.087 maps-clean[34918:19160047] Apache Cordova native platform version 3.8.0 is starting.
+2015-06-20 22:25:48.088 maps-clean[34918:19160047] Multi-tasking -> Device: YES, App: YES
+2015-06-20 22:25:48.093 maps-clean[34918:19160047] Unlimited access to network resources
+2015-06-20 22:25:48.229 maps-clean[34918:19160047] [CDVTimer][localnotification] 0.073016ms
+2015-06-20 22:25:48.229 maps-clean[34918:19160047] [CDVTimer][localnotification] 0.009000ms
+2015-06-20 22:25:48.229 maps-clean[34918:19160047] [CDVTimer][TotalPluginStartup] 0.531018ms
+2015-06-20 22:25:48.301 maps-clean[34918:19160047] Resetting plugins due to page load.
+2015-06-20 22:25:49.012 maps-clean[34918:19160047] Finished load of: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Bundle/Application/C9414F01-A672-487F-90A5-92887018DA6F/maps-clean.app/www/index.html#/
+2015-06-20 23:29:24.271 maps-clean[36114:19501840] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Data/Application/75694B0B-0867-44FF-A081-805E30241509/Library/Cookies/Cookies.binarycookies
+2015-06-20 23:29:24.561 maps-clean[36114:19501840] Apache Cordova native platform version 3.8.0 is starting.
+2015-06-20 23:29:24.561 maps-clean[36114:19501840] Multi-tasking -> Device: YES, App: YES
+2015-06-20 23:29:24.586 maps-clean[36114:19501840] Unlimited access to network resources
+2015-06-20 23:29:24.738 maps-clean[36114:19501840] [CDVTimer][localnotification] 0.056982ms
+2015-06-20 23:29:24.738 maps-clean[36114:19501840] [CDVTimer][localnotification] 0.011027ms
+2015-06-20 23:29:24.738 maps-clean[36114:19501840] [CDVTimer][TotalPluginStartup] 0.496984ms
+2015-06-20 23:29:25.834 maps-clean[36114:19501840] Resetting plugins due to page load.
+2015-06-20 23:29:26.855 maps-clean[36114:19501840] Finished load of: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Bundle/Application/ACCD14FC-7934-473C-BBCF-DF2F09CE0F40/maps-clean.app/www/index.html#/
+2015-06-20 23:36:35.285 maps-clean[36366:19552138] DiskCookieStorage changing policy from 2 to 0, cookie file: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Data/Application/ED146126-102B-4520-A243-580E21BF62C9/Library/Cookies/Cookies.binarycookies
+2015-06-20 23:36:35.666 maps-clean[36366:19552138] Apache Cordova native platform version 3.8.0 is starting.
+2015-06-20 23:36:35.666 maps-clean[36366:19552138] Multi-tasking -> Device: YES, App: YES
+2015-06-20 23:36:35.680 maps-clean[36366:19552138] Unlimited access to network resources
+2015-06-20 23:36:35.843 maps-clean[36366:19552138] [CDVTimer][localnotification] 0.047982ms
+2015-06-20 23:36:35.843 maps-clean[36366:19552138] [CDVTimer][localnotification] 0.006020ms
+2015-06-20 23:36:35.843 maps-clean[36366:19552138] [CDVTimer][TotalPluginStartup] 0.344992ms
+2015-06-20 23:36:36.197 maps-clean[36366:19552138] Resetting plugins due to page load.
+2015-06-20 23:36:37.283 maps-clean[36366:19552138] Finished load of: file:///Users/jamesmatsuba/Library/Developer/CoreSimulator/Devices/9B8C1FAD-B7AF-418B-A4B6-298744CDE943/data/Containers/Bundle/Application/D681CDF5-5AD0-4A82-9832-FB20EF8E3A6F/maps-clean.app/www/index.html#/

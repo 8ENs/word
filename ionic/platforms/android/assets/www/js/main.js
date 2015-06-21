@@ -12,8 +12,10 @@
   var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
   var current_loc_icon = API_HOST + '/images/blue_dot.png';
 
-  angular.module('word', ['ionic','word.services'])
+  angular.module('word', ['ionic', 'ngCordova'])
+  
   .config(function($stateProvider, $urlRouterProvider) {
+    pos = new google.maps.LatLng(49.282123, -123.108421); 
 
     $stateProvider
       .state('home', {
@@ -24,19 +26,26 @@
     $urlRouterProvider.otherwise('/');
   })
 
-  .controller('MapCtrl', ['$scope', '$ionicModal', 'Pins', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', 
-    function($scope, $ionicModal, Pins, $ionicActionSheet, $timeout, $ionicSideMenuDelegate) { // Putting these in strings allows minification not to break
+  .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', '$cordovaLocalNotification', '$ionicPlatform', 
+    function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform) { // Putting these in strings allows minification not to break
+    var isAndroid = ionic.Platform.isAndroid();
+
 
     accessToken = null;
     currentUser = null;
     markers = [];
     currentPin = null;
-    // hard-coded??????
-    pos = new google.maps.LatLng(49.282123, -123.108421); 
-    $scope.pos = pos;
 
-    // bring in pins from Pins factory in services.js
-    $scope.pins = Pins.all();
+    $scope.add = function() {
+        $cordovaLocalNotification.schedule({
+            id: "1",
+            message: "2 Unread Pins Nearby",
+            title: "WOTS Noticiation",
+            badge: 1
+        }).then(function () {
+            console.log("The notification has been set");
+        });
+    };
 
     //MODAL STUFF
 
@@ -76,6 +85,8 @@
       if (index == 1) {
         $scope.oModal1.show()
       } else if (index == 2) {
+        $("#loginEmail").val('');
+        $("#loginPassword").val('');
         $scope.oModal2.show();        
       } else if (index == 3) {
         $scope.oModal3.show();
@@ -103,6 +114,7 @@
         $("#nav_drop").show();
         $("#nav_explore").show();
         $("#nav_logout").show();
+        $("#nav_center_loc").show();
         $("#nav_login").hide();
         $("#nav_register").hide();
       })
@@ -113,6 +125,7 @@
         $("#nav_drop").hide();
         $("#nav_explore").hide();
         $("#nav_logout").hide();
+        $("#nav_center_loc").hide();
         $("#nav_login").show();
         $("#nav_register").show();
       })
@@ -242,6 +255,7 @@
             marker.pin = pin;
             markers.push(marker);
             google.maps.event.addListener(marker, 'click', function() {
+              pinClicked = true;
               onPinClick(marker);
             });
           });
@@ -249,6 +263,10 @@
       })
       $scope.closeModal(3);
     }
+
+
+
+
 
     // MAP - INITIALIZE
 
@@ -259,9 +277,14 @@
         zoom: 14,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
-      map = new google.maps.Map(document.getElementById("map"), mapOptions);
+      map = new google.maps.Map(document.getElementById("map-div"), mapOptions);
+
       $scope.map = map;
     }
+
+    // $ionicPlatform.ready(initializeMap);
+    $ionicPlatform.ready(loadSession);
+
     google.maps.event.addDomListener(window, 'load', initializeMap);
 
 
@@ -275,7 +298,7 @@
         lat = position.coords.latitude;
         lng = position.coords.longitude;
         pos = new google.maps.LatLng(lat, lng);
-        $scope.pos = pos;
+        pos = pos;
 
         // Add a current location to the Map
         $scope.addCurrentGeo();
@@ -284,7 +307,7 @@
         // $scope.loadPublicPins();
 
         // Center
-        map.setCenter(pos);
+        $scope.centerCurrentLocation();
 
         google.maps.event.addListener(currentLocation, 'dragend', function(event) {
           console.log('dragend');
@@ -342,6 +365,10 @@
       });
     }
 
+    $scope.centerCurrentLocation = function() {
+      map.setCenter(pos);
+    }
+
     $scope.loadPublicPins = function() {
       console.log('loadPublicPins');
       // markers = [];
@@ -355,6 +382,7 @@
           marker.pin = pin;
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', function() {
+            pinClicked = true;
             $scope.onPinClick(marker);
           });
         });
@@ -390,6 +418,7 @@
           marker.pin = pin;
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', function() {
+            pinClicked = true;
             $scope.onPinClick(marker);
           });
         });
@@ -424,6 +453,7 @@
     $scope.onPinClick = function(marker){
       console.log('pinClick');
       if (currentUser != null) {
+        marker.setAnimation(google.maps.Animation.BOUNCE);
         $.getJSON(API_HOST + "/api/Pins/" + marker.pin.id + "?filter[include]=wUser", function(pin) {
           currentPin = pin;
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
@@ -455,17 +485,12 @@
     }
 
     $scope.iterator = function(pins) {
+      console.log('iterator');
       if (currentPin != null) {
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
-            // if (pin.status == 'saved') {
-            //   $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
-            // } else if (distToPin < 250) {
-            //   $("#pin_list").text("You are close enough! Touch the pin to open.");
-            // } else {
-            //   $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
-            // }
+            console.log('titleText defined');
             if (pin.status == 'saved') {
               $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
@@ -476,6 +501,10 @@
               $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
               titleText = 'You need to be ' + (distToPin - 250) + ' m closer to open this pin!';
             }
+            if (pinClicked) {
+              $scope.pinPopUp(pin);
+              pinClicked = false;
+            }
           });
         });
       }
@@ -483,26 +512,74 @@
 
     // Triggered on pin click
     $scope.pinPopUp = function(pin) {
-       
-       $scope.iterator([pin]);
-       
-       // Show the action sheet
-       var hideSheet = $ionicActionSheet.show({
+      console.log('pinPopUp');
+      pinId = pin.id;
+      var marker;
+
+      i = markers.length;
+      while(i--) {
+        if (markers[i].pin.id == pinId) {
+          marker = markers[i];
+        }
+      }
+      
+      // Show the action sheet
+      if (pin.status == 'saved' && pin.type != 'public') {
+        var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
-          // destructiveText: 'Delete',
+          destructiveText: 'Delete',
           cancelText: 'Cancel',
           cancel: function() {
-              // add cancel code..
-            },
-          buttonClicked: function(index) {
-           return true;
+            marker.setAnimation(null);
+          },
+          destructiveButtonClicked: function() {
+            $scope.deletePin(pinId);
+            return true;
           }
-       });    
-    };   
+        });    
+      } else {
+        var hideSheet = $ionicActionSheet.show({
+          titleText: titleText,
+          cancelText: 'Cancel',
+          cancel: function() {
+            marker.setAnimation(null);
+          }
+        });    
+      }
+    }; 
+
+    // destroy the database entry (no error handling for id not found)
+    $scope.deletePin = function(pinId) {
+      $.ajax({
+        url: '/api/Pins/' + pinId,
+        type: 'DELETE',
+        success: function(response) {
+
+          // must be an easier way to search through or filter for specific pin
+          for (var i = markers.length - 1; i >= 0; i--) {
+            if (markers[i].pin.id == pinId) {
+              // remove the marker from map
+              markers[i].setMap(null);
+              // remove the instance from array
+              markers.splice(i, 1);
+            }
+          }
+        }
+      });
+    }
 
     $scope.exploreToPinPopUp = function(pin){
       $scope.closeModal(4); // Close the Explore Modal
-      $scope.pinPopUp(pin); // Show the pin actionSheet
+
+      var currentPinCoords = new google.maps.LatLng(pin.coords.lat, pin.coords.lng);
+      map.setCenter(currentPinCoords);
+
+      pinClicked = true;
+      markers.forEach(function(marker) {
+        if (marker.pin.id == pin.internalId) {
+          $scope.onPinClick(marker); // Show the pin actionSheet
+        }
+      });
     } 
 
     // display list
@@ -521,7 +598,7 @@
     }
 
     // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
-    loadSession();
+    
   }]);
 
 }());

@@ -1,5 +1,5 @@
 (function() {
-  window.API_HOST = '';
+  window.API_HOST = 'http://wots.herokuapp.com';
 
   var blue_pin = API_HOST + '/images/blue_pin.png';
   var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
@@ -12,7 +12,7 @@
   var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
   var current_loc_icon = API_HOST + '/images/blue_dot.png';
 
-  angular.module('word', ['ionic'])
+  angular.module('word', ['ionic', 'ngCordova'])
   
   .config(function($stateProvider, $urlRouterProvider) {
     pos = new google.maps.LatLng(49.282123, -123.108421); 
@@ -26,13 +26,26 @@
     $urlRouterProvider.otherwise('/');
   })
 
-  .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', 
-    function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate) { // Putting these in strings allows minification not to break
+  .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', '$cordovaLocalNotification', '$ionicPlatform', 
+    function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform) { // Putting these in strings allows minification not to break
+    var isAndroid = ionic.Platform.isAndroid();
+
 
     accessToken = null;
     currentUser = null;
     markers = [];
     currentPin = null;
+
+    $scope.add = function() {
+        $cordovaLocalNotification.schedule({
+            id: "1",
+            message: "2 Unread Pins Nearby",
+            title: "WOTS Noticiation",
+            badge: 1
+        }).then(function () {
+            console.log("The notification has been set");
+        });
+    };
 
     //MODAL STUFF
 
@@ -251,19 +264,27 @@
       $scope.closeModal(3);
     }
 
+
+
+
+
     // MAP - INITIALIZE
 
     function initializeMap() {
       console.log('initializeMap');
       var mapOptions = {
         disableDefaultUI: true,
-        zoom: 14,
+        zoom: 4,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
-      map = new google.maps.Map(document.getElementById("map"), mapOptions);
+      map = new google.maps.Map(document.getElementById("map-div"), mapOptions);
 
       $scope.map = map;
     }
+
+    // $ionicPlatform.ready(initializeMap);
+    $ionicPlatform.ready(loadSession);
+
     google.maps.event.addDomListener(window, 'load', initializeMap);
 
 
@@ -577,7 +598,7 @@
     }
 
     // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
-    loadSession();
+    
   }]);
 
 }());
