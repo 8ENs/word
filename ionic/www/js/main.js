@@ -305,6 +305,8 @@
 
             $scope.paintDiscoveredMarkers();
 
+            $('pin_list').text('Welcome. Please login.');
+
             // TODO: need to add some sort of refresh where db is queried for new pins not currently in memory
 
           }
