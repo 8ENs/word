@@ -142,12 +142,12 @@
           <h1 class="title">EXPLORE PINS</h1>
           <button class="button button-clear button-primary" ng-click="closeModal(4)">Cancel</button>
         </ion-header-bar>
-        <ion-content>
+        <ion-content id="explore_list">
           <ion-list>
-            <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp({{pin}})" href="#">
-              <img ng-src="{{pin.face}}">
+            <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp(pin)" href="#">
+              <img ng-src="http://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png" />
               <h2>{{pin.message}}</h2>
-              <p>{{pin.senderName}}</p>
+              <p>{{pin.firstname}}</p>
             </ion-item>
           </ion-list>
         </ion-content>
