@@ -70,12 +70,20 @@
     
     $scope.openModal = function (index) {
       if (index == 1) {
+        $("#regFirstname").val(''); // Maybe there is a better way to nuke the inputs...
+        $("#regLastname").val('');
+        $("#regUsername").val('');
+        $("#regEmail").val('');   
+        $("#regPassword").val('');     
         $scope.oModal1.show()
       } else if (index == 2) {
         $("#loginEmail").val('');
         $("#loginPassword").val('');
         $scope.oModal2.show();        
       } else if (index == 3) {
+        $("#recipient").val('');
+        $("#message").val('');
+        $('#pinType').text('Private');
         $scope.oModal3.show();
       } else {
         $scope.explore();
@@ -212,6 +220,21 @@
 
     // DROP PIN
 
+    // Toggle switches
+  $scope.pinTypeChange = function() {
+    if ($('#pinType').text() == 'Private'){
+      type = 'public';
+      console.log(type);
+      $('#pinType').text('Public')
+    } else {
+      type = 'private';
+      console.log(type);
+      // $('#pinType').text('Private');
+      // This needs to change the fuckin toggle as well.
+    }
+    console.log('Pin Type Changed');
+  };   
+
     $scope.dropPin = function () {
       var recipient = $("#recipient").val();
       var newPin;
@@ -219,7 +242,6 @@
       $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
-          var type = "private".toLowerCase();
           var status = 'discovered';
           var coords = {lat: pos.A, lng: pos.F};
 
@@ -304,6 +326,8 @@
             }
 
             $scope.paintDiscoveredMarkers();
+
+            $('pin_list').text('Welcome. Please login.');
 
             // TODO: need to add some sort of refresh where db is queried for new pins not currently in memory
 
