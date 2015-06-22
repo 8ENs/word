@@ -1,15 +1,15 @@
 (function() {
   window.API_HOST = '';
 
-  var blue_pin = API_HOST + '/images/blue_pin.png';
-  var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
-  var green_pin = API_HOST + '/images/green_pin.png';
-  var green_pin_50 = API_HOST + '/images/green_pin_50.png';
+  var blue_pin = API_HOST + '/images/public_marker_skinny.png';
+  var blue_pin_50 = API_HOST + '/images/public_marker_skinny_50.png';
+  var green_pin = API_HOST + '/images/private_marker_skinny.png';
+  var green_pin_50 = API_HOST + '/images/private_marker_skinny_50.png';
   var yellow_pin = API_HOST + '/images/yellow_pin.png';
   var yellow_pin_50 = API_HOST + '/images/yellow_pin_50.png';
   var red_pin = API_HOST + '/images/red_pin.png';
   var red_pin_50 = API_HOST + '/images/red_pin_50.png';
-  var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
+  var gray_pin_50 = API_HOST + '/images/discovered_marker_skinny.png';
   var current_loc_icon = API_HOST + '/images/blue_dot.png';
 
   angular.module('word', ['ionic'])
