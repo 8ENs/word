@@ -8,6 +8,7 @@
                          object-src 'self';
                          style-src * 'unsafe-inline';
                          img-src *">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
     <title>Word on the Street</title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
@@ -122,18 +123,9 @@
               <label class="item item-input">
                 <textarea placeholder="Message..." rows="5" id="message" required></textarea>
               </label>
-
-              <li class="item item-toggle">
-                Private
-                <label class="toggle toggle-assertive">
-                  <input type="checkbox" id="type">
-                  <div class="track">
-                    <div class="handle"></div>
-                  </div>
-                </label>
-              </li>
+              <ion-toggle ng-model="pinType.checked" ng-change="pinTypeChange()"><div id="pinType">Private</div></ion-toggle>
+              <ion-toggle ng-model="pinVisibility.checked" ng-change="pinHiddenChange()"><div id="pinVisibility">Discovered</div></ion-toggle>        
             </div>
-
             <button class="button button-block button-positive" ng-click="dropPin()">
               Drop Pin
             </button>
@@ -148,12 +140,12 @@
           <h1 class="title">EXPLORE PINS</h1>
           <button class="button button-clear button-primary" ng-click="closeModal(4)">Cancel</button>
         </ion-header-bar>
-        <ion-content>
+        <ion-content id="explore_list">
           <ion-list>
-            <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp({{pin}})" href="#">
-              <img ng-src="{{pin.face}}">
-              <h2>{{pin.message}}</h2>
-              <p>{{pin.senderName}}</p>
+            <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp(pin)" href="#">
+              <img ng-src={{pin.pic}}>
+              <h2>{{pin.message}} <span class="explorePinType">[{{pin.type}} {{pin.status}}]</span></h2>
+              <p>{{pin.wUser.firstname}}   ({{pin.dist}} m)</p>
             </ion-item>
           </ion-list>
         </ion-content>
@@ -161,7 +153,7 @@
     </script> 
     
     <ion-footer-bar class="bar-subfooter">
-      <div id="pin_list">Welcome. Please login.</div> 
+      <div id="pin_list">Welcome. Please login to view pin details.</div> 
     </ion-footer-bar>
 
     <ion-footer-bar class="bar-stable">

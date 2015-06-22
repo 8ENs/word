@@ -54,7 +54,7 @@
         }).then(function () {
             console.log("The time-insensitive notification has been set");
         });
-      } else if (timeElapsed > 30000) {
+      } else if (timeElapsed > 120000) {
           $cordovaLocalNotification.schedule({
               id: "1",
               message: message,
@@ -108,15 +108,23 @@
     
     $scope.openModal = function (index) {
       if (index == 1) {
+        $("#regFirstname").val(''); // Maybe there is a better way to nuke the inputs...
+        $("#regLastname").val('');
+        $("#regUsername").val('');
+        $("#regEmail").val('');   
+        $("#regPassword").val('');     
         $scope.oModal1.show()
       } else if (index == 2) {
         $("#loginEmail").val('');
         $("#loginPassword").val('');
         $scope.oModal2.show();        
       } else if (index == 3) {
+        $("#recipient").val('');
+        $("#message").val('');
+        $('#pinType').text('Private');
         $scope.oModal3.show();
       } else {
-        $scope.oModal4.show();
+        $scope.explore();
       }
     }
 
@@ -159,7 +167,7 @@
     var resetMarkers = function() {
       var i = markers.length;
       while (i--) {
-        if (markers[i].type != 'public') {
+        if (markers[i].pin.type != 'public') {
           markers[i].setMap(null);
           markers.splice(i, 1);
         } else {
@@ -245,10 +253,34 @@
       $("#pin_list").text("Welcome. Please login.");
       resetMarkers();
       displayLoggedOutMenus();
-      $scope.loadPublicPins();
     } 
 
     // DROP PIN
+
+    // Toggle switches
+    $scope.pinTypeChange = function() {
+      if ($('#pinType').text() == 'Private'){
+        type = 'public';
+        console.log(type);
+        $('#pinType').text('Public')
+      } else {
+        type = 'private';
+        console.log(type);
+        $('#pinType').text('Private');
+      }
+      console.log('Pin Type Changed');
+    };
+
+    $scope.pinHiddenChange = function() {
+      if ($('#pinVisibility').text() == 'Hidden'){
+        console.log(status);
+        $('#pinVisibility').text('Discovered');
+      } else {
+        console.log(status);
+        $('#pinVisibility').text('Hidden');
+      }
+      console.log('Pin Type Changed');
+    };   
 
     $scope.dropPin = function () {
       var recipient = $("#recipient").val();
@@ -257,10 +289,10 @@
       $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
-          var type = "private".toLowerCase();
-          var status = 'discovered';
           var coords = {lat: pos.A, lng: pos.F};
-
+          type = $('#pinType').text().toLowerCase();
+          status = $('#pinVisibility').text().toLowerCase();
+          
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
         }
       })
@@ -269,19 +301,28 @@
           newPinId = pin.id;
 
           $.getJSON(API_HOST + "/api/Pins/" + newPinId, function(pin) {
-            ico = (pin.type == 'public') ? yellow_pin : red_pin;
-
             var marker = new google.maps.Marker({
               position: pos,
               map: map,
-              icon: ico,
+              icon: red_pin,
               animation: google.maps.Animation.DROP
             });
             marker.pin = pin;
             markers.push(marker);
+            console.log(marker);
+            window.setTimeout(function() {
+              if (marker.pin.type == 'public') {
+                marker.setIcon(blue_pin_50);
+              } else if (marker.pin.recipient == currentUser.username) {
+                marker.setIcon(green_pin_50);
+              } else {
+                marker.setVisible(false);
+              }
+            }, 2500);
+
             google.maps.event.addListener(marker, 'click', function() {
               pinClicked = true;
-              onPinClick(marker);
+              $scope.onPinClick(marker);
             });
           });
         });
@@ -340,12 +381,13 @@
           if (currentUser != null) {
             $scope.iterator([currentPin]);
 
-            markers.forEach(function(marker) {
-              if (marker.icon.includes('red_pin'))
-                marker.setIcon()
-            });
+            // if ($("#pin_list").text('Pin deleted.')) {
+            //   $("#pin_list").text('');
+            // }
 
             $scope.paintDiscoveredMarkers();
+
+            $('pin_list').text('Welcome. Please login.');
 
             // TODO: need to add some sort of refresh where db is queried for new pins not currently in memory
 
@@ -400,9 +442,13 @@
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
             map: map,
-            icon: gray_pin_50
+            icon: gray_pin_50,
+            visible: false
           });
           marker.pin = pin;
+          if (marker.pin.status != 'hidden') {
+            marker.setVisible(true);
+          }
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', function() {
             pinClicked = true;
@@ -436,10 +482,16 @@
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
             map: map,
-            icon: colour
+            icon: colour,
+            visible: false
           });
           marker.pin = pin;
           markers.push(marker);
+
+          if (marker.pin.status != 'hidden') {
+            marker.setVisible(true);
+          }
+
           google.maps.event.addListener(marker, 'click', function() {
             pinClicked = true;
             $scope.onPinClick(marker);
@@ -450,7 +502,7 @@
     }   
 
     isDiscovered = function(marker) {
-      return marker.pin.status == 'discovered';
+      return (marker.pin.status == 'discovered' || marker.pin.status == 'hidden');
     }
 
     $scope.paintDiscoveredMarkers = function () {
@@ -459,12 +511,26 @@
       if (discoveredMarkers.length > 0) {
         discoveredMarkers.forEach(function(marker) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + marker.pin.coords.lat + "&pinLng=" + marker.pin.coords.lng, function(dist) {
-            if (Math.round(dist.distance) < 250) {
+            if (Math.round(dist.distance) < 100) {
               $scope.sendNotification("Unread Pins Nearby");
               if (marker.pin.type == 'public') {
                 marker.setIcon(blue_pin_50);
               } else if (marker.pin.type == 'private') {
                 marker.setIcon(green_pin_50);
+              }
+
+              if (marker.pin.status == 'hidden') {
+                // if was hidden, now discovered
+                setTimeout(function(){alert("WOW! New *hidden* pin(s) discovered!")},100);
+                marker.pin.status = 'discovered';
+                marker.setVisible(true);
+                $.ajax({
+                  url: API_HOST + "/api/Pins/" + marker.pin.id,
+                  type: 'PUT',
+                  data: {"status": "discovered"}
+                });
+              } else {
+                setTimeout(function(){alert('Unread pin(s) in range!')},100);
               }
             } else {
               marker.setIcon(gray_pin_50);
@@ -485,7 +551,10 @@
             var distToPin = Math.round(dist.distance);
 
             if (distToPin < 250 && pin.status == 'discovered') {
+              
+              // two different pointers (sloppy)
               marker.pin.status = 'saved';
+              pin.status = 'saved';
 
               if (pin.type == 'public') {
                 marker.setIcon(blue_pin);
@@ -498,11 +567,9 @@
                 type: 'PUT',
                 data: {"status": "saved"}
               });
-              // $scope.paintDiscoveredMarkers();
             } 
-            
+
             $scope.iterator([pin]);
-            // $scope.pinPopUp(pin);
           });
         });
       }
@@ -514,7 +581,6 @@
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
-            console.log('titleText defined');
             if (pin.status == 'saved') {
               $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
@@ -534,6 +600,37 @@
       }
     }
 
+    $scope.explore = function() {
+      console.log('explore');
+
+      // URL WRONG!!!
+      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][status]=discovered&filter[where][or][2][recipient]=" + currentUser.username;
+      $.getJSON(url, function(pins) {
+        $scope.pins = pins;
+        $.each(pins, function(idx, pin) {
+          $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
+            var distToPin = Math.round(dist.distance);
+            if (pin.type == 'public' && pin.status == 'saved'){
+              pic = '/images/public_marker.png';
+            } else if (pin.type == 'private' && pin.status == 'saved'){
+              pic = '/images/private_marker.png';
+            } else if (pin.status == 'discovered'){
+              pic = '/images/discovered_marker.png';
+              pin.message = 'Discovered Pin!';
+            } else if (pin.status == 'hidden'){
+              pic = '/images/discovered_marker.png';
+              pin.message = 'Hidden message!';
+            }
+            $.extend(pin, {
+              pic: pic,
+              dist: distToPin
+            });
+            $scope.oModal4.show();
+          });
+        });
+      });
+    }
+
     // Triggered on pin click
     $scope.pinPopUp = function(pin) {
       console.log('pinPopUp');
@@ -548,16 +645,18 @@
       }
       
       // Show the action sheet
-      if (pin.status == 'saved' && pin.type != 'public') {
+      if (marker.pin.status == 'saved' && pin.type != 'public') {
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
           destructiveText: 'Delete',
-          cancelText: 'Cancel',
+          cancelText: 'Save',
           cancel: function() {
             marker.setAnimation(null);
           },
           destructiveButtonClicked: function() {
             $scope.deletePin(pinId);
+            $("#pin_list").text('Pin deleted.');
+            currentPin = null;
             return true;
           }
         });    
@@ -593,6 +692,7 @@
     }
 
     $scope.exploreToPinPopUp = function(pin){
+      console.log('exploreToPinPopUp');
       $scope.closeModal(4); // Close the Explore Modal
 
       var currentPinCoords = new google.maps.LatLng(pin.coords.lat, pin.coords.lng);
@@ -600,16 +700,11 @@
 
       pinClicked = true;
       markers.forEach(function(marker) {
-        if (marker.pin.id == pin.internalId) {
+        if (marker.pin.id == pin.id) {
           $scope.onPinClick(marker); // Show the pin actionSheet
         }
       });
     } 
-
-    // display list
-    $scope.list = function (line) {
-      $("#pin_list").append(line);
-    }
 
     function updateCurrentLocation() {
       navigator.geolocation.getCurrentPosition(function(position) {
