@@ -337,9 +337,9 @@
           if (currentUser != null) {
             $scope.iterator([currentPin]);
 
-            if ($("#pin_list").text('Pin deleted.')) {
-              $("#pin_list").text('');
-            }
+            // if ($("#pin_list").text('Pin deleted.')) {
+            //   $("#pin_list").text('');
+            // }
 
             $scope.paintDiscoveredMarkers();
 
@@ -438,10 +438,16 @@
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
             map: map,
-            icon: colour
+            icon: colour,
+            visible: false
           });
           marker.pin = pin;
           markers.push(marker);
+
+          if (marker.pin.status != 'hidden') {
+            marker.setVisible(true);
+          }
+
           google.maps.event.addListener(marker, 'click', function() {
             pinClicked = true;
             $scope.onPinClick(marker);
@@ -452,7 +458,7 @@
     }   
 
     isDiscovered = function(marker) {
-      return marker.pin.status == 'discovered';
+      return (marker.pin.status == 'discovered' || marker.pin.status == 'hidden');
     }
 
     $scope.paintDiscoveredMarkers = function () {
@@ -462,10 +468,25 @@
         discoveredMarkers.forEach(function(marker) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + marker.pin.coords.lat + "&pinLng=" + marker.pin.coords.lng, function(dist) {
             if (Math.round(dist.distance) < 250) {
+              // update temp in-range colour
               if (marker.pin.type == 'public') {
                 marker.setIcon(blue_pin_50);
               } else if (marker.pin.type == 'private') {
                 marker.setIcon(green_pin_50);
+              }
+
+              if (marker.pin.status == 'hidden') {
+                // if was hidden, now discovered
+                setTimeout(function(){alert("WOW! New *hidden* pin(s) discovered!")},100);
+                marker.pin.status = 'discovered';
+                marker.setVisible(true);
+                $.ajax({
+                  url: API_HOST + "/api/Pins/" + marker.pin.id,
+                  type: 'PUT',
+                  data: {"status": "discovered"}
+                });
+              } else {
+                setTimeout(function(){alert('Unread pin(s) in range!')},100);
               }
             } else {
               marker.setIcon(gray_pin_50);
@@ -578,7 +599,7 @@
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
           destructiveText: 'Delete',
-          cancelText: 'Cancel',
+          cancelText: 'Save',
           cancel: function() {
             marker.setAnimation(null);
           },
