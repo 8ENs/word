@@ -564,12 +564,16 @@
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
-            if (pin.type == 'public'){
-              pic = blue_pin;
-            } else if (pin.type == 'private'){
-              pic = green_pin;
-            } else if (pin.type == 'discovered'){
-              pic = gray_pin_50;
+            if (pin.type == 'public' && pin.status == 'saved'){
+              pic = '/images/public_marker.png';
+            } else if (pin.type == 'private' && pin.status == 'saved'){
+              pic = '/images/private_marker.png';
+            } else if (pin.status == 'discovered'){
+              pic = '/images/discovered_marker.png';
+              pin.message = 'Discovered Pin!';
+            } else if (pin.status == 'hidden'){
+              pic = '/images/discovered_marker.png';
+              pin.message = 'Hidden message!';
             }
             $.extend(pin, {
               pic: pic,

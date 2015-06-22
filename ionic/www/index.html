@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
     <title>Word on the Street</title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
@@ -137,8 +138,8 @@
           <ion-list>
             <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp(pin)" href="#">
               <img ng-src={{pin.pic}}>
-              <h2>{{pin.message}} <span class="explorePinType">[{{pin.type}}]</span></h2>
-              <p> - {{pin.wUser.firstname}}   ({{pin.dist}} m)</p>
+              <h2>{{pin.message}} <span class="explorePinType">[{{pin.type}} {{pin.status}}]</span></h2>
+              <p>{{pin.wUser.firstname}}   ({{pin.dist}} m)</p>
             </ion-item>
           </ion-list>
         </ion-content>
