@@ -36,16 +36,38 @@
     markers = [];
     currentPin = null;
 
-    $scope.add = function() {
+    $scope.sendNotification = function(message, displayNow) {
+      if (typeof displayNow === 'undefined') { optionalArg = false; }
+
+      var now = Date.now();
+      console.log(now);
+      var lastSent = JSON.parse(sessionStorage.getItem("notificationSentTime"));
+      console.log(lastSent)
+      var timeElapsed = now - lastSent;
+      console.log(timeElapsed)
+
+      if (displayNow) {
         $cordovaLocalNotification.schedule({
             id: "1",
-            message: "2 Unread Pins Nearby",
-            title: "WOTS Noticiation",
-            badge: 1
+            message: message,
+            title: "Word on the Street"
         }).then(function () {
-            console.log("The notification has been set");
+            console.log("The time-insensitive notification has been set");
         });
-    };
+      } else if (timeElapsed > 120000) {
+          $cordovaLocalNotification.schedule({
+              id: "1",
+              message: message,
+              title: "Word on the Street"
+          }).then(function () {
+              console.log("The timed notification has been set");
+              sessionStorage.setItem('notificationSentTime', JSON.stringify(now));
+        });
+      } else {
+        console.log('message not sent, stopped based on timing')
+      }
+
+    }
 
   
 
@@ -199,7 +221,7 @@
     }
 
     $scope.register = function () {
-      var url = "/api/wUsers"
+      var url = API_HOST + "/api/wUsers"
       var firstName = $("#regFirstname").val();
       var lastName = $("#regLastname").val();
       var email = $("#regEmail").val();
@@ -437,7 +459,8 @@
       if (discoveredMarkers.length > 0) {
         discoveredMarkers.forEach(function(marker) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + marker.pin.coords.lat + "&pinLng=" + marker.pin.coords.lng, function(dist) {
-            if (Math.round(dist.distance) < 250) {
+            if (Math.round(dist.distance) < 100) {
+              $scope.sendNotification("Unread Pins Nearby");
               if (marker.pin.type == 'public') {
                 marker.setIcon(blue_pin_50);
               } else if (marker.pin.type == 'private') {
@@ -590,12 +613,23 @@
 
     function updateCurrentLocation() {
       navigator.geolocation.getCurrentPosition(function(position) {
-        var lat = position.coords.latitude;
-        var lng = position.coords.longitude;
-        newLatlng = new google.maps.LatLng(lat,lng);
-        currentLocation.setPosition(newLatlng);
-        console.log("position updated!");
+        console.log("position auto-updated!");
+        pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        $scope.pos = pos;
+        currentLocation.setPosition(pos);
       });
+
+        if (currentUser != null) {
+          $scope.iterator([currentPin]);
+
+          markers.forEach(function(marker) {
+            if (marker.icon.includes('red_pin'))
+              marker.setIcon()
+          });
+
+          $scope.paintDiscoveredMarkers();
+        
+      }
     }
 
     // Enable Background Mode on Device Ready.
@@ -607,7 +641,7 @@
 
     }, false);
 
-    // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
+    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
     
   }]);
 
