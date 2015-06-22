@@ -167,7 +167,7 @@
     var resetMarkers = function() {
       var i = markers.length;
       while (i--) {
-        if (markers[i].type != 'public') {
+        if (markers[i].pin.type != 'public') {
           markers[i].setMap(null);
           markers.splice(i, 1);
         } else {
@@ -253,7 +253,6 @@
       $("#pin_list").text("Welcome. Please login.");
       resetMarkers();
       displayLoggedOutMenus();
-      $scope.loadPublicPins();
     } 
 
     // DROP PIN
@@ -273,14 +272,12 @@
     };
 
     $scope.pinHiddenChange = function() {
-      if ($('#pinHidden').text() == 'Hidden'){
-        status = 'discovered';
+      if ($('#pinVisibility').text() == 'Hidden'){
         console.log(status);
-        $('#pinHidden').text('Visible')
+        $('#pinVisibility').text('Discovered');
       } else {
-        status = 'hidden';
         console.log(status);
-        $('#pinHidden').text('Hidden');
+        $('#pinVisibility').text('Hidden');
       }
       console.log('Pin Type Changed');
     };   
@@ -293,10 +290,8 @@
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
           var coords = {lat: pos.A, lng: pos.F};
-          
-          // TODO: clean-up (Jody)
-          $scope.pinTypeChange();
-          $scope.pinHiddenChange();
+          type = $('#pinType').text().toLowerCase();
+          status = $('#pinVisibility').text().toLowerCase();
           
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
         }
@@ -314,6 +309,17 @@
             });
             marker.pin = pin;
             markers.push(marker);
+            console.log(marker);
+            window.setTimeout(function() {
+              if (marker.pin.type == 'public') {
+                marker.setIcon(blue_pin_50);
+              } else if (marker.pin.recipient == currentUser.username) {
+                marker.setIcon(green_pin_50);
+              } else {
+                marker.setVisible(false);
+              }
+            }, 2500);
+
             google.maps.event.addListener(marker, 'click', function() {
               pinClicked = true;
               $scope.onPinClick(marker);
@@ -375,14 +381,9 @@
           if (currentUser != null) {
             $scope.iterator([currentPin]);
 
-            markers.forEach(function(marker) {
-              if (marker.icon.includes('red_pin'))
-                marker.setIcon()
-            });
-
-            if ($("#pin_list").text('Pin deleted.')) {
-              $("#pin_list").text('');
-            }
+            // if ($("#pin_list").text('Pin deleted.')) {
+            //   $("#pin_list").text('');
+            // }
 
             $scope.paintDiscoveredMarkers();
 
@@ -441,9 +442,13 @@
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
             map: map,
-            icon: gray_pin_50
+            icon: gray_pin_50,
+            visible: false
           });
           marker.pin = pin;
+          if (marker.pin.status != 'hidden') {
+            marker.setVisible(true);
+          }
           markers.push(marker);
           google.maps.event.addListener(marker, 'click', function() {
             pinClicked = true;
@@ -477,10 +482,16 @@
           var marker = new google.maps.Marker({
             position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
             map: map,
-            icon: colour
+            icon: colour,
+            visible: false
           });
           marker.pin = pin;
           markers.push(marker);
+
+          if (marker.pin.status != 'hidden') {
+            marker.setVisible(true);
+          }
+
           google.maps.event.addListener(marker, 'click', function() {
             pinClicked = true;
             $scope.onPinClick(marker);
@@ -491,7 +502,7 @@
     }   
 
     isDiscovered = function(marker) {
-      return marker.pin.status == 'discovered';
+      return (marker.pin.status == 'discovered' || marker.pin.status == 'hidden');
     }
 
     $scope.paintDiscoveredMarkers = function () {
@@ -506,6 +517,20 @@
                 marker.setIcon(blue_pin_50);
               } else if (marker.pin.type == 'private') {
                 marker.setIcon(green_pin_50);
+              }
+
+              if (marker.pin.status == 'hidden') {
+                // if was hidden, now discovered
+                setTimeout(function(){alert("WOW! New *hidden* pin(s) discovered!")},100);
+                marker.pin.status = 'discovered';
+                marker.setVisible(true);
+                $.ajax({
+                  url: API_HOST + "/api/Pins/" + marker.pin.id,
+                  type: 'PUT',
+                  data: {"status": "discovered"}
+                });
+              } else {
+                setTimeout(function(){alert('Unread pin(s) in range!')},100);
               }
             } else {
               marker.setIcon(gray_pin_50);
@@ -577,14 +602,27 @@
 
     $scope.explore = function() {
       console.log('explore');
-      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=" + currentUser.username;
+
+      // URL WRONG!!!
+      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][status]=discovered&filter[where][or][2][recipient]=" + currentUser.username;
       $.getJSON(url, function(pins) {
         $scope.pins = pins;
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
+            if (pin.type == 'public' && pin.status == 'saved'){
+              pic = '/images/public_marker.png';
+            } else if (pin.type == 'private' && pin.status == 'saved'){
+              pic = '/images/private_marker.png';
+            } else if (pin.status == 'discovered'){
+              pic = '/images/discovered_marker.png';
+              pin.message = 'Discovered Pin!';
+            } else if (pin.status == 'hidden'){
+              pic = '/images/discovered_marker.png';
+              pin.message = 'Hidden message!';
+            }
             $.extend(pin, {
-              pic: "http://www.rantsports.com/clubhouse/wp-content/slideshow/2014/01/ranking-the-25-hottest-girls-who-have-dated-athletes/medium/Kate-Upton.jpg",
+              pic: pic,
               dist: distToPin
             });
             $scope.oModal4.show();
@@ -611,7 +649,7 @@
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
           destructiveText: 'Delete',
-          cancelText: 'Cancel',
+          cancelText: 'Save',
           cancel: function() {
             marker.setAnimation(null);
           },
