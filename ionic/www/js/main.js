@@ -560,11 +560,15 @@
     $scope.explore = function() {
       console.log('explore');
 
+      // {"where":{"coords":{"near":"49,-123"}},"include":"wUser","where":{"or":[{"status":"discovered","recipient":"ben"},{"type":"public"}]}}
+
       // URL WRONG!!!
-      var url = API_HOST + '/api/Pins?filter[where][coords][near]=' + pos.A + "," + pos.F + '&filter[include]=wUser&filter={"where":{"or":[{"status":"discovered","recipient":"ben"},{"type":"public"}]}}'
+      var url = API_HOST + '/api/Pins?filter={"where":{"coords":{"near":"' + pos.A + ',' + pos.F + '"}},"include":"wUser","where":{"or":[{"status":"discovered","recipient":"' + currentUser.username + '"},{"type":"public"}]}}';
+      // var url = API_HOST + '/api/Pins?filter[where][coords][near]=' + pos.A + "," + pos.F + '&filter[include]=wUser&filter={"where":{"or":[{"status":"discovered","recipient":' + currentUser.username + '},{"type":"public"}]}}';
       // var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][status]=discovered&filter[where][or][2][recipient]=" + currentUser.username;
       $.getJSON(url, function(pins) {
         $scope.pins = pins;
+        console.log(pins.length);
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
