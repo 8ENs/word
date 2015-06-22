@@ -558,6 +558,8 @@
 
     $scope.explore = function() {
       console.log('explore');
+
+      // URL WRONG!!!
       var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][status]=discovered&filter[where][or][2][recipient]=" + currentUser.username;
       $.getJSON(url, function(pins) {
         $scope.pins = pins;
