@@ -11,6 +11,7 @@
   var red_pin_50 = API_HOST + '/images/red_pin_50.png';
   var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
   var current_loc_icon = API_HOST + '/images/blue_dot.png';
+  var in_range = 100;
 
   angular.module('word', ['ionic', 'ngCordova'])
   
@@ -511,7 +512,8 @@
       if (discoveredMarkers.length > 0) {
         discoveredMarkers.forEach(function(marker) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + marker.pin.coords.lat + "&pinLng=" + marker.pin.coords.lng, function(dist) {
-            if (Math.round(dist.distance) < 100) {
+            if (Math.round(dist.distance) < in_range) {
+              // update temp in-range colour
               if (marker.pin.type == 'public') {
                 marker.setIcon(blue_pin_50);
               } else if (marker.pin.type == 'private') {
@@ -549,7 +551,7 @@
 
             var distToPin = Math.round(dist.distance);
 
-            if (distToPin < 250 && pin.status == 'discovered') {
+            if (distToPin < in_range && pin.status == 'discovered') {
               
               // two different pointers (sloppy)
               marker.pin.status = 'saved';
@@ -583,12 +585,12 @@
             if (pin.status == 'saved') {
               $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
-            } else if (distToPin < 250) {
+            } else if (distToPin < in_range) {
               $("#pin_list").text("You are close enough! Touch the pin to open.");
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname + ' (Pin Found!)';
             } else {
-              $("#pin_list").text("You need to be " + (distToPin - 250) + " m closer to open this pin!");
-              titleText = 'You need to be ' + (distToPin - 250) + ' m closer to open this pin!';
+              $("#pin_list").text("You need to be " + (distToPin - in_range) + " m closer to open this pin!");
+              titleText = 'You need to be ' + (distToPin - in_range) + ' m closer to open this pin!';
             }
             if (pinClicked) {
               $scope.pinPopUp(pin);
@@ -599,13 +601,16 @@
       }
     }
 
+    isNotHidden = function(pin) {
+      return (pin.status != 'hidden');
+    }
+
     $scope.explore = function() {
       console.log('explore');
 
-      // URL WRONG!!!
-      var url = API_HOST + "/api/Pins?filter[where][coords][near]=" + pos.A + "," + pos.F + "&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][status]=discovered&filter[where][or][2][recipient]=" + currentUser.username;
+      var url = API_HOST + '/api/Pins?filter[where][coords][near]=' + pos.A + ',' + pos.F + '&filter[include]=wUser&filter[where][or][0][type]=public&filter[where][or][1][recipient]=' + currentUser.username;
       $.getJSON(url, function(pins) {
-        $scope.pins = pins;
+        $scope.pins = pins.filter(isNotHidden);
         $.each(pins, function(idx, pin) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
