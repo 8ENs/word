@@ -3,6 +3,11 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta http-equiv="Content-Security-Policy"
+         content="connect-src * 'unsafe-eval';
+                         object-src 'self';
+                         style-src * 'unsafe-inline';
+                         img-src *">
     <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
     <title>Word on the Street</title>
 
@@ -13,7 +18,8 @@
     <!-- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
-    <!-- <script src="cordova.js"></script> -->
+    <script src="js/ng-cordova.js"></script>
+    <script src="cordova.js"></script>
 
     <!-- your app's js -->
     <script src="js/main.js"></script>
@@ -35,12 +41,12 @@
         <ion-nav-buttons side="right">
           <a ng-click="centerCurrentLocation()" id="nav_center_loc" class="button button-icon icon ion-android-locate" style="display: none"></a>
           <a ng-click="openModal(4)" id="nav_explore" class="button button-icon icon ion-social-buffer" style="display: none">Explore</a>
-          <a ng-click="openModal(1)" id="nav_register" class="button button-icon icon ion-person-add">Register</a>
+          <a ng-click="openModal(1)" id="nav_register" class="button button-icon icon ion-person-add">Register</a>         
           <a ng-click="openModal(2)" id="nav_login" class="button button-icon icon ion-log-in">Login</a>
           <a ng-click="logout()" id="nav_logout" class="button button-icon icon ion-log-out" style="display: none">Logout</a>
         </ion-nav-buttons> 
 
-        <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>  
+        <div id="map-div" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>  
       </ion-view>
     </script>
     

@@ -3,6 +3,12 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta http-equiv="Content-Security-Policy"
+         content="connect-src * 'unsafe-eval';
+                         object-src 'self';
+                         style-src * 'unsafe-inline';
+                         img-src *">
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
     <title>Word on the Street</title>
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
@@ -12,11 +18,12 @@
     <!-- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
-    <!-- <script src="cordova.js"></script> -->
+    <script src="js/ng-cordova.js"></script>
+    <script src="cordova.js"></script>
 
     <!-- your app's js -->
     <script src="js/main.js"></script>
-    <script src="js/services.js"></script>
+    <!-- <script src="js/services.js"></script> -->
   </head>
 
   <body class="platform-android platform-cordova platform-webview">
@@ -32,13 +39,14 @@
           <a ng-click="openModal(3)" id="nav_drop" class="button button-icon icon ion-location" style="display: none">Drop Pin</a>
         </ion-nav-buttons>
         <ion-nav-buttons side="right">
+          <a ng-click="centerCurrentLocation()" id="nav_center_loc" class="button button-icon icon ion-android-locate" style="display: none"></a>
           <a ng-click="openModal(4)" id="nav_explore" class="button button-icon icon ion-social-buffer" style="display: none">Explore</a>
-          <a ng-click="openModal(1)" id="nav_register" class="button button-icon icon ion-person-add">Register</a>
+          <a ng-click="openModal(1)" id="nav_register" class="button button-icon icon ion-person-add">Register</a>         
           <a ng-click="openModal(2)" id="nav_login" class="button button-icon icon ion-log-in">Login</a>
           <a ng-click="logout()" id="nav_logout" class="button button-icon icon ion-log-out" style="display: none">Logout</a>
         </ion-nav-buttons> 
 
-        <div id="map" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>  
+        <div id="map-div" data-tap-disabled="true" style="width: 100%; height: 100%;"></div>  
       </ion-view>
     </script>
     
@@ -115,18 +123,9 @@
               <label class="item item-input">
                 <textarea placeholder="Message..." rows="5" id="message" required></textarea>
               </label>
-
-              <li class="item item-toggle">
-                Private
-                <label class="toggle toggle-assertive">
-                  <input type="checkbox" id="type">
-                  <div class="track">
-                    <div class="handle"></div>
-                  </div>
-                </label>
-              </li>
+              <ion-toggle ng-model="pinType.checked" ng-change="pinTypeChange()"><div id="pinType">Private</div></ion-toggle>
+              <ion-toggle ng-model="pinVisibility.checked" ng-change="pinHiddenChange()"><div id="pinVisibility">Discovered</div></ion-toggle>        
             </div>
-
             <button class="button button-block button-positive" ng-click="dropPin()">
               Drop Pin
             </button>
@@ -141,12 +140,12 @@
           <h1 class="title">EXPLORE PINS</h1>
           <button class="button button-clear button-primary" ng-click="closeModal(4)">Cancel</button>
         </ion-header-bar>
-        <ion-content>
+        <ion-content id="explore_list">
           <ion-list>
-            <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp({{pin}})" href="#">
-              <img ng-src="{{pin.face}}">
-              <h2>{{pin.message}}</h2>
-              <p>{{pin.senderName}}</p>
+            <ion-item class="item-remove-animate item-avatar" ng-repeat="pin in pins" type="item-text-wrap" ng-click="exploreToPinPopUp(pin)" href="#">
+              <img ng-src={{pin.pic}}>
+              <h2>{{pin.message}} <span class="explorePinType">[{{pin.type}} {{pin.status}}]</span></h2>
+              <p>{{pin.wUser.firstname}}   ({{pin.dist}} m)</p>
             </ion-item>
           </ion-list>
         </ion-content>
@@ -154,7 +153,7 @@
     </script> 
     
     <ion-footer-bar class="bar-subfooter">
-      <div id="pin_list">Welcome. Please login.</div> 
+      <div id="pin_list">Welcome. Please login to view pin details.</div> 
     </ion-footer-bar>
 
     <ion-footer-bar class="bar-stable">
