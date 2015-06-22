@@ -1,15 +1,15 @@
 (function() {
   window.API_HOST = 'http://wots.herokuapp.com';
 
-  var blue_pin = API_HOST + '/images/public_marker_skinny.png';
-  var blue_pin_50 = API_HOST + '/images/public_marker_skinny_50.png';
-  var green_pin = API_HOST + '/images/private_marker_skinny.png';
-  var green_pin_50 = API_HOST + '/images/private_marker_skinny_50.png';
+  var blue_pin = API_HOST + '/images/blue_pin.png';
+  var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
+  var green_pin = API_HOST + '/images/green_pin.png';
+  var green_pin_50 = API_HOST + '/images/green_pin_50.png';
   var yellow_pin = API_HOST + '/images/yellow_pin.png';
   var yellow_pin_50 = API_HOST + '/images/yellow_pin_50.png';
   var red_pin = API_HOST + '/images/red_pin.png';
   var red_pin_50 = API_HOST + '/images/red_pin_50.png';
-  var gray_pin_50 = API_HOST + '/images/discovered_marker_skinny.png';
+  var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
   var current_loc_icon = API_HOST + '/images/blue_dot.png';
   var in_range = 100;
 
@@ -260,7 +260,8 @@
 
     // Toggle switches
     $scope.pinTypeChange = function() {
-      if ($('#pinType').text() == 'Private'){
+      
+      if (type == 'private'){
         type = 'public';
         console.log(type);
         $('#pinType').text('Public')
@@ -291,8 +292,8 @@
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
           var coords = {lat: pos.A, lng: pos.F};
-          type = $('#pinType').text().toLowerCase();
-          status = $('#pinVisibility').text().toLowerCase();
+          type = 'private';
+          status = 'discovered';
           
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
         }
@@ -620,10 +621,10 @@
               pic = '/images/private_marker.png';
             } else if (pin.status == 'discovered'){
               pic = '/images/discovered_marker.png';
-              pin.message = 'Discovered Pin!';
+              pin.message = '(Discovered Pin!)';
             } else if (pin.status == 'hidden'){
               pic = '/images/discovered_marker.png';
-              pin.message = 'Hidden message!';
+              pin.message = '(Hidden message!)';
             }
             $.extend(pin, {
               pic: pic,
@@ -681,7 +682,6 @@
         url: '/api/Pins/' + pinId,
         type: 'DELETE',
         success: function(response) {
-
           // must be an easier way to search through or filter for specific pin
           for (var i = markers.length - 1; i >= 0; i--) {
             if (markers[i].pin.id == pinId) {
