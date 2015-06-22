@@ -735,7 +735,7 @@
 
     }, false);
 
-    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
+    // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
     
   }]);
 
