@@ -512,7 +512,6 @@
         discoveredMarkers.forEach(function(marker) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + marker.pin.coords.lat + "&pinLng=" + marker.pin.coords.lng, function(dist) {
             if (Math.round(dist.distance) < 100) {
-              $scope.sendNotification("Unread Pins Nearby");
               if (marker.pin.type == 'public') {
                 marker.setIcon(blue_pin_50);
               } else if (marker.pin.type == 'private') {
@@ -521,7 +520,7 @@
 
               if (marker.pin.status == 'hidden') {
                 // if was hidden, now discovered
-                setTimeout(function(){alert("WOW! New *hidden* pin(s) discovered!")},100);
+                $scope.sendNotification("WOW! New *hidden* pin(s) discovered!", true);
                 marker.pin.status = 'discovered';
                 marker.setVisible(true);
                 $.ajax({
@@ -530,7 +529,7 @@
                   data: {"status": "discovered"}
                 });
               } else {
-                setTimeout(function(){alert('Unread pin(s) in range!')},100);
+                $scope.sendNotification("Unread Pins Nearby");
               }
             } else {
               marker.setIcon(gray_pin_50);
