@@ -304,7 +304,6 @@
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
           var coords = {lat: pos.A, lng: pos.F};
-          debugger;
           if ($scope.pinType.checked){
             type = 'private';
           } else {
@@ -607,14 +606,14 @@
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
             if (pin.status == 'saved') {
-              $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
+              $("#pin_list").text('"' + pin.message + '" - ' + pin.wUser.firstname + ' (' + Math.round(dist.distance) + 'm)');
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
             } else if (distToPin < in_range) {
               $("#pin_list").text("You are close enough! Touch the pin to open.");
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname + ' (Pin Found!)';
             } else {
-              $("#pin_list").text("You need to be " + (distToPin - in_range) + " m closer to open this pin!");
-              titleText = 'You need to be ' + (distToPin - in_range) + ' m closer to open this pin!';
+              $("#pin_list").text("You need to be " + (distToPin - in_range) + "m closer to open this pin!");
+              titleText = 'You need to be ' + (distToPin - in_range) + 'm closer to open this pin!';
             }
             if (pinClicked) {
               $scope.pinPopUp(pin);

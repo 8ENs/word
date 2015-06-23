@@ -60,19 +60,19 @@
             <form>
               <div class="list">
                 <label class="item item-input">
-                  <input type="text" placeholder="First" id="regFirstname">
+                  <input type="text" placeholder="First" id="regFirstname" maxlength="50">
                 </label> 
                 <label class="item item-input">
-                  <input type="text" placeholder="Last" id="regLastname">
+                  <input type="text" placeholder="Last" id="regLastname" maxlength="50">
                 </label> 
                 <label class="item item-input">
-                  <input type="text" placeholder="username" id="regUsername">
+                  <input type="text" placeholder="username" id="regUsername" maxlength="50">
                 </label> 
                 <label class="item item-input">
-                  <input type="text" placeholder="email" id="regEmail">
+                  <input type="text" placeholder="email" id="regEmail" maxlength="50">
                 </label> 
                 <label class="item item-input">
-                  <input type="password" placeholder="password" id="regPassword">
+                  <input type="password" placeholder="password" id="regPassword" maxlength="50">
                 </label> 
               </div>
               <button class="button button-block button-positive" ng-click="register()">
@@ -93,10 +93,10 @@
           <form>
             <div class="list">
               <label class="item item-input">
-                <input type="text" placeholder="Email" id="loginEmail" required="true">
+                <input type="text" placeholder="Email" id="loginEmail" maxlength="50" required="true">
               </label>
               <label class="item item-input">
-                <input type="password" id="loginPassword" placeholder="Password" required="true">
+                <input type="password" id="loginPassword" placeholder="Password" maxlength="50" required="true">
               </label>
             </div>
 
@@ -118,10 +118,10 @@
           <form>
             <div class="list">
               <label class="item item-input">
-                <input type="text" placeholder="username" id="recipient" required>
+                <input type="text" placeholder="username" id="recipient" maxlength="50" required>
               </label>
               <label class="item item-input">
-                <textarea placeholder="Message..." rows="5" id="message" required></textarea>
+                <textarea placeholder="Message..." rows="5" id="message" maxlength="140" required></textarea>
               </label>  
             <ion-toggle 
               ng-model="pinType.checked"
