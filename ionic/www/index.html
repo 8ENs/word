@@ -122,9 +122,17 @@
               </label>
               <label class="item item-input">
                 <textarea placeholder="Message..." rows="5" id="message" required></textarea>
-              </label>
-              <ion-toggle ng-model="pinType.checked" ng-change="pinTypeChange()"><div id="pinType">Private</div></ion-toggle>
-              <ion-toggle ng-model="pinVisibility.checked" ng-change="pinHiddenChange()"><div id="pinVisibility">Discovered</div></ion-toggle>        
+              </label>  
+            <ion-toggle 
+              ng-model="pinType.checked"
+              ng-change="pinTypeChange()">
+              Private
+            </ion-toggle> 
+            <ion-toggle 
+              ng-model="pinStatus.checked"
+              ng-change="pinStatusChange()">
+              Hidden
+            </ion-toggle>                           
             </div>
             <button class="button button-block button-positive" ng-click="dropPin()">
               Drop Pin

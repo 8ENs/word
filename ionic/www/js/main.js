@@ -259,30 +259,42 @@
     // DROP PIN
 
     // Toggle switches
-    $scope.pinTypeChange = function() {
+    // $scope.pinTypeChange = function() {
       
-      if (type == 'private'){
-        type = 'public';
-        console.log(type);
-        $('#pinType').text('Public')
-      } else {
-        type = 'private';
-        console.log(type);
-        $('#pinType').text('Private');
-      }
-      console.log('Pin Type Changed');
-    };
+    //   if (type == 'private'){
+    //     type = 'public';
+    //     console.log(type);
+    //     $('#pinType').text('Public')
+    //   } else {
+    //     type = 'private';
+    //     console.log(type);
+    //     $('#pinType').text('Private');
+    //   }
+    //   console.log('Pin Type Changed');
+    // };
 
-    $scope.pinHiddenChange = function() {
-      if ($('#pinVisibility').text() == 'Hidden'){
-        console.log(status);
-        $('#pinVisibility').text('Discovered');
-      } else {
-        console.log(status);
-        $('#pinVisibility').text('Hidden');
-      }
-      console.log('Pin Type Changed');
-    };   
+    // $scope.pinHiddenChange = function() {
+    //   if ($('#pinVisibility').text() == 'Hidden'){
+    //     console.log(status);
+    //     $('#pinVisibility').text('Discovered');
+    //   } else {
+    //     console.log(status);
+    //     $('#pinVisibility').text('Hidden');
+    //   }
+    //   console.log('Pin Type Changed');
+    // };   
+
+    $scope.pinTypeChange = function() {
+      console.log('Pin Type Change');
+    };
+    
+    $scope.pinType = { checked: true };   
+
+    $scope.pinStatusChange = function() {
+      console.log('Pin Status Change');
+    };
+    
+    $scope.pinStatus = { checked: true };     
 
     $scope.dropPin = function () {
       var recipient = $("#recipient").val();
@@ -292,8 +304,19 @@
         if (currentUser != null && user.length > 0) {
           var message = $("#message").val();
           var coords = {lat: pos.A, lng: pos.F};
-          type = 'private';
-          status = 'discovered';
+          debugger;
+          if ($scope.pinType.checked){
+            type = 'private';
+          } else {
+            type = 'public';
+          }
+          if ($scope.pinStatus.checked){
+            status = 'hidden';
+          } else {
+            status = 'discovered';           
+          }
+
+
           
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
         }
