@@ -307,12 +307,19 @@
       .then(function() {
         $.post( API_HOST + "/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
           newPinId = pin.id;
-
+          if (pin.type == 'public') {
+            dropped_pin = blue_pin;
+          } else if (pin.type == 'private') {
+            dropped_pin = green_pin;
+          } else {
+            dropped_pin = red_pin;
+          }
+          
           $.getJSON(API_HOST + "/api/Pins/" + newPinId, function(pin) {
             var marker = new google.maps.Marker({
               position: pos,
               map: map,
-              icon: red_pin,
+              icon: dropped_pin,
               animation: google.maps.Animation.DROP
             });
             marker.pin = pin;
