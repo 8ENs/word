@@ -678,7 +678,7 @@
     // destroy the database entry (no error handling for id not found)
     $scope.deletePin = function(pinId) {
       $.ajax({
-        url: '/api/Pins/' + pinId,
+        url: API_HOST + '/api/Pins/' + pinId,
         type: 'DELETE',
         success: function(response) {
 
@@ -740,7 +740,7 @@
 
     }, false);
 
-    // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
+    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
     
   }]);
 

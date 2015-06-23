@@ -35,12 +35,12 @@
     <splash density="port-xxxhdpi" src="resources/android/splash/drawable-port-xxxhdpi-screen.png" />
     <name>Word On The Street</name>
     <description>
-        A Geolocation Messaging App
+        Leave a geo-located message for your friends.
     </description>
-    <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
+    <author email="ben@coderush.ca" href="http://wordonthestreet.io/">
+      Ben Jody James
     </author>
-    <content src="index.html" />
+    <content src="mobile.html" />
     <access origin="*" />
     <allow-intent href="*" />
     <allow-navigation href="*" />

@@ -2,12 +2,12 @@
 <widget id="com.ionicframework.wordonthestreet" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
   <name>Word On The Street</name>
   <description>
-        A Geolocation Messaging App
+        Leave a geo-located message for your friends.
     </description>
-  <author email="hi@ionicframework" href="http://ionicframework.com/">
-      Ionic Framework Team
+  <author email="ben@coderush.ca" href="http://wordonthestreet.io/">
+      Ben Jody James
     </author>
-  <content src="index.html"/>
+  <content src="mobile.html"/>
   <access origin="*"/>
   <allow-intent href="*"/>
   <allow-navigation href="*"/>
