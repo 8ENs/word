@@ -164,3 +164,19 @@ footer {
 p.copyright {
     margin: 15px 0 0;
 }
+
+.beer-symbol {
+    color: gold;
+}
+
+.love-symbol {
+    color: red;
+}
+
+.hunt-symbol {
+    color: royalblue;
+}
+
+@media (max-width: 480px) {
+    h2{font-size: 24px;}
+}
