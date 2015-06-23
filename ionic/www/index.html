@@ -66,10 +66,10 @@
                   <input type="text" placeholder="Last" id="regLastname" maxlength="50">
                 </label> 
                 <label class="item item-input">
-                  <input type="text" placeholder="username" id="regUsername" maxlength="50">
+                  <input type="text" placeholder="username" class="lowercase" id="regUsername" maxlength="50">
                 </label> 
                 <label class="item item-input">
-                  <input type="text" placeholder="email" id="regEmail" maxlength="50">
+                  <input type="text" placeholder="email" class="lowercase" id="regEmail" maxlength="50">
                 </label> 
                 <label class="item item-input">
                   <input type="password" placeholder="password" id="regPassword" maxlength="50">
@@ -93,7 +93,7 @@
           <form>
             <div class="list">
               <label class="item item-input">
-                <input type="text" placeholder="Email" id="loginEmail" maxlength="50" required="true">
+                <input type="text" placeholder="Email" class="lowercase" id="loginEmail" maxlength="50" required="true">
               </label>
               <label class="item item-input">
                 <input type="password" id="loginPassword" placeholder="Password" maxlength="50" required="true">
@@ -118,10 +118,10 @@
           <form>
             <div class="list">
               <label class="item item-input">
-                <input type="text" placeholder="username" id="recipient" maxlength="50" required>
+                <input type="text" placeholder="username" class="lowercase" id="recipient" maxlength="50" required>
               </label>
               <label class="item item-input">
-                <textarea placeholder="Message..." rows="5" id="message" maxlength="140" required></textarea>
+                <textarea placeholder="Message..." rows="3" class="lowercase" id="message" maxlength="140" required></textarea>
               </label>  
             <ion-toggle 
               ng-model="pinType.checked"

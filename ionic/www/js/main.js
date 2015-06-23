@@ -233,7 +233,7 @@
     }
 
     $scope.loginButton = function () {
-      var loginEmail = sanitize($( "#loginEmail" ).val());
+      var loginEmail = sanitize($( "#loginEmail" ).val().toLowerCase());
       var loginPassword = sanitize($( "#loginPassword" ).val());
       $scope.login(loginEmail, loginPassword);
     }
@@ -242,7 +242,7 @@
       var url = API_HOST + "/api/wUsers"
       var firstName = sanitize($("#regFirstname").val());
       var lastName = sanitize($("#regLastname").val());
-      var email = sanitize($("#regEmail").val());
+      var email = sanitize($("#regEmail").val().toLowerCase());
       var userName = sanitize($("#regUsername").val().toLowerCase());
       var password = sanitize($("#regPassword").val());
       var regData = {email: email, password: password, firstname: firstName, lastname: lastName, username: userName};
@@ -685,7 +685,7 @@
     // destroy the database entry (no error handling for id not found)
     $scope.deletePin = function(pinId) {
       $.ajax({
-        url: '/api/Pins/' + pinId,
+        url: API_HOST + '/api/Pins/' + pinId,
         type: 'DELETE',
         success: function(response) {
           // must be an easier way to search through or filter for specific pin
