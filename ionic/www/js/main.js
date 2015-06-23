@@ -71,8 +71,6 @@
     }
 
   
-
-
     //MODAL STUFF
 
     $ionicModal.fromTemplateUrl('modal1.html', {
@@ -177,6 +175,17 @@
       }
     }
 
+    // Sanitize inputs
+    function sanitize(text) {
+      return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+          // sanitize swears...? ...shit
+    }    
+
     //check session
     // not upgrading public/saved to full blue, and not paiting immediate inRange pins
     var loadSession = function(){
@@ -224,18 +233,18 @@
     }
 
     $scope.loginButton = function () {
-      var loginEmail = $( "#loginEmail" ).val();
-      var loginPassword = $( "#loginPassword" ).val();
+      var loginEmail = sanitize($( "#loginEmail" ).val().toLowerCase());
+      var loginPassword = sanitize($( "#loginPassword" ).val());
       $scope.login(loginEmail, loginPassword);
     }
 
     $scope.register = function () {
       var url = API_HOST + "/api/wUsers"
-      var firstName = $("#regFirstname").val();
-      var lastName = $("#regLastname").val();
-      var email = $("#regEmail").val();
-      var userName = $("#regUsername").val().toLowerCase();
-      var password = $("#regPassword").val();
+      var firstName = sanitize($("#regFirstname").val());
+      var lastName = sanitize($("#regLastname").val());
+      var email = sanitize($("#regEmail").val().toLowerCase());
+      var userName = sanitize($("#regUsername").val().toLowerCase());
+      var password = sanitize($("#regPassword").val());
       var regData = {email: email, password: password, firstname: firstName, lastname: lastName, username: userName};
       
       $.post( url, regData, function (data) {
@@ -258,41 +267,39 @@
 
     // DROP PIN
 
-    // Toggle switches
+    // Toggle switches  
     $scope.pinTypeChange = function() {
-      if ($('#pinType').text() == 'Private'){
-        type = 'public';
-        console.log(type);
-        $('#pinType').text('Public')
-      } else {
-        type = 'private';
-        console.log(type);
-        $('#pinType').text('Private');
-      }
-      console.log('Pin Type Changed');
+      console.log('Pin Type Change');
     };
+    
+    $scope.pinType = { checked: true };   
 
-    $scope.pinHiddenChange = function() {
-      if ($('#pinVisibility').text() == 'Hidden'){
-        console.log(status);
-        $('#pinVisibility').text('Discovered');
-      } else {
-        console.log(status);
-        $('#pinVisibility').text('Hidden');
-      }
-      console.log('Pin Type Changed');
-    };   
+    $scope.pinStatusChange = function() {
+      console.log('Pin Status Change');
+    };
+    
+    $scope.pinStatus = { checked: true };     
 
     $scope.dropPin = function () {
-      var recipient = $("#recipient").val();
+      var recipient = sanitize($("#recipient").val());
       var newPin;
       var newPinId;
       $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
         if (currentUser != null && user.length > 0) {
-          var message = $("#message").val();
+          var message = sanitize($("#message").val());
           var coords = {lat: pos.A, lng: pos.F};
-          type = $('#pinType').text().toLowerCase();
-          status = $('#pinVisibility').text().toLowerCase();
+          if ($scope.pinType.checked){
+            type = 'private';
+          } else {
+            type = 'public';
+          }
+          if ($scope.pinStatus.checked){
+            status = 'hidden';
+          } else {
+            status = 'discovered';           
+          }
+
+
           
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
         }
@@ -583,14 +590,14 @@
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
             if (pin.status == 'saved') {
-              $("#pin_list").text("MSG: " + pin.message + " | FROM: " + pin.wUser.firstname + " | TYPE: " + pin.type + " | STATUS: " + pin.status + " | DIST: " + Math.round(dist.distance));
+              $("#pin_list").text('"' + pin.message + '" - ' + pin.wUser.firstname + ' (' + Math.round(dist.distance) + 'm)');
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
             } else if (distToPin < in_range) {
               $("#pin_list").text("You are close enough! Touch the pin to open.");
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname + ' (Pin Found!)';
             } else {
-              $("#pin_list").text("You need to be " + (distToPin - in_range) + " m closer to open this pin!");
-              titleText = 'You need to be ' + (distToPin - in_range) + ' m closer to open this pin!';
+              $("#pin_list").text("You need to be " + (distToPin - in_range) + "m closer to open this pin!");
+              titleText = 'You need to be ' + (distToPin - in_range) + 'm closer to open this pin!';
             }
             if (pinClicked) {
               $scope.pinPopUp(pin);
@@ -620,10 +627,10 @@
               pic = '/images/private_marker.png';
             } else if (pin.status == 'discovered'){
               pic = '/images/discovered_marker.png';
-              pin.message = 'Discovered Pin!';
+              pin.message = '(Discovered Pin!)';
             } else if (pin.status == 'hidden'){
               pic = '/images/discovered_marker.png';
-              pin.message = 'Hidden message!';
+              pin.message = '(Hidden message!)';
             }
             $.extend(pin, {
               pic: pic,
@@ -653,7 +660,7 @@
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
           destructiveText: 'Delete',
-          cancelText: 'Save',
+          cancelText: 'Dismiss',
           cancel: function() {
             marker.setAnimation(null);
           },
@@ -667,7 +674,7 @@
       } else {
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
-          cancelText: 'Cancel',
+          cancelText: 'Dismiss',
           cancel: function() {
             marker.setAnimation(null);
           }
@@ -681,7 +688,6 @@
         url: API_HOST + '/api/Pins/' + pinId,
         type: 'DELETE',
         success: function(response) {
-
           // must be an easier way to search through or filter for specific pin
           for (var i = markers.length - 1; i >= 0; i--) {
             if (markers[i].pin.id == pinId) {

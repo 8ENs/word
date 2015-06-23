@@ -24,6 +24,8 @@ textarea {
   color:lightgrey; /* Default is private */
 }
 
+.lowercase{text-transform:lowercase;}
+
 #pin_list{
   color:#4a87ee;
   margin:auto 0; 
