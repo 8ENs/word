@@ -677,7 +677,7 @@
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
           destructiveText: 'Delete',
-          cancelText: 'Save',
+          cancelText: 'Dismiss',
           cancel: function() {
             marker.setAnimation(null);
           },
@@ -691,7 +691,7 @@
       } else {
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
-          cancelText: 'Cancel',
+          cancelText: 'Dismiss',
           cancel: function() {
             marker.setAnimation(null);
           }
