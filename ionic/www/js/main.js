@@ -71,8 +71,6 @@
     }
 
   
-
-
     //MODAL STUFF
 
     $ionicModal.fromTemplateUrl('modal1.html', {
@@ -177,6 +175,17 @@
       }
     }
 
+    // Sanitize inputs
+    function sanitize(text) {
+      return text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+          // sanitize swears...? ...shit
+    }    
+
     //check session
     // not upgrading public/saved to full blue, and not paiting immediate inRange pins
     var loadSession = function(){
@@ -224,18 +233,18 @@
     }
 
     $scope.loginButton = function () {
-      var loginEmail = $( "#loginEmail" ).val();
-      var loginPassword = $( "#loginPassword" ).val();
+      var loginEmail = sanitize($( "#loginEmail" ).val());
+      var loginPassword = sanitize($( "#loginPassword" ).val());
       $scope.login(loginEmail, loginPassword);
     }
 
     $scope.register = function () {
       var url = API_HOST + "/api/wUsers"
-      var firstName = $("#regFirstname").val();
-      var lastName = $("#regLastname").val();
-      var email = $("#regEmail").val();
-      var userName = $("#regUsername").val().toLowerCase();
-      var password = $("#regPassword").val();
+      var firstName = sanitize($("#regFirstname").val());
+      var lastName = sanitize($("#regLastname").val());
+      var email = sanitize($("#regEmail").val());
+      var userName = sanitize($("#regUsername").val().toLowerCase());
+      var password = sanitize($("#regPassword").val());
       var regData = {email: email, password: password, firstname: firstName, lastname: lastName, username: userName};
       
       $.post( url, regData, function (data) {
@@ -258,32 +267,7 @@
 
     // DROP PIN
 
-    // Toggle switches
-    // $scope.pinTypeChange = function() {
-      
-    //   if (type == 'private'){
-    //     type = 'public';
-    //     console.log(type);
-    //     $('#pinType').text('Public')
-    //   } else {
-    //     type = 'private';
-    //     console.log(type);
-    //     $('#pinType').text('Private');
-    //   }
-    //   console.log('Pin Type Changed');
-    // };
-
-    // $scope.pinHiddenChange = function() {
-    //   if ($('#pinVisibility').text() == 'Hidden'){
-    //     console.log(status);
-    //     $('#pinVisibility').text('Discovered');
-    //   } else {
-    //     console.log(status);
-    //     $('#pinVisibility').text('Hidden');
-    //   }
-    //   console.log('Pin Type Changed');
-    // };   
-
+    // Toggle switches  
     $scope.pinTypeChange = function() {
       console.log('Pin Type Change');
     };
@@ -297,12 +281,12 @@
     $scope.pinStatus = { checked: true };     
 
     $scope.dropPin = function () {
-      var recipient = $("#recipient").val();
+      var recipient = sanitize($("#recipient").val());
       var newPin;
       var newPinId;
       $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
         if (currentUser != null && user.length > 0) {
-          var message = $("#message").val();
+          var message = sanitize($("#message").val());
           var coords = {lat: pos.A, lng: pos.F};
           if ($scope.pinType.checked){
             type = 'private';
