@@ -11,6 +11,9 @@
   var red_pin_50 = API_HOST + '/images/red_pin_50.png';
   var gray_pin_50 = API_HOST + '/images/gray_pin_50.png';
   var current_loc_icon = API_HOST + '/images/blue_dot.png';
+  var public_marker = API_HOST + '/images/public_marker.png';
+  var private_marker = API_HOST + '/images/private_marker.png';
+  var discovered_marker = API_HOST + '/images/discovered_marker.png';
   var in_range = 100;
 
   angular.module('word', ['ionic', 'ngCordova'])
@@ -20,11 +23,11 @@
 
     $stateProvider
       .state('home', {
-        url: '/',
+        url: '',
         controller: 'MapCtrl',
         templateUrl: 'home.html'
       })
-    $urlRouterProvider.otherwise('/');
+    $urlRouterProvider.otherwise('');
   })
 
   .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', '$cordovaLocalNotification', '$ionicPlatform', 
@@ -629,14 +632,14 @@
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
             if (pin.type == 'public' && pin.status == 'saved'){
-              pic = '/images/public_marker.png';
+              pic = public_marker;
             } else if (pin.type == 'private' && pin.status == 'saved'){
-              pic = '/images/private_marker.png';
+              pic = private_marker;
             } else if (pin.status == 'discovered'){
-              pic = '/images/discovered_marker.png';
+              pic = discovered_marker;
               pin.message = '(Discovered Pin!)';
             } else if (pin.status == 'hidden'){
-              pic = '/images/discovered_marker.png';
+              pic = discovered_marker;
               pin.message = '(Hidden message!)';
             }
             $.extend(pin, {
