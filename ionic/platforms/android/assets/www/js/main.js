@@ -16,7 +16,7 @@
   var discovered_marker = API_HOST + '/images/discovered_marker.png';
   var in_range = 100;
 
-  angular.module('word', ['ionic', 'ngCordova'])
+  angular.module('word', ['ionic', 'ngCordova', 'autocomplete'])
   
   .config(function($stateProvider, $urlRouterProvider) {
     pos = new google.maps.LatLng(49.282123, -123.108421); 
@@ -39,6 +39,14 @@
     currentUser = null;
     markers = [];
     currentPin = null;
+
+    $scope.recipientNames = [];
+       $.getJSON(API_HOST + "/api/wUsers", function(users){
+         users.forEach(function(user){
+           $scope.recipientNames.push(user.username);
+         })
+       });
+
 
     $scope.sendNotification = function(message, displayNow) {
       if (typeof displayNow === 'undefined') { optionalArg = false; }
@@ -283,8 +291,13 @@
     
     $scope.pinStatus = { checked: true };     
 
+    recipientName = '';
+    $scope.grabInput = function(name) {
+      recipientName = name;
+    }
+
     $scope.dropPin = function () {
-      var recipient = sanitize($("#recipient").val());
+      var recipient = sanitize(recipientName);
       var newPin;
       var newPinId;
       $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {

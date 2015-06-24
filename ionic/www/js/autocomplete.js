@@ -107,11 +107,11 @@ app.directive('autocomplete', function() {
 
       // Default atts
       scope.attrs = {
-        "placeholder": "start typing...",
-        "class": "",
-        "id": "",
+        "placeholder": " username",
+        "class": "lowercase",
+        "id": "recipient",
         "inputclass": "",
-        "inputid": ""
+        "inputid": "recipient1"
       };
 
       for (var a in attrs) {

@@ -16,7 +16,7 @@
   var discovered_marker = API_HOST + '/images/discovered_marker.png';
   var in_range = 100;
 
-  angular.module('word', ['ionic', 'ngCordova'])
+  angular.module('word', ['ionic', 'ngCordova', 'autocomplete'])
   
   .config(function($stateProvider, $urlRouterProvider) {
     pos = new google.maps.LatLng(49.282123, -123.108421); 
@@ -39,6 +39,14 @@
     currentUser = null;
     markers = [];
     currentPin = null;
+
+    $scope.recipientNames = [];
+       $.getJSON(API_HOST + "/api/wUsers", function(users){
+         users.forEach(function(user){
+           $scope.recipientNames.push(user.username);
+         })
+       });
+
 
     $scope.sendNotification = function(message, displayNow) {
       if (typeof displayNow === 'undefined') { optionalArg = false; }
@@ -121,7 +129,7 @@
         $("#loginPassword").val('');
         $scope.oModal2.show();        
       } else if (index == 3) {
-        $("#recipient").val('');
+        $("#recipient1").val('');
         $("#message").val('');
         $('#pinType').text('Private');
         $scope.oModal3.show();
@@ -283,8 +291,16 @@
     
     $scope.pinStatus = { checked: true };     
 
+    recipientName = '';
+    $scope.grabInput = function(name) {
+      recipientName = name;
+    }
+
     $scope.dropPin = function () {
-      var recipient = sanitize($("#recipient").val());
+      if ($('#message').val().length == 0) {
+        return alert('no message');
+      }
+      var recipient = sanitize(recipientName);
       var newPin;
       var newPinId;
       $.getJSON(API_HOST + "/api/wUsers?filter[where][username]=" + recipient, function(user) {
@@ -302,18 +318,18 @@
             status = 'discovered';           
           }
 
-
-          
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
+        } else {
+          return alert('not valid user');
         }
       })
       .then(function() {
         $.post( API_HOST + "/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
           newPinId = pin.id;
           if (pin.type == 'public') {
-            dropped_pin = blue_pin;
+            dropped_pin = blue_pin_50;
           } else if (pin.type == 'private') {
-            dropped_pin = green_pin;
+            dropped_pin = green_pin_50;
           } else {
             dropped_pin = red_pin;
           }
