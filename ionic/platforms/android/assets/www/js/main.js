@@ -129,7 +129,7 @@
         $("#loginPassword").val('');
         $scope.oModal2.show();        
       } else if (index == 3) {
-        $("#recipient").val('');
+        $("#recipient1").val('');
         $("#message").val('');
         $('#pinType').text('Private');
         $scope.oModal3.show();
@@ -297,6 +297,9 @@
     }
 
     $scope.dropPin = function () {
+      if ($('#message').val().length == 0) {
+        return alert('no message');
+      }
       var recipient = sanitize(recipientName);
       var newPin;
       var newPinId;
@@ -315,18 +318,18 @@
             status = 'discovered';           
           }
 
-
-          
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
+        } else {
+          return alert('not valid user');
         }
       })
       .then(function() {
         $.post( API_HOST + "/api/wUsers/" + currentUser.id + "/pins", newPin, function (pin) {
           newPinId = pin.id;
           if (pin.type == 'public') {
-            dropped_pin = blue_pin;
+            dropped_pin = blue_pin_50;
           } else if (pin.type == 'private') {
-            dropped_pin = green_pin;
+            dropped_pin = green_pin_50;
           } else {
             dropped_pin = red_pin;
           }

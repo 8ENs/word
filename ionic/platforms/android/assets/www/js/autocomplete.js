@@ -111,7 +111,7 @@ app.directive('autocomplete', function() {
         "class": "lowercase",
         "id": "recipient",
         "inputclass": "",
-        "inputid": ""
+        "inputid": "recipient1"
       };
 
       for (var a in attrs) {
