@@ -296,9 +296,14 @@
       recipientName = name;
     }
 
+
+
     $scope.dropPin = function () {
       if ($('#message').val().length == 0) {
         return alert('no message');
+      }
+      if (recipientName == '') {
+        recipientName = $("#recipient1").val();
       }
       var recipient = sanitize(recipientName);
       var newPin;
@@ -319,6 +324,7 @@
           }
 
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
+          recipientName = '';
         } else {
           return alert('not valid user');
         }
@@ -555,7 +561,7 @@
 
               if (marker.pin.status == 'hidden') {
                 // if was hidden, now discovered
-                $scope.sendNotification("WOW! New *hidden* pin(s) discovered!", true);
+                // $scope.sendNotification("WOW! New *hidden* pin(s) discovered!", true);
                 marker.pin.status = 'discovered';
                 marker.setVisible(true);
                 $.ajax({
@@ -564,7 +570,7 @@
                   data: {"status": "discovered"}
                 });
               } else {
-                $scope.sendNotification("Unread Pins Nearby");
+                // $scope.sendNotification("Unread Pins Nearby");
               }
             } else {
               marker.setIcon(gray_pin_50);
@@ -583,7 +589,6 @@
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
 
             var distToPin = Math.round(dist.distance);
-
             if (distToPin < in_range && pin.status == 'discovered') {
               
               // two different pointers (sloppy)
@@ -772,7 +777,7 @@
 
     }, false);
 
-    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
+    // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
     
   }]);
 
