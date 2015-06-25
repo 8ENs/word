@@ -148,7 +148,6 @@
         currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
         accessToken = sessionStorage.getItem("token");
         $scope.loadPrivatePins();
-        $scope.paintDiscoveredMarkers();
         $scope.displayLoggedInMenus();
         $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
       }
@@ -412,8 +411,9 @@
             $scope.onPinClick(marker);
           });
         });
-        if (currentUser != null)
-          $scope.upgradePublicSaved()
+        if (currentUser != null) {
+          $scope.upgradePublicSaved();
+        }
       });
     }    
 
@@ -487,7 +487,7 @@
                   data: {"status": "discovered"}
                 });
               } else {
-                setTimeout(function(){alert('Unread pin(s) in range!')},100);
+                // setTimeout(function(){alert('Unread pin(s) in range!')},100);
               }
             } else {
               marker.setIcon(gray_pin_50);
