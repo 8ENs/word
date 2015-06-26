@@ -31,11 +31,11 @@
     $urlRouterProvider.otherwise('');
   })
 
-  .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', '$cordovaLocalNotification', '$ionicPlatform', '$ionicPopup', '$http',
-    function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform, $ionicPopup, $http) { // Putting these in strings allows minification not to break
+  .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', '$cordovaLocalNotification', '$ionicPlatform', '$ionicPopup', 
+    function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform, $ionicPopup) { // Putting these in strings allows minification not to break
     
     // set to true when doing a android build
-    var isAndroid = true;
+    var isAndroid = false;
 
     accessToken = null;
     currentUser = null;
@@ -210,8 +210,6 @@
           // sanitize swears...? ...shit
     }    
 
-    //check session
-    // not upgrading public/saved to full blue, and not paiting immediate inRange pins
     var loadSession = function(){
       console.log('loadSession');
       $scope.loadPublicPins();
@@ -219,8 +217,6 @@
         if(localStorage.getItem("currentUser")) {
           currentUser = JSON.parse(localStorage.getItem("currentUser"));
           accessToken = localStorage.getItem("token");
-          $scope.loadPrivatePins();
-          $scope.paintDiscoveredMarkers();
           $scope.displayLoggedInMenus();
           $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
         }
@@ -228,8 +224,6 @@
         if(sessionStorage.getItem("currentUser")) {
           currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
           accessToken = sessionStorage.getItem("token");
-          $scope.loadPrivatePins();
-          $scope.paintDiscoveredMarkers();
           $scope.displayLoggedInMenus();
           $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
         }
@@ -254,7 +248,7 @@
           } else {
             sessionStorage.setItem('token', accessToken);
           }
-          $http.get( API_HOST + "/api/wUsers/" + authData.userId, function(userJson) {
+          $.get( API_HOST + "/api/wUsers/" + authData.userId, function(userJson) {
             currentUser = userJson;
             if (isAndroid) {
               localStorage.setItem('currentUser', JSON.stringify(currentUser));
@@ -263,7 +257,6 @@
             }
             $scope.upgradePublicSaved();
             $scope.loadPrivatePins();
-            // might need to fully load before painting...if pins near immediate location, they may not turn half-green/blue
             $scope.closeModal(2);
             $scope.displayLoggedInMenus();
             $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
@@ -290,7 +283,7 @@
       var password = sanitize($("#regPassword").val());
       var regData = {email: email, password: password, firstname: firstName, lastname: lastName, username: userName};
       
-      $http.post( url, regData, function (data) {
+      $.post( url, regData, function (data) {
         $scope.login(email, password);
       })
       $scope.closeModal(1);
@@ -327,8 +320,6 @@
     $scope.grabInput = function(name) {
       recipientName = name;
     }
-
-
 
     $scope.dropPin = function () {
       if ($('#message').val().length == 0) {
@@ -407,10 +398,6 @@
       $scope.closeModal(3);
     }
 
-
-
-
-
     // MAP - INITIALIZE
 
     function initializeMap() {
@@ -448,11 +435,14 @@
         // Add a current location to the Map
         $scope.addCurrentGeo();
 
-        // Add all markers to map (default gray_pin_50)
-        // $scope.loadPublicPins();
-
         // Center
         $scope.centerCurrentLocation();
+
+        // Now that we know our current location, add all private markers to map (so that half green/blue toggle appropriately if in_range on load)
+        if (currentUser != null) {
+          $scope.loadPrivatePins();
+        } 
+        
 
         google.maps.event.addListener(currentLocation, 'dragend', function(event) {
           console.log('dragend');
@@ -505,7 +495,7 @@
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        draggable: false,
+        draggable: true,
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
@@ -539,16 +529,17 @@
         if (currentUser != null)
           $scope.upgradePublicSaved()
       });
-    }    
+    }  
+
+    isPublicSaved = function(marker) {
+      return (marker.pin.type == 'public' && marker.pin.status == 'saved');
+    }
 
     $scope.upgradePublicSaved = function() {
       console.log('upgradePublicSaved');
-      markers.forEach(function(marker) {
-        var colour = gray_pin_50;
-        if (marker.pin.type == 'public' && marker.pin.status == 'saved') {
-          colour = blue_pin;
-        }
-        marker.setIcon(colour);
+      var publicMarkers = markers.filter(isPublicSaved);
+      publicMarkers.forEach(function(marker) {
+          marker.setIcon(blue_pin);
       });
     }
 
@@ -589,6 +580,7 @@
     $scope.paintDiscoveredMarkers = function () {
       console.log('paintDiscoveredMarkers');
       var discoveredMarkers = markers.filter(isDiscovered);
+
       if (discoveredMarkers.length > 0) {
         discoveredMarkers.forEach(function(marker) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + marker.pin.coords.lat + "&pinLng=" + marker.pin.coords.lng, function(dist) {
@@ -799,13 +791,13 @@
         if (currentUser != null) {
           $scope.iterator([currentPin]);
 
+          // don't need this now that we're never dropping red pins
           markers.forEach(function(marker) {
             if (marker.icon.includes('red_pin'))
               marker.setIcon()
           });
 
           $scope.paintDiscoveredMarkers();
-        
       }
     }
 
@@ -820,14 +812,14 @@
     // Enable Background Mode on Device Ready.
     document.addEventListener('deviceready', function () {
         // Android customization
-        cordova.plugins.backgroundMode.setDefaults({ text:'Word on the Street Listening'});
+        cordova.plugins.backgroundMode.setDefaults({ text:'Word on the Street'});
         // Enable background mode
         cordova.plugins.backgroundMode.enable();
 
     }, false);
 
-    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
-    setInterval(queryDatabase, 30000); // updates current location every 10 seconds.
+    // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
+    // setInterval(queryDatabase, 30000); // updates current location every 10 seconds.
   }]);
 
 }());
