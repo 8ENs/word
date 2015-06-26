@@ -787,21 +787,22 @@
           marker = markers[i];
         }
       }
+     
       
       // Show the action sheet
       if (marker.pin.status == 'saved' && pin.type == 'private') {
         var hideSheet = $ionicActionSheet.show({
+          buttons: 
+          [
+            { text: 'Claim Prize!' }
+          ],
           titleText: titleText,
-          destructiveText: 'Delete',
           cancelText: 'Dismiss',
           cancel: function() {
             marker.setAnimation(null);
           },
-          destructiveButtonClicked: function() {
-            $scope.deletePin(pinId);
-            $("#pin_list").text('Pin deleted.');
-            currentPin = null;
-            return true;
+          buttonClicked: function(index) {
+            window.open("https://cdn4.iconfinder.com/data/icons/Starbucks_coffee/PNG/128/starbucks_coffee_1.png");
           }
         });    
       } else {
