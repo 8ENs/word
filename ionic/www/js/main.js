@@ -36,7 +36,7 @@
     function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform, $ionicPopup) { // Putting these in strings allows minification not to break
     
     // set to true when doing a android build
-    var isAndroid = true;
+    var isAndroid = false;
 
     accessToken = null;
     currentUser = null;
@@ -512,7 +512,7 @@
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        draggable: false,
+        draggable: true,
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
@@ -933,8 +933,8 @@
     }, false);
 
 
-    setInterval(updateCurrentLocation, 30000); // updates current location every 30 seconds.
-    setInterval(queryDatabase, 90000); // queries dB every 90 seconds. - set to 90 seconds until demo day scavenger hunt items are claimed.
+    // setInterval(updateCurrentLocation, 30000); // updates current location every 30 seconds.
+    // setInterval(queryDatabase, 90000); // queries dB every 90 seconds. - set to 90 seconds until demo day scavenger hunt items are claimed.
   }]);
 
 }());
