@@ -1,5 +1,5 @@
 (function() {
-  var API_HOST = window.API_HOST = 'http://wots.herokuapp.com';
+  window.API_HOST = 'http://wots.herokuapp.com';
 
   var blue_pin = API_HOST + '/images/blue_pin.png';
   var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
@@ -15,7 +15,7 @@
   var private_marker = API_HOST + '/images/private_marker.png';
   var discovered_marker = API_HOST + '/images/discovered_marker.png';
   var in_range = 100;
-  var pos;
+
 
   angular.module('word', ['ionic', 'ngCordova', 'autocomplete'])
   
@@ -410,14 +410,11 @@
       map = new google.maps.Map(document.getElementById("map-div"), mapOptions);
 
       $scope.map = map;
-      $scope.$apply();
-    }
 
+    }
+    $ionicPlatform.ready(loadSession);
     
-    google.maps.event.addDomListener(window, 'load', function onLoad(){
-      initializeMap();
-      $ionicPlatform.ready(loadSession);
-    });
+    google.maps.event.addDomListener(window, 'load', initializeMap);
 
 
     // MAP - GEO LOCATION CHECK
@@ -495,7 +492,7 @@
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        draggable: true,
+        draggable: false,
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
@@ -818,8 +815,8 @@
 
     }, false);
 
-    // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
-    // setInterval(queryDatabase, 30000); // updates current location every 10 seconds.
+    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
+    setInterval(queryDatabase, 180000); // syncs with db every 3 min
   }]);
 
 }());
