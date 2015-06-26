@@ -35,7 +35,7 @@
     function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform, $ionicPopup) { // Putting these in strings allows minification not to break
     
     // set to true when doing a android build
-    var isAndroid = true;
+    var isAndroid = false;
 
     accessToken = null;
     currentUser = null;
@@ -504,7 +504,7 @@
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        draggable: false,
+        draggable: true,
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
