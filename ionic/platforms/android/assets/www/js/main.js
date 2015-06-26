@@ -34,7 +34,7 @@
     function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform, $ionicPopup) { // Putting these in strings allows minification not to break
     
     // set to true when doing a android build
-    var isAndroid = true
+    var isAndroid = true;
 
     accessToken = null;
     currentUser = null;
@@ -416,7 +416,7 @@
       console.log('initializeMap');
       var mapOptions = {
         disableDefaultUI: true,
-        zoom: 14,
+        zoom: 17,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
       map = new google.maps.Map(document.getElementById("map-div"), mapOptions);
@@ -500,7 +500,7 @@
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        draggable: true,
+        draggable: false,
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
