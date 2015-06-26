@@ -171,6 +171,7 @@
         $("#nav_explore").show();
         $("#nav_logout").show();
         $("#nav_center_loc").show();
+        $("#nav_refresh").show();
         $("#nav_login").hide();
         $("#nav_register").hide();
       })
@@ -182,12 +183,13 @@
         $("#nav_explore").hide();
         $("#nav_logout").hide();
         $("#nav_center_loc").hide();
+        $("#nav_refresh").hide();
         $("#nav_login").show();
         $("#nav_register").show();
       })
     }
 
-    var resetMarkers = function() {
+    var resetNonPublicMarkers = function() {
       var i = markers.length;
       while (i--) {
         if (markers[i].pin.type != 'public') {
@@ -199,6 +201,15 @@
       }
     }
 
+    var clearAllMarkers = function() {
+      // setAllMap(null);
+      var i = markers.length;
+      while (i--) {
+        markers[i].setMap(null);
+      }
+      markers = [];
+    }
+
     // Sanitize inputs
     function sanitize(text) {
       return text
@@ -207,7 +218,6 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#039;");
-          // sanitize swears...? ...shit
     }    
 
     var loadSession = function(){
@@ -228,7 +238,6 @@
           $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
         }
       }
-
     }
 
     $scope.login = function (email, password) {
@@ -297,7 +306,7 @@
       currentUser = null;
       sessionStorage.clear();
       $("#pin_list").text("Welcome. Please login.");
-      resetMarkers();
+      resetNonPublicMarkers();
       displayLoggedOutMenus();
     } 
 
@@ -799,11 +808,18 @@
     }
 
     function queryDatabase() {
-      console.log("db load")
-      resetMarkers();
+      console.log("db load");
+      // resetNonPublicMarkers();
+      clearAllMarkers();
+      $scope.loadPublicPins();
       $scope.loadPrivatePins();
       $scope.paintDiscoveredMarkers();
+    }
 
+    $scope.refreshMap = function() {
+      console.log("refresh Map");
+      updateCurrentLocation();
+      queryDatabase();
     }
 
     // Enable Background Mode on Device Ready.
