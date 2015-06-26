@@ -10,7 +10,6 @@
                          img-src *">
     
     <title>Word on the Street</title>
-    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -127,16 +126,12 @@
         <ion-content>
           <form>
             <div class="list">
-            <autocomplete ng-model="yourchoice" data="recipientNames" on-select="grabInput" on-type="updateRecipientNames" name="recipient" id="recipient" maxlength="50" type="text"required></autocomplete>
+            <autocomplete ng-model="yourchoice" data="recipientNames" on-select="grabInput" on-type="updateRecipientNames" name="recipient" id="recipient" maxlength="50" type="text" required></autocomplete>
 
               <label class="item item-input">
                 <textarea placeholder="message..." rows="3" id="message" maxlength="140" required></textarea>
               </label>  
-            <ion-toggle 
-              ng-model="pinType.checked"
-              ng-change="pinTypeChange()">
-              Private
-            </ion-toggle> 
+
             <ion-toggle 
               ng-model="pinStatus.checked"
               ng-change="pinStatusChange()">

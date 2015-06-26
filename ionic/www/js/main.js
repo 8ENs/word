@@ -30,10 +30,11 @@
     $urlRouterProvider.otherwise('');
   })
 
-  .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', '$cordovaLocalNotification', '$ionicPlatform', 
-    function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform) { // Putting these in strings allows minification not to break
-    var isAndroid = ionic.Platform.isAndroid();
-
+  .controller('MapCtrl', ['$scope', '$ionicModal', '$ionicActionSheet', '$timeout', '$ionicSideMenuDelegate', '$cordovaLocalNotification', '$ionicPlatform', '$ionicPopup',
+    function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform, $ionicPopup) { // Putting these in strings allows minification not to break
+    
+    // set to true when doing a android build
+    var isAndroid = false;
 
     accessToken = null;
     currentUser = null;
@@ -50,7 +51,6 @@
 
     $scope.sendNotification = function(message, displayNow) {
       if (typeof displayNow === 'undefined') { optionalArg = false; }
-
       var now = Date.now();
       console.log(now);
       var lastSent = JSON.parse(sessionStorage.getItem("notificationSentTime"));
@@ -59,22 +59,34 @@
       console.log(timeElapsed)
 
       if (displayNow) {
-        $cordovaLocalNotification.schedule({
-            id: "1",
-            message: message,
-            title: "Word on the Street"
-        }).then(function () {
-            console.log("The time-insensitive notification has been set");
-        });
-      } else if (timeElapsed > 120000) {
+        if (isAndroid) {
           $cordovaLocalNotification.schedule({
               id: "1",
               message: message,
               title: "Word on the Street"
           }).then(function () {
-              console.log("The timed notification has been set");
+              console.log("The time-insensitive android notification has been sent");
+          });
+        } else {
+          $ionicPopup.alert({ title: message });
+          console.log("The time-insensitive web notification has been sent");
+        }
+        
+      } else if (timeElapsed > 120000) {
+        if (isAndroid) {
+          $cordovaLocalNotification.schedule({
+              id: "1",
+              message: message,
+              title: "Word on the Street"
+          }).then(function () {
+              console.log("The timed android notification has been sent");
               sessionStorage.setItem('notificationSentTime', JSON.stringify(now));
         });
+        } else {
+          $ionicPopup.alert({ title: message });
+          console.log("The timed web notification has been sent");
+          sessionStorage.setItem('notificationSentTime', JSON.stringify(now));
+        }
       } else {
         console.log('message not sent, stopped based on timing')
       }
@@ -202,14 +214,26 @@
     var loadSession = function(){
       console.log('loadSession');
       $scope.loadPublicPins();
-      if(sessionStorage.getItem("currentUser")) {
-        currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-        accessToken = sessionStorage.getItem("token");
-        $scope.loadPrivatePins();
-        $scope.paintDiscoveredMarkers();
-        $scope.displayLoggedInMenus();
-        $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
+      if (isAndroid) {
+        if(localStorage.getItem("currentUser")) {
+          currentUser = JSON.parse(localStorage.getItem("currentUser"));
+          accessToken = localStorage.getItem("token");
+          $scope.loadPrivatePins();
+          $scope.paintDiscoveredMarkers();
+          $scope.displayLoggedInMenus();
+          $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
+        }
+      } else {
+        if(sessionStorage.getItem("currentUser")) {
+          currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
+          accessToken = sessionStorage.getItem("token");
+          $scope.loadPrivatePins();
+          $scope.paintDiscoveredMarkers();
+          $scope.displayLoggedInMenus();
+          $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
+        }
       }
+
     }
 
     $scope.login = function (email, password) {
@@ -224,11 +248,18 @@
         success: function(auth) {
           authData = auth;
           accessToken = auth.id;
-          sessionStorage.setItem('token', accessToken);
-          
+          if (isAndroid) {
+            localStorage.setItem('token', accessToken);
+          } else {
+            sessionStorage.setItem('token', accessToken);
+          }
           $.get( API_HOST + "/api/wUsers/" + authData.userId, function(userJson) {
             currentUser = userJson;
-            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            if (isAndroid) {
+              localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            } else {
+              sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            }
             $scope.upgradePublicSaved();
             $scope.loadPrivatePins();
             // might need to fully load before painting...if pins near immediate location, they may not turn half-green/blue
@@ -239,7 +270,7 @@
         }
       })
       .fail(function() {
-        alert('login failed');
+        $ionicPopup.alert({ title: "Login Failed" });
       });
     }
 
@@ -300,7 +331,7 @@
 
     $scope.dropPin = function () {
       if ($('#message').val().length == 0) {
-        return alert('no message');
+        return $ionicPopup.alert({ title: "Please enter a message" });
       }
       if (recipientName == '') {
         recipientName = $("#recipient1").val();
@@ -326,7 +357,7 @@
           newPin = {recipient: recipient, message: message, coords: coords, type: type, status: status};
           recipientName = '';
         } else {
-          return alert('not valid user');
+          return $ionicPopup.alert({ title: "Pin not posted. Recipient username not valid." });
         }
       })
       .then(function() {
@@ -348,7 +379,12 @@
               animation: google.maps.Animation.DROP
             });
             marker.pin = pin;
-            markers.push(marker);
+            if (pin.status == 'hidden' && pin.recipient != currentUser.username && pin.type == "private"){
+              $ionicPopup.alert( {title: "you dropped a hidden pin"});
+            } else {
+              markers.push(marker);
+            }
+            
             console.log(marker);
             window.setTimeout(function() {
               if (marker.pin.type == 'public') {
@@ -380,7 +416,7 @@
       console.log('initializeMap');
       var mapOptions = {
         disableDefaultUI: true,
-        zoom: 14,
+        zoom: 17,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
       map = new google.maps.Map(document.getElementById("map-div"), mapOptions);
@@ -464,7 +500,7 @@
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        draggable: true,
+        draggable: false,
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
@@ -561,7 +597,7 @@
 
               if (marker.pin.status == 'hidden') {
                 // if was hidden, now discovered
-                // $scope.sendNotification("WOW! New *hidden* pin(s) discovered!", true);
+                $scope.sendNotification("WOW! New *hidden* pin(s) discovered!", true);
                 marker.pin.status = 'discovered';
                 marker.setVisible(true);
                 $.ajax({
@@ -570,7 +606,7 @@
                   data: {"status": "discovered"}
                 });
               } else {
-                // $scope.sendNotification("Unread Pins Nearby");
+                $scope.sendNotification("Unread Pins Nearby");
               }
             } else {
               marker.setIcon(gray_pin_50);
@@ -768,6 +804,14 @@
       }
     }
 
+    function queryDatabase() {
+      console.log("db load")
+      resetMarkers();
+      $scope.loadPrivatePins();
+      $scope.paintDiscoveredMarkers();
+
+    }
+
     // Enable Background Mode on Device Ready.
     document.addEventListener('deviceready', function () {
         // Android customization
@@ -777,8 +821,8 @@
 
     }, false);
 
-    // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
-    
+    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
+    setInterval(queryDatabase, 30000); // updates current location every 10 seconds.
   }]);
 
 }());

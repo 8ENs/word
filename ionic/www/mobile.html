@@ -10,7 +10,6 @@
                          img-src *">
     
     <title>Word on the Street</title>
-    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
 
     <link href="lib/ionic/css/ionic.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
@@ -22,7 +21,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 
     <script src="js/ng-cordova.js"></script>
-    <script src="cordova.js"></script>
+    <!--<script src="cordova.js"></script> -->
 
     <!-- your app's js -->
     <script src="js/main.js"></script>
@@ -132,11 +131,7 @@
               <label class="item item-input">
                 <textarea placeholder="message..." rows="3" id="message" maxlength="140" required></textarea>
               </label>  
-            <ion-toggle 
-              ng-model="pinType.checked"
-              ng-change="pinTypeChange()">
-              Private
-            </ion-toggle> 
+
             <ion-toggle 
               ng-model="pinStatus.checked"
               ng-change="pinStatusChange()">
