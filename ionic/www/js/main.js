@@ -35,7 +35,7 @@
     function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform, $ionicPopup) { // Putting these in strings allows minification not to break
     
     // set to true when doing a android build
-    var isAndroid = false;
+    var isAndroid = true;
 
     accessToken = null;
     currentUser = null;
@@ -43,11 +43,17 @@
     currentPin = null;
 
     $scope.recipientNames = [];
+
+    var updateUserNames = function () {
+      $scope.recipientNames = [];
        $.getJSON(API_HOST + "/api/wUsers", function(users){
          users.forEach(function(user){
            $scope.recipientNames.push(user.username);
          })
        });
+    }
+
+    updateUserNames();
 
 
     $scope.sendNotification = function(message, displayNow) {
@@ -73,6 +79,7 @@
           console.log("The time-insensitive web notification has been sent");
         }
         
+        //set how often the unread pin msg appears here
       } else if (timeElapsed > 120000) {
         if (isAndroid) {
           $cordovaLocalNotification.schedule({
@@ -497,7 +504,7 @@
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        draggable: true,
+        draggable: false,
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
@@ -636,7 +643,7 @@
 
               if (marker.pin.status == 'hidden') {
                 // if was hidden, now discovered
-                $scope.sendNotification("WOW! New *hidden* pin(s) discovered!", true);
+                $scope.sendNotification("New *hidden* pin(s) discovered!", true);
                 marker.pin.status = 'discovered';
                 marker.setVisible(true);
                 $.ajax({
@@ -645,7 +652,7 @@
                   data: {"status": "discovered"}
                 });
               } else {
-                $scope.sendNotification("Unread Pins Nearby");
+                $scope.sendNotification("There are unread pins nearby!");
               }
             } else {
               marker.setIcon(gray_pin_50);
@@ -708,8 +715,8 @@
             if (pin.status == 'saved') {
               if (pin.type == 'sponsored') {
                 if (pin.recipient == currentUser.username) {
-                  $("#pin_list").text('Congrats, ' + currentUser.firstname + ', you won: "' + pin.message + '" - ' + pin.wUser.firstname + ' (' + distToPin + 'm)');
-                  titleText = 'Congrats, ' + currentUser.firstname + ', you won: "' + pin.message + '" - ' + pin.wUser.firstname;
+                  $("#pin_list").text('Congrats, ' + currentUser.firstname + ', you won: a prize, open pin for details - ' + pin.wUser.firstname + ' (' + distToPin + 'm)');
+                  titleText = 'Congrats, ' + currentUser.firstname + ', you won:' + pin.message;
                 } else {
                   $("#pin_list").text('Snap! This prize has already been claimed by, ' + pin.recipient + '. Keep hunting!');
                   titleText = 'Snap! This prize has already been claimed by, ' + pin.recipient + '. Keep hunting!';
@@ -868,9 +875,9 @@
       if (currentUser != null) {
         console.log("db load")
         resetMarkers();
-        $scope.loadPublicPins();
         $scope.loadSponsoredPins();
         $scope.loadPrivatePins();
+        updateUserNames(); // take this out after demo day, make it every 30 min or something
       }
     }
 
@@ -883,8 +890,8 @@
 
     }, false);
 
-    // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
-    // setInterval(queryDatabase, 100000); // queries dB every 100 seconds.
+    setInterval(updateCurrentLocation, 30000); // updates current location every 30 seconds.
+    setInterval(queryDatabase, 90000); // queries dB every 90 seconds. - set to 90 seconds until demo day scavenger hunt items are claimed.
   }]);
 
 }());
