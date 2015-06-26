@@ -868,6 +868,8 @@
       if (currentUser != null) {
         console.log("db load")
         resetMarkers();
+        $scope.loadPublicPins();
+        $scope.loadSponsoredPins();
         $scope.loadPrivatePins();
       }
     }
@@ -882,7 +884,7 @@
     }, false);
 
     // setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
-    // setInterval(queryDatabase, 30000); // queries dB every 10 seconds.
+    // setInterval(queryDatabase, 100000); // queries dB every 100 seconds.
   }]);
 
 }());
