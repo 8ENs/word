@@ -1,11 +1,12 @@
 (function() {
-  var API_HOST = window.API_HOST = 'http://wots.herokuapp.com';
+  window.API_HOST = 'http://wots.herokuapp.com';
 
   var blue_pin = API_HOST + '/images/blue_pin.png';
   var blue_pin_50 = API_HOST + '/images/blue_pin_50.png';
   var green_pin = API_HOST + '/images/green_pin.png';
   var green_pin_50 = API_HOST + '/images/green_pin_50.png';
   var yellow_pin = API_HOST + '/images/yellow_pin.png';
+  var yellow_pin_wide = API_HOST + '/images/yellow_pin_wide.png';
   var yellow_pin_50 = API_HOST + '/images/yellow_pin_50.png';
   var red_pin = API_HOST + '/images/red_pin.png';
   var red_pin_50 = API_HOST + '/images/red_pin_50.png';
@@ -15,7 +16,7 @@
   var private_marker = API_HOST + '/images/private_marker.png';
   var discovered_marker = API_HOST + '/images/discovered_marker.png';
   var in_range = 100;
-  var pos;
+
 
   angular.module('word', ['ionic', 'ngCordova', 'autocomplete'])
   
@@ -178,6 +179,7 @@
         $("#nav_explore").show();
         $("#nav_logout").show();
         $("#nav_center_loc").show();
+        $("#nav_refresh").show();
         $("#nav_login").hide();
         $("#nav_register").hide();
       })
@@ -189,12 +191,13 @@
         $("#nav_explore").hide();
         $("#nav_logout").hide();
         $("#nav_center_loc").hide();
+        $("#nav_refresh").hide();
         $("#nav_login").show();
         $("#nav_register").show();
       })
     }
 
-    var resetMarkers = function() {
+    var resetNonPublicMarkers = function() {
       var i = markers.length;
       while (i--) {
         if (markers[i].pin.type != 'public') {
@@ -206,6 +209,15 @@
       }
     }
 
+    var clearAllMarkers = function() {
+      // setAllMap(null);
+      var i = markers.length;
+      while (i--) {
+        markers[i].setMap(null);
+      }
+      markers = [];
+    }
+
     // Sanitize inputs
     function sanitize(text) {
       return text
@@ -214,7 +226,6 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;")
           .replace(/'/g, "&#039;");
-          // sanitize swears...? ...shit
     }    
 
     var loadSession = function(){
@@ -236,7 +247,6 @@
           $("#pin_list").text('Welcome ' + currentUser.firstname + '. Time to get crackin!');
         }
       }
-
     }
 
     $scope.login = function (email, password) {
@@ -264,6 +274,7 @@
               sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
             }
             $scope.upgradePublicSaved();
+            $scope.loadSponsoredPins();
             $scope.upgradeSponsoredSaved();
             $scope.loadPrivatePins();
             $scope.closeModal(2);
@@ -306,7 +317,7 @@
       currentUser = null;
       sessionStorage.clear();
       $("#pin_list").text("Welcome. Please login.");
-      resetMarkers();
+      resetNonPublicMarkers();
       displayLoggedOutMenus();
     } 
 
@@ -419,14 +430,11 @@
       map = new google.maps.Map(document.getElementById("map-div"), mapOptions);
 
       $scope.map = map;
-      $scope.$apply();
-    }
 
+    }
+    $ionicPlatform.ready(loadSession);
     
-    google.maps.event.addDomListener(window, 'load', function onLoad(){
-      initializeMap();
-      $ionicPlatform.ready(loadSession);
-    });
+    google.maps.event.addDomListener(window, 'load', initializeMap);
 
 
     // MAP - GEO LOCATION CHECK
@@ -504,7 +512,7 @@
       currentLocation = new google.maps.Marker({
         map: map,
         position: pos,
-        draggable: true,
+        draggable: false,
         icon: current_loc_icon,
         zIndex: google.maps.Marker.MAX_ZINDEX + 1
       });
@@ -716,7 +724,7 @@
               if (pin.type == 'sponsored') {
                 if (pin.recipient == currentUser.username) {
                   $("#pin_list").text('Congrats, ' + currentUser.firstname + ', you won: a prize, open pin for details - ' + pin.wUser.firstname + ' (' + distToPin + 'm)');
-                  titleText = 'Congrats, ' + currentUser.firstname + ', you won:' + pin.message;
+                  titleText = 'Congrats, ' + currentUser.firstname + ', you won: ' + pin.message;
                 } else {
                   $("#pin_list").text('Snap! This prize has already been claimed by, ' + pin.recipient + '. Keep hunting!');
                   titleText = 'Snap! This prize has already been claimed by, ' + pin.recipient + '. Keep hunting!';
@@ -761,6 +769,9 @@
             } else if (pin.status == 'discovered'){
               pic = discovered_marker;
               pin.message = '(Discovered Pin!)';
+            } else if (pin.type == 'sponsored'){ 
+              pic = yellow_pin;
+              pin.message = 'Sponsered Pin!' 
             } else if (pin.status == 'hidden'){
               pic = discovered_marker;
               pin.message = '(Hidden message!)';
@@ -803,7 +814,30 @@
             currentPin = null;
             return true;
           }
-        });    
+        });
+        
+      } else if (marker.pin.type == 'sponsored' && pin.recipient == currentUser.username){
+
+        var hideSheet = $ionicActionSheet.show({
+
+          titleText: "Go to this url in the browser: " + pin.media,
+          cancelText: 'Dismiss',
+          cancel: function() {
+            marker.setAnimation(null);
+          }
+        });
+   
+      } else if (marker.pin.type == 'sponsored' && pin.recipient != currentUser.username){
+
+        var hideSheet = $ionicActionSheet.show({
+
+          titleText: titleText,
+          cancelText: 'Dismiss',
+          cancel: function() {
+            marker.setAnimation(null);
+          }
+        });
+   
       } else {
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
@@ -871,14 +905,22 @@
     }
 
     function queryDatabase() {
-      // users can't click on pins unless logged in so should only query db to redraw if logged in
-      if (currentUser != null) {
-        console.log("db load")
-        resetMarkers();
-        $scope.loadSponsoredPins();
-        $scope.loadPrivatePins();
-        updateUserNames(); // take this out after demo day, make it every 30 min or something
-      }
+
+      console.log("db load");
+      // resetNonPublicMarkers();
+      clearAllMarkers();
+      $scope.loadPublicPins();
+      $scope.loadPrivatePins();
+      $scope.paintDiscoveredMarkers();
+      $scope.loadSponsoredPins();
+      $scope.upgradeSponsoredSaved();
+      updateUserNames(); // take this out after demo day, make it every 30 min or something
+    }
+
+    $scope.refreshMap = function() {
+      console.log("refresh Map");
+      updateCurrentLocation();
+      queryDatabase();
     }
 
     // Enable Background Mode on Device Ready.
@@ -890,8 +932,9 @@
 
     }, false);
 
+
     setInterval(updateCurrentLocation, 30000); // updates current location every 30 seconds.
-    setInterval(queryDatabase, 60000); // queries dB every 60 seconds. - set to 60 seconds until demo day scavenger hunt items are claimed.
+    setInterval(queryDatabase, 90000); // queries dB every 90 seconds. - set to 90 seconds until demo day scavenger hunt items are claimed.
   }]);
 
 }());

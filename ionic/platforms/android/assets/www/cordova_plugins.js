@@ -6,10 +6,11 @@ module.exports = [
         "runs": true
     },
     {
-        "file": "plugins/org.apache.cordova.device/www/device.js",
-        "id": "org.apache.cordova.device.device",
+        "file": "plugins/de.appplant.cordova.plugin.background-mode/www/background-mode.js",
+        "id": "de.appplant.cordova.plugin.background-mode.BackgroundMode",
         "clobbers": [
-            "device"
+            "cordova.plugins.backgroundMode",
+            "plugin.backgroundMode"
         ]
     },
     {
@@ -21,11 +22,10 @@ module.exports = [
         ]
     },
     {
-        "file": "plugins/de.appplant.cordova.plugin.background-mode/www/background-mode.js",
-        "id": "de.appplant.cordova.plugin.background-mode.BackgroundMode",
+        "file": "plugins/org.apache.cordova.device/www/device.js",
+        "id": "org.apache.cordova.device.device",
         "clobbers": [
-            "cordova.plugins.backgroundMode",
-            "plugin.backgroundMode"
+            "device"
         ]
     }
 ];
@@ -34,9 +34,9 @@ module.exports.metadata =
 {
     "cordova-plugin-geolocation": "1.0.2-dev",
     "cordova-plugin-whitelist": "1.0.0",
-    "org.apache.cordova.device": "0.3.0",
+    "de.appplant.cordova.plugin.background-mode": "0.6.4",
     "de.appplant.cordova.plugin.local-notification": "0.8.1",
-    "de.appplant.cordova.plugin.background-mode": "0.6.4"
+    "org.apache.cordova.device": "0.3.0"
 }
 // BOTTOM OF METADATA
 });

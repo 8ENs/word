@@ -26,7 +26,12 @@ h6 {
     font-weight: 400;
 }
 
-.intro-header {
+.text-standout {
+    color:#337ab7;
+    font-weight:bold;
+}
+
+.intro-header, .hints-header {
     padding-top: 50px; /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
     padding-bottom: 50px;
     text-align: center;
@@ -35,10 +40,17 @@ h6 {
     background-size: cover;
 }
 
+.hints-header {background:lightgrey;}
+
 .intro-message {
     position: relative;
     padding-top: 20%;
-    padding-bottom: 20%;
+    padding-bottom: 5%;
+}
+
+.hint-list-message {
+    padding-top: 20%;
+    padding-bottom: 5%;
 }
 
 .intro-message > h1 {
@@ -67,8 +79,8 @@ h6 {
     }
 
     ul.intro-social-buttons > li {
-        display: block;
-        margin-bottom: 20px;
+        display: block-inline;
+        margin: 10px 5px 10px 5px;
         padding: 0;
     }
 
@@ -146,7 +158,7 @@ h6 {
     }
 
     ul.banner-social-buttons > li {
-        display: block;
+        display: block-inline;
         margin-bottom: 20px;
         padding: 0;
     }
@@ -179,4 +191,10 @@ p.copyright {
 
 @media (max-width: 480px) {
     h2{font-size: 24px;}
+    .platform-version-button{width:80px;height:80px;}
+    .intro-message h3{
+        font-size:17px;
+        padding-top: 3%;
+        padding-bottom: 3%;
+    }
 }

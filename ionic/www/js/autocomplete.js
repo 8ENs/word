@@ -110,7 +110,7 @@ app.directive('autocomplete', function() {
         "placeholder": " username",
         "class": "lowercase",
         "id": "recipient",
-        "inputclass": "",
+        "inputclass": "lowercase",
         "inputid": "recipient1"
       };
 
