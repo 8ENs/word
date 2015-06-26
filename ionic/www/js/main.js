@@ -35,7 +35,7 @@
     function($scope, $ionicModal, $ionicActionSheet, $timeout, $ionicSideMenuDelegate, $cordovaLocalNotification, $ionicPlatform, $ionicPopup) { // Putting these in strings allows minification not to break
     
     // set to true when doing a android build
-    var isAndroid = false;
+    var isAndroid = true;
 
     accessToken = null;
     currentUser = null;
@@ -43,11 +43,17 @@
     currentPin = null;
 
     $scope.recipientNames = [];
+
+    var updateUserNames = function () {
+      $scope.recipientNames = [];
        $.getJSON(API_HOST + "/api/wUsers", function(users){
          users.forEach(function(user){
            $scope.recipientNames.push(user.username);
          })
        });
+    }
+
+    updateUserNames();
 
 
     $scope.sendNotification = function(message, displayNow) {
@@ -73,6 +79,7 @@
           console.log("The time-insensitive web notification has been sent");
         }
         
+        //set how often the unread pin msg appears here
       } else if (timeElapsed > 120000) {
         if (isAndroid) {
           $cordovaLocalNotification.schedule({
@@ -213,6 +220,7 @@
     var loadSession = function(){
       console.log('loadSession');
       $scope.loadPublicPins();
+      $scope.loadSponsoredPins();
       if (isAndroid) {
         if(localStorage.getItem("currentUser")) {
           currentUser = JSON.parse(localStorage.getItem("currentUser"));
@@ -256,6 +264,7 @@
               sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
             }
             $scope.upgradePublicSaved();
+            $scope.upgradeSponsoredSaved();
             $scope.loadPrivatePins();
             $scope.closeModal(2);
             $scope.displayLoggedInMenus();
@@ -404,7 +413,7 @@
       console.log('initializeMap');
       var mapOptions = {
         disableDefaultUI: true,
-        zoom: 17,
+        zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
       };
       map = new google.maps.Map(document.getElementById("map-div"), mapOptions);
@@ -524,7 +533,7 @@
           });
         });
         if (currentUser != null)
-          $scope.upgradePublicSaved()
+          $scope.upgradePublicSaved();
       });
     }  
 
@@ -537,6 +546,44 @@
       var publicMarkers = markers.filter(isPublicSaved);
       publicMarkers.forEach(function(marker) {
           marker.setIcon(blue_pin);
+      });
+    }
+
+    $scope.loadSponsoredPins = function() {
+      console.log('loadSponsoredPins');
+      // markers = [];
+      $.getJSON(API_HOST + "/api/Pins?filter[include]=wUser&filter[where][type]=sponsored", function(pins) {
+        pins.forEach(function(pin) {
+          var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(pin.coords.lat, pin.coords.lng),
+            map: map,
+            icon: gray_pin_50,
+            visible: false
+          });
+          marker.pin = pin;
+          if (marker.pin.status != 'hidden') {
+            marker.setVisible(true);
+          }
+          markers.push(marker);
+          google.maps.event.addListener(marker, 'click', function() {
+            pinClicked = true;
+            $scope.onPinClick(marker);
+          });
+        });
+        if (currentUser != null)
+          $scope.upgradeSponsoredSaved();
+      });
+    }  
+
+    isSponsoredSaved = function(marker) {
+      return (marker.pin.type == 'sponsored' && marker.pin.status == 'saved');
+    }
+
+    $scope.upgradeSponsoredSaved = function() {
+      console.log('upgradeSponsoredSaved');
+      var sponsoredMarkers = markers.filter(isSponsoredSaved);
+      sponsoredMarkers.forEach(function(marker) {
+          marker.setIcon(yellow_pin);
       });
     }
 
@@ -570,16 +617,16 @@
       });
     }   
 
-    isDiscovered = function(marker) {
+    isDiscoveredOrHidden = function(marker) {
       return (marker.pin.status == 'discovered' || marker.pin.status == 'hidden');
     }
 
     $scope.paintDiscoveredMarkers = function () {
       console.log('paintDiscoveredMarkers');
-      var discoveredMarkers = markers.filter(isDiscovered);
+      var discoveredOrHiddenMarkers = markers.filter(isDiscoveredOrHidden);
 
-      if (discoveredMarkers.length > 0) {
-        discoveredMarkers.forEach(function(marker) {
+      if (discoveredOrHiddenMarkers.length > 0) {
+        discoveredOrHiddenMarkers.forEach(function(marker) {
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + marker.pin.coords.lat + "&pinLng=" + marker.pin.coords.lng, function(dist) {
             if (Math.round(dist.distance) < in_range) {
               // update temp in-range colour
@@ -587,11 +634,13 @@
                 marker.setIcon(blue_pin_50);
               } else if (marker.pin.type == 'private') {
                 marker.setIcon(green_pin_50);
+              } else if (marker.pin.type == 'sponsored') {
+                marker.setIcon(yellow_pin_50);
               }
 
               if (marker.pin.status == 'hidden') {
                 // if was hidden, now discovered
-                $scope.sendNotification("WOW! New *hidden* pin(s) discovered!", true);
+                $scope.sendNotification("New *hidden* pin(s) discovered!", true);
                 marker.pin.status = 'discovered';
                 marker.setVisible(true);
                 $.ajax({
@@ -600,7 +649,7 @@
                   data: {"status": "discovered"}
                 });
               } else {
-                $scope.sendNotification("Unread Pins Nearby");
+                $scope.sendNotification("There are unread pins nearby!");
               }
             } else {
               marker.setIcon(gray_pin_50);
@@ -629,6 +678,14 @@
                 marker.setIcon(blue_pin);
               } else if (pin.type == 'private') {
                 marker.setIcon(green_pin);
+              } else if (pin.type == 'sponsored') {
+                marker.setIcon(yellow_pin);
+                pin.recipient = currentUser.username;
+                $.ajax({
+                  url: API_HOST + "/api/Pins/" + pin.id,
+                  type: 'PUT',
+                  data: {"recipient": currentUser.username}
+                });
               }
 
               $.ajax({
@@ -638,6 +695,8 @@
               });
             } 
 
+          })
+          .then(function() {
             $scope.iterator([pin]);
           });
         });
@@ -651,8 +710,18 @@
           $.getJSON(API_HOST + "/api/Pins/distance?currentLat=" + pos.A + "&currentLng=" + pos.F + "&pinLat=" + pin.coords.lat + "&pinLng=" + pin.coords.lng, function(dist) {
             var distToPin = Math.round(dist.distance);
             if (pin.status == 'saved') {
-              $("#pin_list").text('"' + pin.message + '" - ' + pin.wUser.firstname + ' (' + Math.round(dist.distance) + 'm)');
-              titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
+              if (pin.type == 'sponsored') {
+                if (pin.recipient == currentUser.username) {
+                  $("#pin_list").text('Congrats, ' + currentUser.firstname + ', you won: a prize, open pin for details - ' + pin.wUser.firstname + ' (' + distToPin + 'm)');
+                  titleText = 'Congrats, ' + currentUser.firstname + ', you won:' + pin.message;
+                } else {
+                  $("#pin_list").text('Snap! This prize has already been claimed by, ' + pin.recipient + '. Keep hunting!');
+                  titleText = 'Snap! This prize has already been claimed by, ' + pin.recipient + '. Keep hunting!';
+                }
+              } else {
+                $("#pin_list").text('"' + pin.message + '" - ' + pin.wUser.firstname + ' (' + distToPin + 'm)');
+                titleText = '"' + pin.message + '" - ' + pin.wUser.firstname;
+              }
             } else if (distToPin < in_range) {
               $("#pin_list").text("You are close enough! Touch the pin to open.");
               titleText = '"' + pin.message + '" - ' + pin.wUser.firstname + ' (Pin Found!)';
@@ -717,7 +786,7 @@
       }
       
       // Show the action sheet
-      if (marker.pin.status == 'saved' && pin.type != 'public') {
+      if (marker.pin.status == 'saved' && pin.type == 'private') {
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
           destructiveText: 'Delete',
@@ -799,11 +868,14 @@
     }
 
     function queryDatabase() {
-      console.log("db load")
-      resetMarkers();
-      $scope.loadPrivatePins();
-      $scope.paintDiscoveredMarkers();
-
+      // users can't click on pins unless logged in so should only query db to redraw if logged in
+      if (currentUser != null) {
+        console.log("db load")
+        resetMarkers();
+        $scope.loadSponsoredPins();
+        $scope.loadPrivatePins();
+        updateUserNames(); // take this out after demo day, make it every 30 min or something
+      }
     }
 
     // Enable Background Mode on Device Ready.
@@ -815,8 +887,9 @@
 
     }, false);
 
-    setInterval(updateCurrentLocation, 10000); // updates current location every 10 seconds.
-    setInterval(queryDatabase, 180000); // syncs with db every 3 min
+
+    setInterval(updateCurrentLocation, 30000); // updates current location every 30 seconds.
+    setInterval(queryDatabase, 90000); // queries dB every 90 seconds. - set to 90 seconds until demo day scavenger hunt items are claimed.
   }]);
 
 }());
