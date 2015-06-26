@@ -804,15 +804,18 @@
       if (marker.pin.status == 'saved' && pin.type == 'private') {
         var hideSheet = $ionicActionSheet.show({
           titleText: titleText,
+          destructiveText: 'Delete',
           cancelText: 'Dismiss',
-          destructiveText: 'Delete'
           cancel: function() {
             marker.setAnimation(null);
           },
-          buttonClicked: function(index) {
-            window.open("https://cdn4.iconfinder.com/data/icons/Starbucks_coffee/PNG/128/starbucks_coffee_1.png");
+          destructiveButtonClicked: function() {
+            $scope.deletePin(pinId);
+            $("#pin_list").text('Pin deleted.');
+            currentPin = null;
+            return true;
           }
-        });
+        }); 
         
       } else if (marker.pin.type == 'sponsored' && pin.recipient == currentUser.username){
 
