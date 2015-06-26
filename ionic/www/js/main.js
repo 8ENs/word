@@ -803,12 +803,9 @@
       // Show the action sheet
       if (marker.pin.status == 'saved' && pin.type == 'private') {
         var hideSheet = $ionicActionSheet.show({
-          buttons: 
-          [
-            { text: 'Claim Prize!' }
-          ],
           titleText: titleText,
           cancelText: 'Dismiss',
+          destructiveText: 'Delete'
           cancel: function() {
             marker.setAnimation(null);
           },
